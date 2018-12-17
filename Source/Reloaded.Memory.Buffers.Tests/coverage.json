@@ -1,0 +1,1586 @@
+{
+  "Reloaded.Memory.Buffers.dll": {
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\MemoryBuffer.cs": {
+      "Reloaded.Memory.Buffers.MemoryBuffer": {
+        "System.Int32 Reloaded.Memory.Buffers.MemoryBuffer::get_BufferOverhead()": {
+          "Lines": {
+            "24": 1548
+          },
+          "Branches": []
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.MemoryBuffer::get_AllocationAddress()": {
+          "Lines": {
+            "27": 514
+          },
+          "Branches": []
+        },
+        "Reloaded.Memory.Sources.IMemory Reloaded.Memory.Buffers.MemoryBuffer::get_MemorySource()": {
+          "Lines": {
+            "38": 149283
+          },
+          "Branches": []
+        },
+        "Reloaded.Memory.Buffers.Structs.MemoryBufferHeader Reloaded.Memory.Buffers.MemoryBuffer::get_BufferHeader()": {
+          "Lines": {
+            "43": 245404,
+            "44": 245404
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.MemoryBuffer::set_BufferHeader(Reloaded.Memory.Buffers.Structs.MemoryBufferHeader)": {
+          "Lines": {
+            "45": 16522
+          },
+          "Branches": []
+        },
+        "Reloaded.Memory.Buffers.MemoryBuffer Reloaded.Memory.Buffers.MemoryBuffer::FromAddress(System.Diagnostics.Process,System.IntPtr)": {
+          "Lines": {
+            "114": 513,
+            "116": 513,
+            "117": 513,
+            "119": 513,
+            "120": 513,
+            "121": 513,
+            "122": 513,
+            "123": 0,
+            "125": 0,
+            "126": 513
+          },
+          "Branches": [
+            {
+              "Line": 119,
+              "Offset": 40,
+              "EndOffset": 42,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 513
+            },
+            {
+              "Line": 121,
+              "Offset": 52,
+              "EndOffset": 54,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 513
+            },
+            {
+              "Line": 121,
+              "Offset": 52,
+              "EndOffset": 81,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 0
+            },
+            {
+              "Line": 119,
+              "Offset": 40,
+              "EndOffset": 82,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 0
+            }
+          ]
+        },
+        "System.Boolean Reloaded.Memory.Buffers.MemoryBuffer::IsBuffer(System.Diagnostics.Process,System.IntPtr)": {
+          "Lines": {
+            "139": 1722,
+            "141": 1722,
+            "142": 1722,
+            "144": 1703,
+            "145": 1026,
+            "146": 677,
+            "147": 57,
+            "149": 696,
+            "150": 1722
+          },
+          "Branches": [
+            {
+              "Line": 144,
+              "Offset": 32,
+              "EndOffset": 34,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1026
+            },
+            {
+              "Line": 144,
+              "Offset": 32,
+              "EndOffset": 38,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 677
+            }
+          ]
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.MemoryBuffer::Add(System.Byte[])": {
+          "Lines": {
+            "165": 8002,
+            "167": 8002,
+            "168": 8002,
+            "172": 8002,
+            "173": 0,
+            "176": 8002,
+            "180": 8002,
+            "181": 8002,
+            "184": 8002,
+            "185": 2,
+            "186": 2,
+            "187": 2,
+            "188": 2,
+            "192": 8000,
+            "193": 8000,
+            "194": 8000,
+            "197": 8000,
+            "198": 8000,
+            "199": 8000,
+            "201": 8000,
+            "203": 8002
+          },
+          "Branches": [
+            {
+              "Line": 172,
+              "Offset": 47,
+              "EndOffset": 22,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 0
+            },
+            {
+              "Line": 172,
+              "Offset": 47,
+              "EndOffset": 49,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 8002
+            },
+            {
+              "Line": 184,
+              "Offset": 81,
+              "EndOffset": 83,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 8000
+            },
+            {
+              "Line": 184,
+              "Offset": 81,
+              "EndOffset": 101,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 2
+            },
+            {
+              "Line": 184,
+              "Offset": 106,
+              "EndOffset": 108,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 2
+            },
+            {
+              "Line": 184,
+              "Offset": 106,
+              "EndOffset": 134,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 8000
+            }
+          ]
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.MemoryBuffer::Add(TStructure&,System.Boolean)": {
+          "Lines": {
+            "213": 8002,
+            "214": 8002,
+            "215": 8002
+          },
+          "Branches": []
+        },
+        "System.Boolean Reloaded.Memory.Buffers.MemoryBuffer::CanItemFit(System.Int32)": {
+          "Lines": {
+            "223": 73668,
+            "225": 73668,
+            "226": 73668
+          },
+          "Branches": []
+        },
+        "System.Boolean Reloaded.Memory.Buffers.MemoryBuffer::Equals(System.Object)": {
+          "Lines": {
+            "236": 29764,
+            "238": 29764,
+            "239": 29764,
+            "240": 29764
+          },
+          "Branches": [
+            {
+              "Line": 239,
+              "Offset": 9,
+              "EndOffset": 11,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 29764
+            },
+            {
+              "Line": 239,
+              "Offset": 9,
+              "EndOffset": 30,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 0
+            }
+          ]
+        },
+        "Reloaded.Memory.Sources.IMemory Reloaded.Memory.Buffers.MemoryBuffer::GetMemorySource(System.Diagnostics.Process)": {
+          "Lines": {
+            "254": 2751,
+            "255": 2751,
+            "256": 1611,
+            "258": 1140,
+            "259": 2751
+          },
+          "Branches": [
+            {
+              "Line": 255,
+              "Offset": 21,
+              "EndOffset": 23,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1611
+            },
+            {
+              "Line": 255,
+              "Offset": 21,
+              "EndOffset": 31,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1140
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.MemoryBuffer::.ctor(System.Diagnostics.Process,System.IntPtr,System.Int32,System.Boolean)": {
+          "Lines": {
+            "30": 1029,
+            "68": 516,
+            "69": 516,
+            "70": 516,
+            "71": 516,
+            "73": 516,
+            "74": 516,
+            "76": 516,
+            "77": 0,
+            "78": 516,
+            "81": 516,
+            "82": 516,
+            "85": 516,
+            "86": 516,
+            "87": 516,
+            "89": 516,
+            "90": 516
+          },
+          "Branches": [
+            {
+              "Line": 70,
+              "Offset": 26,
+              "EndOffset": 28,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 516
+            },
+            {
+              "Line": 76,
+              "Offset": 69,
+              "EndOffset": 71,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 0
+            },
+            {
+              "Line": 76,
+              "Offset": 69,
+              "EndOffset": 115,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 516
+            },
+            {
+              "Line": 70,
+              "Offset": 26,
+              "EndOffset": 116,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 516
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.MemoryBuffer::.ctor(Reloaded.Memory.Sources.IMemory,System.IntPtr)": {
+          "Lines": {
+            "97": 513,
+            "98": 513,
+            "99": 513,
+            "100": 513,
+            "101": 513
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.MemoryBuffer::.cctor()": {
+          "Lines": {
+            "33": 1
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\MemoryBufferHelper.cs": {
+      "Reloaded.Memory.Buffers.MemoryBufferHelper": {
+        "System.Diagnostics.Process Reloaded.Memory.Buffers.MemoryBufferHelper::get_Process()": {
+          "Lines": {
+            "29": 1068
+          },
+          "Branches": []
+        },
+        "Reloaded.Memory.Buffers.Structs.BufferAllocationProperties Reloaded.Memory.Buffers.MemoryBufferHelper::FindBufferLocation(System.Int32,System.IntPtr,System.IntPtr)": {
+          "Lines": {
+            "55": 516,
+            "56": 516,
+            "57": 516,
+            "60": 190924,
+            "61": 94946,
+            "62": 94946,
+            "63": 94946,
+            "64": 516,
+            "65": 94430,
+            "67": 0,
+            "68": 516
+          },
+          "Branches": [
+            {
+              "Line": 60,
+              "Offset": 90,
+              "EndOffset": 31,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 94946
+            },
+            {
+              "Line": 63,
+              "Offset": 68,
+              "EndOffset": 70,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 516
+            },
+            {
+              "Line": 63,
+              "Offset": 68,
+              "EndOffset": 82,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 94430
+            },
+            {
+              "Line": 60,
+              "Offset": 90,
+              "EndOffset": 92,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 0
+            }
+          ]
+        },
+        "Reloaded.Memory.Buffers.MemoryBuffer Reloaded.Memory.Buffers.MemoryBufferHelper::CreateMemoryBuffer(System.Int32,System.Int64,System.Int64,System.Int32)": {
+          "Lines": {
+            "80": 516,
+            "82": 516,
+            "83": 516,
+            "84": 516,
+            "85": 1032,
+            "86": 516,
+            "88": 516,
+            "89": 516,
+            "90": 516,
+            "92": 0,
+            "93": 0,
+            "95": 0,
+            "97": 516
+          },
+          "Branches": [
+            {
+              "Line": 85,
+              "Offset": 111,
+              "EndOffset": 35,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 516
+            },
+            {
+              "Line": 85,
+              "Offset": 111,
+              "EndOffset": 113,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 0
+            }
+          ]
+        },
+        "Reloaded.Memory.Buffers.MemoryBuffer[] Reloaded.Memory.Buffers.MemoryBufferHelper::GetBuffers(System.Int32,System.Boolean)": {
+          "Lines": {
+            "112": 256,
+            "114": 256,
+            "115": 256
+          },
+          "Branches": []
+        },
+        "Reloaded.Memory.Buffers.MemoryBuffer[] Reloaded.Memory.Buffers.MemoryBufferHelper::GetBuffers(System.Int32,System.IntPtr,System.IntPtr,System.Boolean)": {
+          "Lines": {
+            "127": 256,
+            "129": 256,
+            "132": 256,
+            "133": 256,
+            "135": 33792,
+            "136": 16512,
+            "137": 16512,
+            "138": 16512,
+            "139": 16512,
+            "140": 16512,
+            "141": 16512,
+            "143": 256,
+            "144": 256
+          },
+          "Branches": [
+            {
+              "Line": 135,
+              "Offset": 147,
+              "EndOffset": 52,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 16512
+            },
+            {
+              "Line": 139,
+              "Offset": 124,
+              "EndOffset": 126,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 16512
+            },
+            {
+              "Line": 139,
+              "Offset": 124,
+              "EndOffset": 135,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 16512
+            },
+            {
+              "Line": 135,
+              "Offset": 147,
+              "EndOffset": 149,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 256
+            }
+          ]
+        },
+        "System.Int32 Reloaded.Memory.Buffers.MemoryBufferHelper::GetBufferSize(System.Int32)": {
+          "Lines": {
+            "159": 516,
+            "161": 516,
+            "166": 516,
+            "167": 516,
+            "168": 0,
+            "170": 516,
+            "171": 516
+          },
+          "Branches": [
+            {
+              "Line": 167,
+              "Offset": 24,
+              "EndOffset": 26,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 516
+            },
+            {
+              "Line": 167,
+              "Offset": 24,
+              "EndOffset": 42,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 0
+            },
+            {
+              "Line": 167,
+              "Offset": 45,
+              "EndOffset": 47,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 0
+            },
+            {
+              "Line": 167,
+              "Offset": 45,
+              "EndOffset": 54,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 516
+            }
+          ]
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.MemoryBufferHelper::GetBufferPointerInPageRange(Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION,System.Int32,System.IntPtr,System.IntPtr)": {
+          "Lines": {
+            "183": 94946,
+            "185": 94946,
+            "186": 79199,
+            "190": 15747,
+            "194": 15747,
+            "195": 15747,
+            "198": 15747,
+            "199": 15747,
+            "201": 15747,
+            "202": 11567,
+            "226": 4180,
+            "227": 4180,
+            "229": 4180,
+            "230": 516,
+            "232": 3664,
+            "233": 3664,
+            "235": 3664,
+            "236": 0,
+            "244": 3664,
+            "245": 3664,
+            "247": 3664,
+            "248": 0,
+            "250": 3664,
+            "251": 3664,
+            "253": 3664,
+            "254": 0,
+            "256": 3664,
+            "257": 94946
+          },
+          "Branches": [
+            {
+              "Line": 185,
+              "Offset": 21,
+              "EndOffset": 23,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 79199
+            },
+            {
+              "Line": 185,
+              "Offset": 21,
+              "EndOffset": 35,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 15747
+            },
+            {
+              "Line": 201,
+              "Offset": 123,
+              "EndOffset": 125,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 11567
+            },
+            {
+              "Line": 201,
+              "Offset": 123,
+              "EndOffset": 137,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 4180
+            },
+            {
+              "Line": 229,
+              "Offset": 179,
+              "EndOffset": 181,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 516
+            },
+            {
+              "Line": 229,
+              "Offset": 179,
+              "EndOffset": 192,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 3664
+            },
+            {
+              "Line": 229,
+              "Offset": 197,
+              "EndOffset": 199,
+              "Path": 0,
+              "Ordinal": 6,
+              "Hits": 516
+            },
+            {
+              "Line": 229,
+              "Offset": 197,
+              "EndOffset": 218,
+              "Path": 1,
+              "Ordinal": 7,
+              "Hits": 3664
+            },
+            {
+              "Line": 235,
+              "Offset": 257,
+              "EndOffset": 259,
+              "Path": 0,
+              "Ordinal": 8,
+              "Hits": 0
+            },
+            {
+              "Line": 235,
+              "Offset": 257,
+              "EndOffset": 270,
+              "Path": 1,
+              "Ordinal": 9,
+              "Hits": 3664
+            },
+            {
+              "Line": 235,
+              "Offset": 275,
+              "EndOffset": 277,
+              "Path": 0,
+              "Ordinal": 10,
+              "Hits": 0
+            },
+            {
+              "Line": 235,
+              "Offset": 275,
+              "EndOffset": 296,
+              "Path": 1,
+              "Ordinal": 11,
+              "Hits": 3664
+            },
+            {
+              "Line": 247,
+              "Offset": 338,
+              "EndOffset": 340,
+              "Path": 0,
+              "Ordinal": 12,
+              "Hits": 0
+            },
+            {
+              "Line": 247,
+              "Offset": 338,
+              "EndOffset": 351,
+              "Path": 1,
+              "Ordinal": 13,
+              "Hits": 3664
+            },
+            {
+              "Line": 247,
+              "Offset": 356,
+              "EndOffset": 358,
+              "Path": 0,
+              "Ordinal": 14,
+              "Hits": 0
+            },
+            {
+              "Line": 247,
+              "Offset": 356,
+              "EndOffset": 374,
+              "Path": 1,
+              "Ordinal": 15,
+              "Hits": 3664
+            },
+            {
+              "Line": 253,
+              "Offset": 412,
+              "EndOffset": 414,
+              "Path": 0,
+              "Ordinal": 16,
+              "Hits": 0
+            },
+            {
+              "Line": 253,
+              "Offset": 412,
+              "EndOffset": 425,
+              "Path": 1,
+              "Ordinal": 17,
+              "Hits": 3664
+            },
+            {
+              "Line": 253,
+              "Offset": 430,
+              "EndOffset": 432,
+              "Path": 0,
+              "Ordinal": 18,
+              "Hits": 0
+            },
+            {
+              "Line": 253,
+              "Offset": 430,
+              "EndOffset": 448,
+              "Path": 1,
+              "Ordinal": 19,
+              "Hits": 3664
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.MemoryBufferHelper::.ctor(System.Diagnostics.Process)": {
+          "Lines": {
+            "20": 16,
+            "35": 16,
+            "36": 16,
+            "37": 16,
+            "38": 16,
+            "39": 16
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\MemoryBufferSearcher.cs": {
+      "Reloaded.Memory.Buffers.MemoryBufferSearcher": {
+        "Reloaded.Memory.Buffers.MemoryBuffer[] Reloaded.Memory.Buffers.MemoryBufferSearcher::FindBuffers()": {
+          "Lines": {
+            "39": 4,
+            "41": 4,
+            "44": 11192,
+            "45": 5592,
+            "46": 5592,
+            "47": 5592,
+            "48": 5592,
+            "49": 513,
+            "50": 513,
+            "51": 513,
+            "53": 513,
+            "54": 513,
+            "55": 513,
+            "56": 5592,
+            "58": 4,
+            "59": 4
+          },
+          "Branches": [
+            {
+              "Line": 44,
+              "Offset": 172,
+              "EndOffset": 20,
+              "Path": 1,
+              "Ordinal": 9,
+              "Hits": 5592
+            },
+            {
+              "Line": 46,
+              "Offset": 38,
+              "EndOffset": 40,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 3967
+            },
+            {
+              "Line": 46,
+              "Offset": 57,
+              "EndOffset": 59,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 1209
+            },
+            {
+              "Line": 46,
+              "Offset": 38,
+              "EndOffset": 84,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 4383
+            },
+            {
+              "Line": 46,
+              "Offset": 57,
+              "EndOffset": 84,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 4383
+            },
+            {
+              "Line": 46,
+              "Offset": 87,
+              "EndOffset": 89,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 513
+            },
+            {
+              "Line": 53,
+              "Offset": 136,
+              "EndOffset": 138,
+              "Path": 0,
+              "Ordinal": 6,
+              "Hits": 513
+            },
+            {
+              "Line": 53,
+              "Offset": 136,
+              "EndOffset": 153,
+              "Path": 1,
+              "Ordinal": 7,
+              "Hits": 513
+            },
+            {
+              "Line": 46,
+              "Offset": 87,
+              "EndOffset": 154,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 5592
+            },
+            {
+              "Line": 44,
+              "Offset": 172,
+              "EndOffset": 177,
+              "Path": 0,
+              "Ordinal": 8,
+              "Hits": 4
+            }
+          ]
+        },
+        "Reloaded.Memory.Buffers.MemoryBuffer[] Reloaded.Memory.Buffers.MemoryBufferSearcher::GetBuffers(System.Int32,System.Boolean)": {
+          "Lines": {
+            "74": 512,
+            "76": 512,
+            "77": 512,
+            "78": 65663,
+            "79": 512,
+            "80": 508,
+            "81": 4,
+            "84": 4,
+            "87": 517,
+            "88": 4,
+            "89": 512
+          },
+          "Branches": [
+            {
+              "Line": 76,
+              "Offset": 17,
+              "EndOffset": 19,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 512
+            },
+            {
+              "Line": 79,
+              "Offset": 63,
+              "EndOffset": 65,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 508
+            },
+            {
+              "Line": 79,
+              "Offset": 63,
+              "EndOffset": 70,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 4
+            },
+            {
+              "Line": 76,
+              "Offset": 17,
+              "EndOffset": 71,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 4
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.MemoryBufferSearcher::.ctor(System.Diagnostics.Process)": {
+          "Lines": {
+            "18": 16,
+            "28": 16,
+            "29": 16,
+            "30": 16,
+            "31": 16
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\MemoryPages.cs": {
+      "Reloaded.Memory.Buffers.MemoryPages": {
+        "System.Collections.Generic.List`1<Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION> Reloaded.Memory.Buffers.MemoryPages::GetPages(System.Diagnostics.Process)": {
+          "Lines": {
+            "20": 520,
+            "22": 520,
+            "23": 520,
+            "26": 520,
+            "27": 520,
+            "30": 520,
+            "31": 260,
+            "35": 520,
+            "38": 520,
+            "41": 651416,
+            "42": 650896,
+            "44": 650896,
+            "47": 650896,
+            "48": 650896,
+            "49": 650896,
+            "51": 520,
+            "52": 520
+          },
+          "Branches": [
+            {
+              "Line": 30,
+              "Offset": 42,
+              "EndOffset": 44,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 520
+            },
+            {
+              "Line": 30,
+              "Offset": 42,
+              "EndOffset": 50,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 0
+            },
+            {
+              "Line": 30,
+              "Offset": 55,
+              "EndOffset": 57,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 260
+            },
+            {
+              "Line": 30,
+              "Offset": 55,
+              "EndOffset": 69,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 520
+            },
+            {
+              "Line": 41,
+              "Offset": 145,
+              "EndOffset": 86,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 650896
+            },
+            {
+              "Line": 41,
+              "Offset": 145,
+              "EndOffset": 147,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 520
+            }
+          ]
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Utilities\\Mathematics.cs": {
+      "Reloaded.Memory.Buffers.Utilities.Mathematics": {
+        "System.Int32 Reloaded.Memory.Buffers.Utilities.Mathematics::RoundUp(System.Int32,System.Int32)": {
+          "Lines": {
+            "14": 8518,
+            "15": 8518,
+            "16": 0,
+            "18": 8518,
+            "19": 8518,
+            "20": 8002,
+            "22": 516,
+            "23": 8518
+          },
+          "Branches": [
+            {
+              "Line": 15,
+              "Offset": 7,
+              "EndOffset": 9,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 0
+            },
+            {
+              "Line": 15,
+              "Offset": 7,
+              "EndOffset": 13,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 8518
+            },
+            {
+              "Line": 19,
+              "Offset": 23,
+              "EndOffset": 25,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 8002
+            },
+            {
+              "Line": 19,
+              "Offset": 23,
+              "EndOffset": 29,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 516
+            }
+          ]
+        },
+        "System.Int64 Reloaded.Memory.Buffers.Utilities.Mathematics::RoundUp(System.Int64,System.Int64)": {
+          "Lines": {
+            "33": 7328,
+            "34": 7328,
+            "35": 0,
+            "37": 7328,
+            "38": 7328,
+            "39": 3796,
+            "41": 3532,
+            "42": 7328
+          },
+          "Branches": [
+            {
+              "Line": 34,
+              "Offset": 8,
+              "EndOffset": 10,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 0
+            },
+            {
+              "Line": 34,
+              "Offset": 8,
+              "EndOffset": 14,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 7328
+            },
+            {
+              "Line": 38,
+              "Offset": 25,
+              "EndOffset": 27,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 3796
+            },
+            {
+              "Line": 38,
+              "Offset": 25,
+              "EndOffset": 31,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 3532
+            }
+          ]
+        },
+        "System.Int64 Reloaded.Memory.Buffers.Utilities.Mathematics::RoundDown(System.Int64,System.Int64)": {
+          "Lines": {
+            "52": 7844,
+            "53": 7844,
+            "54": 0,
+            "56": 7844,
+            "57": 7844,
+            "58": 248,
+            "60": 7596,
+            "61": 7844
+          },
+          "Branches": [
+            {
+              "Line": 53,
+              "Offset": 8,
+              "EndOffset": 10,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 0
+            },
+            {
+              "Line": 53,
+              "Offset": 8,
+              "EndOffset": 14,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 7844
+            },
+            {
+              "Line": 57,
+              "Offset": 25,
+              "EndOffset": 27,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 248
+            },
+            {
+              "Line": 57,
+              "Offset": 25,
+              "EndOffset": 31,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 7596
+            }
+          ]
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Utilities\\VirtualAllocUtility.cs": {
+      "Reloaded.Memory.Buffers.Utilities.VirtualAllocUtility": {
+        "Reloaded.Memory.Buffers.Utilities.VirtualAllocUtility/VirtualAllocFunction Reloaded.Memory.Buffers.Utilities.VirtualAllocUtility::GetVirtualAllocFunction(System.Diagnostics.Process)": {
+          "Lines": {
+            "22": 516,
+            "25": 516,
+            "27": 516,
+            "28": 258,
+            "30": 516,
+            "31": 516
+          },
+          "Branches": [
+            {
+              "Line": 27,
+              "Offset": 34,
+              "EndOffset": 36,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 258
+            },
+            {
+              "Line": 27,
+              "Offset": 34,
+              "EndOffset": 49,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 516
+            }
+          ]
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.Utilities.VirtualAllocUtility::VirtualAllocLocal(System.IntPtr,System.IntPtr,System.UInt64)": {
+          "Lines": {
+            "40": 258,
+            "41": 258,
+            "42": 258,
+            "43": 258,
+            "44": 258,
+            "45": 258,
+            "46": 258,
+            "47": 258,
+            "48": 258
+          },
+          "Branches": []
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.Utilities.VirtualAllocUtility::VirtualAllocRemote(System.IntPtr,System.IntPtr,System.UInt64)": {
+          "Lines": {
+            "51": 258,
+            "52": 258,
+            "53": 258,
+            "54": 258,
+            "55": 258,
+            "56": 258,
+            "57": 258,
+            "58": 258,
+            "59": 258,
+            "60": 258
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Utilities\\VirtualQueryUtility.cs": {
+      "Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility": {
+        "Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility/VirtualQueryFunction Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility::GetVirtualQueryFunction(System.Diagnostics.Process)": {
+          "Lines": {
+            "22": 1033,
+            "25": 1033,
+            "27": 1033,
+            "28": 517,
+            "30": 1033,
+            "31": 1033
+          },
+          "Branches": [
+            {
+              "Line": 27,
+              "Offset": 34,
+              "EndOffset": 36,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 517
+            },
+            {
+              "Line": 27,
+              "Offset": 34,
+              "EndOffset": 49,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1033
+            }
+          ]
+        },
+        "Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility::VirtualQueryLocal(System.IntPtr,System.IntPtr)": {
+          "Lines": {
+            "40": 540036,
+            "41": 540036,
+            "42": 540036,
+            "43": 540036,
+            "44": 540036
+          },
+          "Branches": []
+        },
+        "Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility::VirtualQueryRemote(System.IntPtr,System.IntPtr)": {
+          "Lines": {
+            "47": 111373,
+            "48": 111373,
+            "49": 111373,
+            "50": 111373,
+            "51": 111373
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Testing\\Buffers.cs": {
+      "Reloaded.Memory.Buffers.Testing.Buffers": {
+        "System.Boolean Reloaded.Memory.Buffers.Testing.Buffers::FreeBuffer(Reloaded.Memory.Buffers.MemoryBuffer)": {
+          "Lines": {
+            "21": 514,
+            "22": 514,
+            "23": 514
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Structs\\AddressRange.cs": {
+      "Reloaded.Memory.Buffers.Structs.AddressRange": {
+        "System.Boolean Reloaded.Memory.Buffers.Structs.AddressRange::Contains(Reloaded.Memory.Buffers.Structs.AddressRange&)": {
+          "Lines": {
+            "26": 32200,
+            "27": 32200,
+            "28": 32200,
+            "29": 17544,
+            "31": 14656,
+            "32": 32200
+          },
+          "Branches": [
+            {
+              "Line": 27,
+              "Offset": 13,
+              "EndOffset": 15,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 24936
+            },
+            {
+              "Line": 27,
+              "Offset": 13,
+              "EndOffset": 34,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 7264
+            },
+            {
+              "Line": 27,
+              "Offset": 37,
+              "EndOffset": 39,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 17544
+            },
+            {
+              "Line": 27,
+              "Offset": 37,
+              "EndOffset": 43,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 14656
+            }
+          ]
+        },
+        "System.Boolean Reloaded.Memory.Buffers.Structs.AddressRange::Overlaps(Reloaded.Memory.Buffers.Structs.AddressRange&)": {
+          "Lines": {
+            "39": 15747,
+            "40": 15747,
+            "41": 15747,
+            "42": 4041,
+            "44": 11706,
+            "45": 11706,
+            "46": 139,
+            "48": 11567,
+            "49": 15747
+          },
+          "Branches": [
+            {
+              "Line": 40,
+              "Offset": 13,
+              "EndOffset": 15,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 4041
+            },
+            {
+              "Line": 40,
+              "Offset": 13,
+              "EndOffset": 34,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 11706
+            },
+            {
+              "Line": 40,
+              "Offset": 37,
+              "EndOffset": 39,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 4041
+            },
+            {
+              "Line": 40,
+              "Offset": 37,
+              "EndOffset": 43,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 11706
+            },
+            {
+              "Line": 44,
+              "Offset": 55,
+              "EndOffset": 57,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 139
+            },
+            {
+              "Line": 44,
+              "Offset": 55,
+              "EndOffset": 76,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 11567
+            },
+            {
+              "Line": 44,
+              "Offset": 79,
+              "EndOffset": 81,
+              "Path": 0,
+              "Ordinal": 6,
+              "Hits": 139
+            },
+            {
+              "Line": 44,
+              "Offset": 79,
+              "EndOffset": 85,
+              "Path": 1,
+              "Ordinal": 7,
+              "Hits": 11567
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.AddressRange::.ctor(System.Int64,System.Int64)": {
+          "Lines": {
+            "16": 63434,
+            "17": 63434,
+            "18": 63434,
+            "19": 63434
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Structs\\BufferAllocationProperties.cs": {
+      "Reloaded.Memory.Buffers.Structs.BufferAllocationProperties": {
+        "System.Void Reloaded.Memory.Buffers.Structs.BufferAllocationProperties::.ctor(System.IntPtr,System.Int32)": {
+          "Lines": {
+            "26": 516,
+            "27": 516,
+            "28": 516,
+            "29": 516
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Structs\\MemoryBufferHeader.cs": {
+      "Reloaded.Memory.Buffers.Structs.MemoryBufferHeader": {
+        "System.IntPtr Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::get_DataPointer()": {
+          "Lines": {
+            "19": 58054
+          },
+          "Branches": []
+        },
+        "System.Int32 Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::get_Alignment()": {
+          "Lines": {
+            "22": 8520
+          },
+          "Branches": []
+        },
+        "System.Int32 Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::get_Offset()": {
+          "Lines": {
+            "25": 106188
+          },
+          "Branches": []
+        },
+        "System.Int32 Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::get_Size()": {
+          "Lines": {
+            "28": 90698
+          },
+          "Branches": []
+        },
+        "System.Int32 Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::get_Remaining()": {
+          "Lines": {
+            "31": 73670
+          },
+          "Branches": []
+        },
+        "System.IntPtr Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::get_WritePointer()": {
+          "Lines": {
+            "34": 8000
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::SetAlignment(System.Int32)": {
+          "Lines": {
+            "67": 2,
+            "68": 2,
+            "69": 2,
+            "70": 2
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::Lock()": {
+          "Lines": {
+            "77": 8002,
+            "78": 8002,
+            "79": 8002
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::Unlock()": {
+          "Lines": {
+            "86": 8002,
+            "87": 8002,
+            "88": 8002
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::Align()": {
+          "Lines": {
+            "94": 8002,
+            "95": 8002,
+            "96": 8002
+          },
+          "Branches": []
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferHeader::.ctor(System.IntPtr,System.Int32)": {
+          "Lines": {
+            "53": 516,
+            "54": 516,
+            "55": 516,
+            "56": 516,
+            "57": 516,
+            "58": 516,
+            "59": 516
+          },
+          "Branches": []
+        }
+      }
+    },
+    "E:\\Desktop\\ReloaedResearch\\Reloaded.Memory.Buffers\\Source\\Reloaded.Memory.Buffers\\Structs\\MemoryBufferMagic.cs": {
+      "Reloaded.Memory.Buffers.Structs.MemoryBufferMagic": {
+        "System.Boolean Reloaded.Memory.Buffers.Structs.MemoryBufferMagic::MagicEquals(Reloaded.Memory.Buffers.Structs.MemoryBufferMagic&)": {
+          "Lines": {
+            "46": 1703,
+            "47": 1703,
+            "48": 1703,
+            "49": 1703,
+            "50": 1703,
+            "51": 1703,
+            "53": 36238,
+            "54": 17093,
+            "55": 677,
+            "57": 1026,
+            "59": 1703
+          },
+          "Branches": [
+            {
+              "Line": 53,
+              "Offset": 109,
+              "EndOffset": 57,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 17093
+            },
+            {
+              "Line": 54,
+              "Offset": 86,
+              "EndOffset": 88,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 677
+            },
+            {
+              "Line": 54,
+              "Offset": 86,
+              "EndOffset": 93,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 16416
+            },
+            {
+              "Line": 53,
+              "Offset": 109,
+              "EndOffset": 111,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 1026
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferMagic::PseudoGenerate()": {
+          "Lines": {
+            "65": 1,
+            "66": 1,
+            "67": 34,
+            "68": 16,
+            "69": 16,
+            "70": 16,
+            "71": 16,
+            "72": 1
+          },
+          "Branches": [
+            {
+              "Line": 67,
+              "Offset": 47,
+              "EndOffset": 8,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 16
+            },
+            {
+              "Line": 67,
+              "Offset": 47,
+              "EndOffset": 49,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1
+            }
+          ]
+        },
+        "System.Void Reloaded.Memory.Buffers.Structs.MemoryBufferMagic::.ctor(System.Boolean)": {
+          "Lines": {
+            "29": 1,
+            "38": 1,
+            "39": 1,
+            "40": 1
+          },
+          "Branches": [
+            {
+              "Line": 38,
+              "Offset": 4,
+              "EndOffset": 6,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1
+            },
+            {
+              "Line": 38,
+              "Offset": 4,
+              "EndOffset": 13,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}
