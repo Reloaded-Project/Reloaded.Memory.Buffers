@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Reloaded.Memory.Buffers.Utilities;
 using Vanara.PInvoke;
 
-namespace Reloaded.Memory.Buffers
+namespace Reloaded.Memory.Buffers.Internal
 {
     /// <summary>
     /// Utility class which searches for existing <see cref="MemoryBuffer"/>s
     /// in a process with support for caching already found buffers.
     /// </summary>
-    public class MemoryBufferSearcher
+    internal class MemoryBufferSearcher
     {
         /// <summary> Maintains address to buffer mappings. </summary>
         private Dictionary<IntPtr, MemoryBuffer> _bufferCache = new Dictionary<IntPtr, MemoryBuffer>(100);
@@ -25,7 +23,7 @@ namespace Reloaded.Memory.Buffers
         /// existing Reloaded <see cref="MemoryBuffer"/>s within a given <see cref="Process"/>.
         /// </summary>
         /// <param name="targetProcess">The process in which to search for buffers.</param>
-        public MemoryBufferSearcher(Process targetProcess)
+        internal MemoryBufferSearcher(Process targetProcess)
         {
             _process = targetProcess;
         }
@@ -35,7 +33,7 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         /// <remarks>Running this function updates the internal module cache.</remarks>
         /// <returns>A list of available <see cref="MemoryBuffer"/>s to be used.</returns>
-        public MemoryBuffer[] FindBuffers()
+        internal MemoryBuffer[] FindBuffers()
         {
             // Get a list of all pages.
             var memoryBasicInformation = MemoryPages.GetPages(_process);
@@ -45,10 +43,10 @@ namespace Reloaded.Memory.Buffers
             {
                 if (memoryBasicInformation[x].State == (uint)(Kernel32.MEM_ALLOCATION_TYPE.MEM_COMMIT) &&
                     memoryBasicInformation[x].Type == (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_PRIVATE &&
-                    MemoryBuffer.IsBuffer(_process, memoryBasicInformation[x].BaseAddress))
+                    MemoryBufferFactory.IsBuffer(_process, memoryBasicInformation[x].BaseAddress))
                 {
                     var address = memoryBasicInformation[x].BaseAddress;
-                    MemoryBuffer buffer = MemoryBuffer.FromAddress(_process, address);
+                    MemoryBuffer buffer = MemoryBufferFactory.FromAddress(_process, address);
 
                     if (! _bufferCache.ContainsKey(address))
                         _bufferCache.Add(address, buffer);
@@ -70,7 +68,7 @@ namespace Reloaded.Memory.Buffers
         ///     set of buffers which satisfy the size parameter.
         /// However this may not find the buffers that have been added since the last time this function has called.</param>
         /// <returns></returns>
-        public MemoryBuffer[] GetBuffers(int size, bool useCache = true)
+        internal MemoryBuffer[] GetBuffers(int size, bool useCache = true)
         {
             // Return the already known buffers if there is a buffer that can fit the size.
             if (useCache)

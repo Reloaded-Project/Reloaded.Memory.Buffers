@@ -1,10 +1,11 @@
-﻿using Reloaded.Memory.Buffers.Structs;
-using Reloaded.Memory.Buffers.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Reloaded.Memory.Buffers.Internal;
+using Reloaded.Memory.Buffers.Internal.Structs;
+using Reloaded.Memory.Buffers.Internal.Utilities;
 using Vanara.PInvoke;
 
 namespace Reloaded.Memory.Buffers
@@ -86,8 +87,8 @@ namespace Reloaded.Memory.Buffers
                 {
                     try
                     {
-                        var bufferProperties = FindBufferLocation(size, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
-                        return new MemoryBuffer(Process, bufferProperties.MemoryAddress, bufferProperties.Size);
+                        var memoryLocation = FindBufferLocation(size, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
+                        return MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
                     }
                     catch (Exception ex) { caughtException = ex; }
                 }
@@ -103,27 +104,26 @@ namespace Reloaded.Memory.Buffers
         */
 
         /// <summary>
-        /// Returns a list of already known buffers that satisfy size requirements.
+        /// Searches unmanaged memory for pre-existing <see cref="MemoryBuffer"/>s that satisfy
+        /// the given size requirements.
         /// </summary>
         /// <param name="size">The amount of bytes a buffer must have minimum.</param>
         /// <param name="useCache">See <see cref="MemoryBufferSearcher.GetBuffers"/></param>
-        /// <returns></returns>
-        public MemoryBuffer[] GetBuffers(int size, bool useCache = true)
+        public MemoryBuffer[] FindBuffers(int size, bool useCache = true)
         {
-            // Get buffers already existing in process.
             return _bufferSearcher.GetBuffers(size, useCache);
         }
 
         /// <summary>
-        /// Returns a list of already known buffers that satisfy a given size requirement 
-        /// within a given range of memory addresses.
+        /// Searches unmanaged memory for pre-existing <see cref="MemoryBuffer"/>s that satisfy
+        /// the given size requirements and address range.
         /// </summary>
         /// <param name="size">The amount of bytes a buffer must have minimum.</param>
         /// <param name="minimumAddress">The maximum pointer a <see cref="MemoryBuffer"/> can occupy.</param>
         /// <param name="maximumAddress">The minimum pointer a <see cref="MemoryBuffer"/> can occupy.</param>
         /// <param name="useCache">See <see cref="MemoryBufferSearcher.GetBuffers"/></param>
         /// <returns></returns>
-        public MemoryBuffer[] GetBuffers(int size, IntPtr minimumAddress, IntPtr maximumAddress, bool useCache = true)
+        public MemoryBuffer[] FindBuffers(int size, IntPtr minimumAddress, IntPtr maximumAddress, bool useCache = true)
         {
             // Get buffers already existing in process.
             var buffers = _bufferSearcher.GetBuffers(size, useCache);
@@ -134,7 +134,7 @@ namespace Reloaded.Memory.Buffers
 
             foreach (var buffer in buffers)
             {
-                var bufferHeader = buffer.BufferHeader;
+                var bufferHeader = buffer.Properties;
                 var bufferAddressRange = new AddressRange((long)bufferHeader.DataPointer, (long)(bufferHeader.DataPointer + bufferHeader.Size));
                 if (allowedRange.Contains(ref bufferAddressRange))
                     memoryBuffers.Add(buffer);
@@ -150,8 +150,8 @@ namespace Reloaded.Memory.Buffers
         */
 
         /// <summary>
-        /// Calculates the size of a <see cref="MemoryBuffer"/> to be created for a given requested size,
-        /// accounting of overhead, that is a rounded multiple of the minimum allocation granularity.
+        /// Calculates the size of a <see cref="MemoryBuffer"/> to be created for a given requested size
+        /// of raw data, taking into consideration buffer overhead.
         /// </summary>
         /// <param name="size">The size of the buffer to be allocated.</param>
         /// <returns>A calculated buffer size based off of the requested capacity in bytes.</returns>
@@ -167,7 +167,7 @@ namespace Reloaded.Memory.Buffers
             if (systemInfo.dwPageSize > pageSize || (pageSize % systemInfo.dwPageSize != 0))
                 pageSize = (int)systemInfo.dwPageSize;
 
-            return Mathematics.RoundUp(size + MemoryBuffer.BufferOverhead, pageSize);
+            return Mathematics.RoundUp(size + MemoryBufferFactory.BufferOverhead, pageSize);
         }
 
         /// <summary>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Reloaded.Memory.Buffers.Structs
+﻿namespace Reloaded.Memory.Buffers.Internal.Structs
 {
     /// <summary>
     /// Defines a physical address range with a minimum and maximum address.

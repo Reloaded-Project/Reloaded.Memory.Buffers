@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reloaded.Memory.Buffers.Utilities
+﻿namespace Reloaded.Memory.Buffers.Internal.Utilities
 {
     internal static class Mathematics
     {
@@ -10,7 +8,7 @@ namespace Reloaded.Memory.Buffers.Utilities
         /// <param name="number">The number to round up.</param>
         /// <param name="multiple">The multiple the number should be rounded to.</param>
         /// <returns></returns>
-        public static int RoundUp(int number, int multiple)
+        internal static int RoundUp(int number, int multiple)
         {
             if (multiple == 0)
                 return number;
@@ -29,7 +27,7 @@ namespace Reloaded.Memory.Buffers.Utilities
         /// <param name="number">The number to round up.</param>
         /// <param name="multiple">The multiple the number should be rounded to.</param>
         /// <returns></returns>
-        public static long RoundUp(long number, long multiple)
+        internal static long RoundUp(long number, long multiple)
         {
             if (multiple == 0)
                 return number;
@@ -48,7 +46,7 @@ namespace Reloaded.Memory.Buffers.Utilities
         /// <param name="number">The number to round down.</param>
         /// <param name="multiple">The multiple the number should be rounded to.</param>
         /// <returns></returns>
-        public static long RoundDown(long number, long multiple)
+        internal static long RoundDown(long number, long multiple)
         {
             if (multiple == 0)
                 return number;

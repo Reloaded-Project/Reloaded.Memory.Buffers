@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Reloaded.Memory.Buffers.Utilities;
+using Reloaded.Memory.Buffers.Internal.Utilities;
 using Vanara.PInvoke;
 
 namespace Reloaded.Memory.Buffers

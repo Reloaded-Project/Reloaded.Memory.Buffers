@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
-namespace Reloaded.Memory.Buffers.Structs
+namespace Reloaded.Memory.Buffers.Internal.Structs
 {
     /// <summary>
     /// Sits at the top of every Reloaded buffer and identifies the buffer as Reloaded managed.
@@ -12,9 +10,14 @@ namespace Reloaded.Memory.Buffers.Structs
     public unsafe struct MemoryBufferMagic
     {
         /// <summary>
+        /// The initial value from which the pseudo-random sequence is generated.
+        /// </summary>
+        public const int InitialSeed = 1;  // Increment by one every time breaking changes are made.
+        
+        /// <summary>
         /// Contains the amount of integers used to store the header.
         /// </summary>
-        public const int MagicCount = 16; // 512bit header.
+        public const int MagicCount = 16;  // 512bit header.
 
         /// <summary>
         /// Standard pseudo-random generated signature to mark the start of a Reloaded buffer.
@@ -63,7 +66,7 @@ namespace Reloaded.Memory.Buffers.Structs
         /// </summary>
         private void PseudoGenerate()
         {
-            int randomNumber = 17;
+            int randomNumber = InitialSeed;
             for (int x = 0; x < MagicCount; x++)
             {
                 ReloadedIdentifier[x] = randomNumber;

@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
-using Reloaded.Memory.Buffers.Utilities;
+using Reloaded.Memory.Buffers.Internal.Utilities;
 
-namespace Reloaded.Memory.Buffers.Structs
+namespace Reloaded.Memory.Buffers
 {
     /// <summary>
     /// Contains the individual details of the memory buffer in question.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct MemoryBufferHeader
+    public struct MemoryBufferProperties
     {
         /// <summary>Describes the current state of the buffer.</summary>
         public BufferState State;
@@ -44,12 +42,12 @@ namespace Reloaded.Memory.Buffers.Structs
         }
 
         /// <summary>
-        /// Creates a new <see cref="MemoryBufferHeader"/> given the location of the raw data
+        /// Creates a new <see cref="MemoryBufferProperties"/> given the location of the raw data
         /// and the amount of raw data available at that location.
         /// </summary>
         /// <param name="dataPointer">Pointer to raw data (normally following this header).</param>
         /// <param name="size">The amount of data available at the given pointer, in bytes.</param>
-        public MemoryBufferHeader(IntPtr dataPointer, int size)
+        public MemoryBufferProperties(IntPtr dataPointer, int size)
         {
             this.Alignment      = 4;
             this.DataPointer    = dataPointer;

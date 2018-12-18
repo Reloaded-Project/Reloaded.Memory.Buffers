@@ -83,15 +83,15 @@
         },
         "System.Boolean Reloaded.Memory.Buffers.MemoryBuffer::IsBuffer(System.Diagnostics.Process,System.IntPtr)": {
           "Lines": {
-            "139": 1722,
-            "141": 1722,
-            "142": 1722,
-            "144": 1703,
+            "139": 1719,
+            "141": 1719,
+            "142": 1719,
+            "144": 1701,
             "145": 1026,
-            "146": 677,
-            "147": 57,
-            "149": 696,
-            "150": 1722
+            "146": 675,
+            "147": 54,
+            "149": 693,
+            "150": 1719
           },
           "Branches": [
             {
@@ -108,7 +108,7 @@
               "EndOffset": 38,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 677
+              "Hits": 675
             }
           ]
         },
@@ -205,10 +205,10 @@
         },
         "System.Boolean Reloaded.Memory.Buffers.MemoryBuffer::Equals(System.Object)": {
           "Lines": {
-            "236": 29764,
-            "238": 29764,
-            "239": 29764,
-            "240": 29764
+            "236": 29076,
+            "238": 29076,
+            "239": 29076,
+            "240": 29076
           },
           "Branches": [
             {
@@ -217,7 +217,7 @@
               "EndOffset": 11,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 29764
+              "Hits": 29076
             },
             {
               "Line": 239,
@@ -231,11 +231,11 @@
         },
         "Reloaded.Memory.Sources.IMemory Reloaded.Memory.Buffers.MemoryBuffer::GetMemorySource(System.Diagnostics.Process)": {
           "Lines": {
-            "254": 2751,
-            "255": 2751,
-            "256": 1611,
+            "254": 2748,
+            "255": 2748,
+            "256": 1608,
             "258": 1140,
-            "259": 2751
+            "259": 2748
           },
           "Branches": [
             {
@@ -244,7 +244,7 @@
               "EndOffset": 23,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 1611
+              "Hits": 1608
             },
             {
               "Line": 255,
@@ -342,12 +342,12 @@
             "55": 516,
             "56": 516,
             "57": 516,
-            "60": 190924,
-            "61": 94946,
-            "62": 94946,
-            "63": 94946,
+            "60": 202866,
+            "61": 100917,
+            "62": 100917,
+            "63": 100917,
             "64": 516,
-            "65": 94430,
+            "65": 100401,
             "67": 0,
             "68": 516
           },
@@ -358,7 +358,7 @@
               "EndOffset": 31,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 94946
+              "Hits": 100917
             },
             {
               "Line": 63,
@@ -374,7 +374,7 @@
               "EndOffset": 82,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 94430
+              "Hits": 100401
             },
             {
               "Line": 60,
@@ -527,34 +527,34 @@
         },
         "System.IntPtr Reloaded.Memory.Buffers.MemoryBufferHelper::GetBufferPointerInPageRange(Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION,System.Int32,System.IntPtr,System.IntPtr)": {
           "Lines": {
-            "183": 94946,
-            "185": 94946,
-            "186": 79199,
-            "190": 15747,
-            "194": 15747,
-            "195": 15747,
-            "198": 15747,
-            "199": 15747,
-            "201": 15747,
-            "202": 11567,
-            "226": 4180,
-            "227": 4180,
-            "229": 4180,
+            "183": 100917,
+            "185": 100917,
+            "186": 83830,
+            "190": 17087,
+            "194": 17087,
+            "195": 17087,
+            "198": 17087,
+            "199": 17087,
+            "201": 17087,
+            "202": 11518,
+            "226": 5569,
+            "227": 5569,
+            "229": 5569,
             "230": 516,
-            "232": 3664,
-            "233": 3664,
-            "235": 3664,
+            "232": 5053,
+            "233": 5053,
+            "235": 5053,
             "236": 0,
-            "244": 3664,
-            "245": 3664,
-            "247": 3664,
+            "244": 5053,
+            "245": 5053,
+            "247": 5053,
             "248": 0,
-            "250": 3664,
-            "251": 3664,
-            "253": 3664,
+            "250": 5053,
+            "251": 5053,
+            "253": 5053,
             "254": 0,
-            "256": 3664,
-            "257": 94946
+            "256": 5053,
+            "257": 100917
           },
           "Branches": [
             {
@@ -563,7 +563,7 @@
               "EndOffset": 23,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 79199
+              "Hits": 83830
             },
             {
               "Line": 185,
@@ -571,7 +571,7 @@
               "EndOffset": 35,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 15747
+              "Hits": 17087
             },
             {
               "Line": 201,
@@ -579,7 +579,7 @@
               "EndOffset": 125,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 11567
+              "Hits": 11518
             },
             {
               "Line": 201,
@@ -587,7 +587,7 @@
               "EndOffset": 137,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 4180
+              "Hits": 5569
             },
             {
               "Line": 229,
@@ -603,7 +603,7 @@
               "EndOffset": 192,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 229,
@@ -619,7 +619,7 @@
               "EndOffset": 218,
               "Path": 1,
               "Ordinal": 7,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 235,
@@ -635,7 +635,7 @@
               "EndOffset": 270,
               "Path": 1,
               "Ordinal": 9,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 235,
@@ -651,7 +651,7 @@
               "EndOffset": 296,
               "Path": 1,
               "Ordinal": 11,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 247,
@@ -667,7 +667,7 @@
               "EndOffset": 351,
               "Path": 1,
               "Ordinal": 13,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 247,
@@ -683,7 +683,7 @@
               "EndOffset": 374,
               "Path": 1,
               "Ordinal": 15,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 253,
@@ -699,7 +699,7 @@
               "EndOffset": 425,
               "Path": 1,
               "Ordinal": 17,
-              "Hits": 3664
+              "Hits": 5053
             },
             {
               "Line": 253,
@@ -715,7 +715,7 @@
               "EndOffset": 448,
               "Path": 1,
               "Ordinal": 19,
-              "Hits": 3664
+              "Hits": 5053
             }
           ]
         },
@@ -738,18 +738,18 @@
           "Lines": {
             "39": 4,
             "41": 4,
-            "44": 11192,
-            "45": 5592,
-            "46": 5592,
-            "47": 5592,
-            "48": 5592,
+            "44": 11236,
+            "45": 5614,
+            "46": 5614,
+            "47": 5614,
+            "48": 5614,
             "49": 513,
             "50": 513,
             "51": 513,
             "53": 513,
             "54": 513,
             "55": 513,
-            "56": 5592,
+            "56": 5614,
             "58": 4,
             "59": 4
           },
@@ -760,7 +760,7 @@
               "EndOffset": 20,
               "Path": 1,
               "Ordinal": 9,
-              "Hits": 5592
+              "Hits": 5614
             },
             {
               "Line": 46,
@@ -768,7 +768,7 @@
               "EndOffset": 40,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 3967
+              "Hits": 3990
             },
             {
               "Line": 46,
@@ -776,7 +776,7 @@
               "EndOffset": 59,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 1209
+              "Hits": 1206
             },
             {
               "Line": 46,
@@ -784,7 +784,7 @@
               "EndOffset": 84,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 4383
+              "Hits": 4408
             },
             {
               "Line": 46,
@@ -792,7 +792,7 @@
               "EndOffset": 84,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 4383
+              "Hits": 4408
             },
             {
               "Line": 46,
@@ -824,7 +824,7 @@
               "EndOffset": 154,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 5592
+              "Hits": 5614
             },
             {
               "Line": 44,
@@ -910,12 +910,12 @@
             "31": 260,
             "35": 520,
             "38": 520,
-            "41": 651416,
-            "42": 650896,
-            "44": 650896,
-            "47": 650896,
-            "48": 650896,
-            "49": 650896,
+            "41": 652296,
+            "42": 651776,
+            "44": 651776,
+            "47": 651776,
+            "48": 651776,
+            "49": 651776,
             "51": 520,
             "52": 520
           },
@@ -958,7 +958,7 @@
               "EndOffset": 86,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 650896
+              "Hits": 651776
             },
             {
               "Line": 41,
@@ -1022,14 +1022,14 @@
         },
         "System.Int64 Reloaded.Memory.Buffers.Utilities.Mathematics::RoundUp(System.Int64,System.Int64)": {
           "Lines": {
-            "33": 7328,
-            "34": 7328,
+            "33": 10106,
+            "34": 10106,
             "35": 0,
-            "37": 7328,
-            "38": 7328,
-            "39": 3796,
-            "41": 3532,
-            "42": 7328
+            "37": 10106,
+            "38": 10106,
+            "39": 5210,
+            "41": 4896,
+            "42": 10106
           },
           "Branches": [
             {
@@ -1046,7 +1046,7 @@
               "EndOffset": 14,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 7328
+              "Hits": 10106
             },
             {
               "Line": 38,
@@ -1054,7 +1054,7 @@
               "EndOffset": 27,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 3796
+              "Hits": 5210
             },
             {
               "Line": 38,
@@ -1062,20 +1062,20 @@
               "EndOffset": 31,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 3532
+              "Hits": 4896
             }
           ]
         },
         "System.Int64 Reloaded.Memory.Buffers.Utilities.Mathematics::RoundDown(System.Int64,System.Int64)": {
           "Lines": {
-            "52": 7844,
-            "53": 7844,
+            "52": 10622,
+            "53": 10622,
             "54": 0,
-            "56": 7844,
-            "57": 7844,
-            "58": 248,
-            "60": 7596,
-            "61": 7844
+            "56": 10622,
+            "57": 10622,
+            "58": 416,
+            "60": 10206,
+            "61": 10622
           },
           "Branches": [
             {
@@ -1092,7 +1092,7 @@
               "EndOffset": 14,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 7844
+              "Hits": 10622
             },
             {
               "Line": 57,
@@ -1100,7 +1100,7 @@
               "EndOffset": 27,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 248
+              "Hits": 416
             },
             {
               "Line": 57,
@@ -1108,7 +1108,7 @@
               "EndOffset": 31,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 7596
+              "Hits": 10206
             }
           ]
         }
@@ -1207,21 +1207,21 @@
         },
         "Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility::VirtualQueryLocal(System.IntPtr,System.IntPtr)": {
           "Lines": {
-            "40": 540036,
-            "41": 540036,
-            "42": 540036,
-            "43": 540036,
-            "44": 540036
+            "40": 543176,
+            "41": 543176,
+            "42": 543176,
+            "43": 543176,
+            "44": 543176
           },
           "Branches": []
         },
         "Vanara.PInvoke.Kernel32/MEMORY_BASIC_INFORMATION Reloaded.Memory.Buffers.Utilities.VirtualQueryUtility::VirtualQueryRemote(System.IntPtr,System.IntPtr)": {
           "Lines": {
-            "47": 111373,
-            "48": 111373,
-            "49": 111373,
-            "50": 111373,
-            "51": 111373
+            "47": 109113,
+            "48": 109113,
+            "49": 109113,
+            "50": 109113,
+            "51": 109113
           },
           "Branches": []
         }
@@ -1243,12 +1243,12 @@
       "Reloaded.Memory.Buffers.Structs.AddressRange": {
         "System.Boolean Reloaded.Memory.Buffers.Structs.AddressRange::Contains(Reloaded.Memory.Buffers.Structs.AddressRange&)": {
           "Lines": {
-            "26": 32200,
-            "27": 32200,
-            "28": 32200,
+            "26": 37756,
+            "27": 37756,
+            "28": 37756,
             "29": 17544,
-            "31": 14656,
-            "32": 32200
+            "31": 20212,
+            "32": 37756
           },
           "Branches": [
             {
@@ -1257,7 +1257,7 @@
               "EndOffset": 15,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 24936
+              "Hits": 27740
             },
             {
               "Line": 27,
@@ -1265,7 +1265,7 @@
               "EndOffset": 34,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 7264
+              "Hits": 10016
             },
             {
               "Line": 27,
@@ -1281,21 +1281,21 @@
               "EndOffset": 43,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 14656
+              "Hits": 20212
             }
           ]
         },
         "System.Boolean Reloaded.Memory.Buffers.Structs.AddressRange::Overlaps(Reloaded.Memory.Buffers.Structs.AddressRange&)": {
           "Lines": {
-            "39": 15747,
-            "40": 15747,
-            "41": 15747,
-            "42": 4041,
-            "44": 11706,
-            "45": 11706,
-            "46": 139,
-            "48": 11567,
-            "49": 15747
+            "39": 17087,
+            "40": 17087,
+            "41": 17087,
+            "42": 5429,
+            "44": 11658,
+            "45": 11658,
+            "46": 140,
+            "48": 11518,
+            "49": 17087
           },
           "Branches": [
             {
@@ -1304,7 +1304,7 @@
               "EndOffset": 15,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 4041
+              "Hits": 5429
             },
             {
               "Line": 40,
@@ -1312,7 +1312,7 @@
               "EndOffset": 34,
               "Path": 1,
               "Ordinal": 1,
-              "Hits": 11706
+              "Hits": 11658
             },
             {
               "Line": 40,
@@ -1320,7 +1320,7 @@
               "EndOffset": 39,
               "Path": 0,
               "Ordinal": 2,
-              "Hits": 4041
+              "Hits": 5429
             },
             {
               "Line": 40,
@@ -1328,7 +1328,7 @@
               "EndOffset": 43,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 11706
+              "Hits": 11658
             },
             {
               "Line": 44,
@@ -1336,7 +1336,7 @@
               "EndOffset": 57,
               "Path": 0,
               "Ordinal": 4,
-              "Hits": 139
+              "Hits": 140
             },
             {
               "Line": 44,
@@ -1344,7 +1344,7 @@
               "EndOffset": 76,
               "Path": 1,
               "Ordinal": 5,
-              "Hits": 11567
+              "Hits": 11518
             },
             {
               "Line": 44,
@@ -1352,7 +1352,7 @@
               "EndOffset": 81,
               "Path": 0,
               "Ordinal": 6,
-              "Hits": 139
+              "Hits": 140
             },
             {
               "Line": 44,
@@ -1360,16 +1360,16 @@
               "EndOffset": 85,
               "Path": 1,
               "Ordinal": 7,
-              "Hits": 11567
+              "Hits": 11518
             }
           ]
         },
         "System.Void Reloaded.Memory.Buffers.Structs.AddressRange::.ctor(System.Int64,System.Int64)": {
           "Lines": {
-            "16": 63434,
-            "17": 63434,
-            "18": 63434,
-            "19": 63434
+            "16": 71670,
+            "17": 71670,
+            "18": 71670,
+            "19": 71670
           },
           "Branches": []
         }
@@ -1477,17 +1477,17 @@
       "Reloaded.Memory.Buffers.Structs.MemoryBufferMagic": {
         "System.Boolean Reloaded.Memory.Buffers.Structs.MemoryBufferMagic::MagicEquals(Reloaded.Memory.Buffers.Structs.MemoryBufferMagic&)": {
           "Lines": {
-            "46": 1703,
-            "47": 1703,
-            "48": 1703,
-            "49": 1703,
-            "50": 1703,
-            "51": 1703,
-            "53": 36238,
-            "54": 17093,
-            "55": 677,
+            "46": 1701,
+            "47": 1701,
+            "48": 1701,
+            "49": 1701,
+            "50": 1701,
+            "51": 1701,
+            "53": 36234,
+            "54": 17091,
+            "55": 675,
             "57": 1026,
-            "59": 1703
+            "59": 1701
           },
           "Branches": [
             {
@@ -1496,7 +1496,7 @@
               "EndOffset": 57,
               "Path": 1,
               "Ordinal": 3,
-              "Hits": 17093
+              "Hits": 17091
             },
             {
               "Line": 54,
@@ -1504,7 +1504,7 @@
               "EndOffset": 88,
               "Path": 0,
               "Ordinal": 0,
-              "Hits": 677
+              "Hits": 675
             },
             {
               "Line": 54,

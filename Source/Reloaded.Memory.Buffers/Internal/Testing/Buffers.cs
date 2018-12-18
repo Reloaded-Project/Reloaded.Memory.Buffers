@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Reloaded.Memory.Buffers.Utilities;
-using Vanara.PInvoke;
-
-namespace Reloaded.Memory.Buffers.Testing
+﻿namespace Reloaded.Memory.Buffers.Internal.Testing
 {
     /// <summary>
     /// FOR TESTING USE ONLY, PLEASE DO NOT USE.

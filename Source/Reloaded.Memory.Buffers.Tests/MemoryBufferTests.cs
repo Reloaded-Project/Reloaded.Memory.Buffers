@@ -95,7 +95,7 @@ namespace Reloaded.Memory.Buffers.Tests
             var buffer = bufferHelper.CreateMemoryBuffer(4096);
 
             // Cleanup
-            Testing.Buffers.FreeBuffer(buffer);
+            Internal.Testing.Buffers.FreeBuffer(buffer);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Reloaded.Memory.Buffers.Tests
             for (int x = 0; x < repetitions; x++)
             {
                 int newSize = size + (x * increment);
-                var buffers = bufferHelper.GetBuffers(newSize);
+                var buffers = bufferHelper.FindBuffers(newSize);
 
                 if (!buffers.Contains(memoryBuffers[x]))
                     Assert.True(false, $"Failed to find existing buffer in memory of minimum size {newSize} bytes.");
@@ -129,7 +129,7 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Cleanup.
             for (int x = 0; x < repetitions; x++)
-                Testing.Buffers.FreeBuffer(memoryBuffers[x]);
+                Internal.Testing.Buffers.FreeBuffer(memoryBuffers[x]);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Reloaded.Memory.Buffers.Tests
             for (int x = 0; x < repetitions; x++)
             {
                 int newSize = sizeStart + (x * increment);
-                var foundBuffers = bufferHelper.GetBuffers(newSize, (IntPtr) minAddress, (IntPtr) maxAddress);
+                var foundBuffers = bufferHelper.FindBuffers(newSize, (IntPtr) minAddress, (IntPtr) maxAddress);
 
                 if (!foundBuffers.Contains(buffers[x]))
                     Assert.True(false, $"Failed to find existing buffer in memory of minimum size {newSize} bytes.");
@@ -177,7 +177,7 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Cleanup
             for (int x = 0; x < buffers.Length; x++)
-                Testing.Buffers.FreeBuffer(buffers[x]);
+                Internal.Testing.Buffers.FreeBuffer(buffers[x]);
         }
 
         /// <summary>
@@ -191,12 +191,12 @@ namespace Reloaded.Memory.Buffers.Tests
             var buffer = bufferHelper.CreateMemoryBuffer(1000);
 
             // Disable item alignment.
-            var bufferHeader = buffer.BufferHeader;
+            var bufferHeader = buffer.Properties;
             bufferHeader.SetAlignment(1);
-            buffer.BufferHeader = bufferHeader;
+            buffer.Properties = bufferHeader;
 
             // Get remaining space, generate random byte array.
-            int remainingBufferSpace = buffer.BufferHeader.Remaining;
+            int remainingBufferSpace = buffer.Properties.Remaining;
             var randomByteArray = RandomByteArray.GenerateRandomByteArray(remainingBufferSpace);
 
             // Fill the buffer with the random byte array and verify each item as it's added.
@@ -210,7 +210,7 @@ namespace Reloaded.Memory.Buffers.Tests
             }
 
             // Compare again, running the entire array this time.
-            IntPtr bufferStartPtr = buffer.BufferHeader.DataPointer;
+            IntPtr bufferStartPtr = buffer.Properties.DataPointer;
             for (int x = 0; x < remainingBufferSpace; x++)
             {
                 IntPtr readAddress = bufferStartPtr + x;
@@ -239,7 +239,7 @@ namespace Reloaded.Memory.Buffers.Tests
         /// </summary>
         private unsafe void AssertBufferInRange(MemoryBuffer buffer, IntPtr minAddress, IntPtr maxAddress)
         {
-            IntPtr bufferDataPtr = buffer.BufferHeader.DataPointer;
+            IntPtr bufferDataPtr = buffer.Properties.DataPointer;
             if ((void*)bufferDataPtr < (void*)minAddress ||
                 (void*)bufferDataPtr > (void*)maxAddress)
             {

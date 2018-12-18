@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using Vanara.PInvoke;
 
-namespace Reloaded.Memory.Buffers.Utilities
+namespace Reloaded.Memory.Buffers.Internal.Utilities
 {
     /// <summary/>
     public static unsafe class VirtualAllocUtility
