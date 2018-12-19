@@ -7,14 +7,13 @@
 	<br/> <br/>
 	<strong><i>Allocate Memory... & Knuckles</i></strong>
 	<br/> <br/>
-	<!-- TODO: Update This -->
 	<!-- Coverage -->
-	<a href="">
-		<img src="" alt="Coverage" />
+	<a href="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers">
+		<img src="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers/branch/master/graph/badge.svg" alt="Coverage" />
 	</a>
 	<!-- Build Status -->
-	<a href="">
-		<img src="" alt="Build Status" />
+	<a href="https://ci.appveyor.com/project/sewer56lol/reloaded-memory-buffers">
+		<img src="https://ci.appveyor.com/api/projects/status/mlcow0611h61datr/branch/master?svg=true" alt="Build Status" />
 	</a>
 </div>
 
@@ -41,15 +40,15 @@ Below is a list of ideas as to what you should NOT expect from this library:
 + Storage of disposable memory. (Everything written is stored for the lifetime of the program)
 + Relocatable & resizable memory. (Usage of written bytes is unpredictable. Cannot fulfill.)
 
-For more details please see what this library is not..
+For more details please see [what this library is not](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/blob/master/Docs/What-this-library-is-not.md).
 
 ## Documentation
 
 The following below are links aimed to help you get started with the library, they cover the basics of use:
 
 + [Getting Started](https://github.com/Reloaded-Project/Reloaded.Memory/blob/master/Docs/Getting-Started.md)
-+ [Why this library was made]()
-+ [What this library is not]()
++ [Why this library was made](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/blob/master/Docs/Why-was-this-made.md)
++ [What this library is not](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/blob/master/Docs/What-this-library-is-not.md)
 
 For extra ideas of how to use the library, you may always take a look at `Reloaded.Memory.Buffers.Tests`, the test suite for the library.
 
