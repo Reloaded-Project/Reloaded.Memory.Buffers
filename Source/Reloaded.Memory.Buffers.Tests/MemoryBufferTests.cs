@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Reloaded.Memory.Buffers.Tests.Helpers;
 using Reloaded.Memory.Sources;
@@ -70,14 +72,29 @@ namespace Reloaded.Memory.Buffers.Tests
         /// the return of the correct pointer and CanItemFit.
         /// </summary>
         [Fact]
-        private void MemoryBufferAddInternal() => MemoryBufferAdd(_bufferHelper);
+        private void MemoryBufferAddGenericInternal() => MemoryBufferAddGeneric(_bufferHelper);
 
         /// <summary>
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>; including
         /// the return of the correct pointer and CanItemFit.
         /// </summary>
         [Fact]
-        private void MemoryBufferAddExternal() => MemoryBufferAdd(_externalBufferHelper);
+        private void MemoryBufferAddGenericExternal() => MemoryBufferAddGeneric(_externalBufferHelper);
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>, with raw data;
+        /// including the return of the correct pointer and CanItemFit.
+        /// </summary>
+        [Fact]
+        private unsafe void MemoryBufferAddByteArrayInternal() => MemoryBufferAddByteArray(_bufferHelper);
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>, with raw data;
+        /// including the return of the correct pointer and CanItemFit.
+        /// </summary>
+        [Fact]
+        private unsafe void MemoryBufferAddByteArrayExternal() => MemoryBufferAddByteArray(_externalBufferHelper);
+
 
         /*
          * ----------
@@ -184,7 +201,7 @@ namespace Reloaded.Memory.Buffers.Tests
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>; including
         /// the return of the correct pointer and CanItemFit.
         /// </summary>
-        private void MemoryBufferAdd(MemoryBufferHelper bufferHelper)
+        private unsafe void MemoryBufferAddGeneric(MemoryBufferHelper bufferHelper)
         {
             // Setup test.
             ExternalMemory externalMemory = new ExternalMemory(bufferHelper.Process);
@@ -195,37 +212,86 @@ namespace Reloaded.Memory.Buffers.Tests
             bufferHeader.SetAlignment(1);
             buffer.Properties = bufferHeader;
 
-            // Get remaining space, generate random byte array.
-            int remainingBufferSpace = buffer.Properties.Remaining;
-            var randomByteArray = RandomByteArray.GenerateRandomByteArray(remainingBufferSpace);
+            // Get remaining space, items to place.
+            int remainingBufferSpace    = bufferHeader.Remaining;
+            int structSize              = Struct.GetSize<RandomIntStruct>();
+            int itemsToFit              = remainingBufferSpace / structSize;
 
-            // Fill the buffer with the random byte array and verify each item as it's added.
-            for (int x = 0; x < remainingBufferSpace; x++)
+            // Generate array of random int structs.
+            RandomIntStruct[] randomIntStructs = new RandomIntStruct[itemsToFit];
+
+            for (int x = 0; x < itemsToFit; x++)
+                randomIntStructs[x] = RandomIntStruct.BuildRandomStruct();
+
+            // Fill the buffer and verify each item as it's added.
+            for (int x = 0; x < itemsToFit; x++)
             {
-                IntPtr writeAddress = buffer.Add(ref randomByteArray.Array[x]);
+                IntPtr writeAddress = buffer.Add(ref randomIntStructs[x]);
 
                 // Read back and compare.
-                externalMemory.Read(writeAddress, out byte actual);
-                Assert.Equal(randomByteArray.Array[x], actual);
+                externalMemory.Read(writeAddress, out RandomIntStruct actual);
+                Assert.Equal(randomIntStructs[x], actual);
             }
 
             // Compare again, running the entire array this time.
-            IntPtr bufferStartPtr = buffer.Properties.DataPointer;
+            IntPtr bufferStartPtr = bufferHeader.DataPointer;
+            for (int x = 0; x < itemsToFit; x++)
+            {
+                IntPtr readAddress = bufferStartPtr + (x * structSize);
+
+                // Read back and compare.
+                externalMemory.Read(readAddress, out RandomIntStruct actual);
+                Assert.Equal(randomIntStructs[x], actual);
+            }
+
+            // The array is full, calling CanItemFit should return false.
+            Assert.False(buffer.CanItemFit(structSize));
+
+            // Likewise, calling Add should return IntPtr.Zero.
+            var randIntStr = RandomIntStruct.BuildRandomStruct();
+            Assert.Equal(IntPtr.Zero, buffer.Add(ref randIntStr));
+        }
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>, with raw data;
+        /// including the return of the correct pointer and CanItemFit.
+        /// </summary>
+        private unsafe void MemoryBufferAddByteArray(MemoryBufferHelper bufferHelper)
+        {
+            // Setup test.
+            ExternalMemory externalMemory = new ExternalMemory(bufferHelper.Process);
+            var buffer = bufferHelper.CreateMemoryBuffer(1000);
+
+            // Disable item alignment.
+            var bufferHeader = buffer.Properties;
+            bufferHeader.SetAlignment(1);
+            buffer.Properties = bufferHeader;
+
+            // Get remaining space, items to place.
+            int remainingBufferSpace = bufferHeader.Remaining;
+            var randomByteArray      = RandomByteArray.GenerateRandomByteArray(remainingBufferSpace);
+            byte[] rawArray          = randomByteArray.Array;
+
+            // Fill the buffer with the whole array.
+            buffer.Add(rawArray);
+
+            // Compare against the array written.
+            IntPtr bufferStartPtr = bufferHeader.DataPointer;
             for (int x = 0; x < remainingBufferSpace; x++)
             {
                 IntPtr readAddress = bufferStartPtr + x;
 
                 // Read back and compare.
                 externalMemory.Read(readAddress, out byte actual);
-                Assert.Equal(randomByteArray.Array[x], actual);
+                Assert.Equal(rawArray[x], actual);
             }
 
             // The array is full, calling CanItemFit should return false.
-            Assert.False(buffer.CanItemFit(1));
+            Assert.False(buffer.CanItemFit(sizeof(byte)));
 
             // Likewise, calling Add should return IntPtr.Zero.
-            byte miscByte = 55;
-            Assert.Equal(IntPtr.Zero, buffer.Add(ref miscByte));
+            byte testByte = 55;
+            Assert.Equal(IntPtr.Zero, buffer.Add(ref testByte));
         }
 
         /*
