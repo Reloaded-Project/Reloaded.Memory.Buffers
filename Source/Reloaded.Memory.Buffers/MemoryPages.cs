@@ -35,13 +35,14 @@ namespace Reloaded.Memory.Buffers
             VirtualQueryUtility.VirtualQueryFunction virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
             
             // Shorthand for convenience.
-            List<Kernel32.MEMORY_BASIC_INFORMATION> memoryPages = new List<Kernel32.MEMORY_BASIC_INFORMATION>();
+            List<Kernel32.MEMORY_BASIC_INFORMATION> memoryPages = new List<Kernel32.MEMORY_BASIC_INFORMATION>(8192);
 
             // Until we get all of the pages.
             while (currentAddress <= maxAddress)
             {
                 // Get our info from VirtualQueryEx.
-                var memoryInformation = virtualQueryFunction(process.Handle, (IntPtr)currentAddress);
+                var memoryInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
+                virtualQueryFunction(process.Handle, (IntPtr)currentAddress, ref memoryInformation);
 
                 // Add the page and increment address iterator to go to next page.
                 memoryPages.Add(memoryInformation);

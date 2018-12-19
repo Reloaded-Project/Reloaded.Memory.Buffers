@@ -72,7 +72,7 @@ namespace Reloaded.Memory.Buffers
             {
                 _bufferMutex = Mutex.OpenExisting(GetMutexName(process));
             }
-            catch (WaitHandleCannotBeOpenedException ex)
+            catch (WaitHandleCannotBeOpenedException)
             {
                 // Mutex does not exist.
                 _bufferMutex = new Mutex(false, GetMutexName(process));

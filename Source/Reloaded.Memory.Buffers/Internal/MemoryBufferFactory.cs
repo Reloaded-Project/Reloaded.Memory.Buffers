@@ -61,7 +61,8 @@ namespace Reloaded.Memory.Buffers.Internal
         {
             // Query the region we are going to create a buffer in.
             var virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
-            var memoryInformation = virtualQueryFunction(process.Handle, bufferMagicAddress);
+            var memoryInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
+            virtualQueryFunction(process.Handle, bufferMagicAddress, ref memoryInformation);
 
             if (memoryInformation.State != (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE)
             {

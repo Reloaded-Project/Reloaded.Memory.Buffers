@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security;
 using Vanara.PInvoke;
 
 namespace Reloaded.Memory.Buffers.Internal.Utilities
@@ -7,8 +9,16 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
     /// <summary/>
     public static unsafe class VirtualQueryUtility
     {
+        /* Custom Kernel32 DLLImport statements for performance uptick. */
+
+        [DllImport("kernel32.dll", SetLastError = true), SuppressUnmanagedCodeSecurity]
+        private static extern SizeT VirtualQueryEx(HPROCESS hProcess, IntPtr lpAddress, ref Kernel32.MEMORY_BASIC_INFORMATION lpBuffer, SizeT dwLength);
+
+        [DllImport("kernel32.dll", SetLastError = true), SuppressUnmanagedCodeSecurity]
+        private static extern SizeT VirtualQuery(IntPtr lpAddress, ref Kernel32.MEMORY_BASIC_INFORMATION lpBuffer, SizeT dwLength);
+
         /// <summary/>
-        public delegate Kernel32.MEMORY_BASIC_INFORMATION VirtualQueryFunction(IntPtr processHandle, IntPtr address);
+        public delegate void VirtualQueryFunction(IntPtr processHandle, IntPtr address, ref Kernel32.MEMORY_BASIC_INFORMATION memoryInformation);
 
         /// <summary>
         /// Retrieves the function to use in place of VirtualQuery.
@@ -34,18 +44,14 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
          * The Remote one; runs it for another process; being the slower of the two.
          */
 
-        private static Kernel32.MEMORY_BASIC_INFORMATION VirtualQueryLocal(IntPtr processHandle, IntPtr address)
+        private static void VirtualQueryLocal(IntPtr processHandle, IntPtr address, ref Kernel32.MEMORY_BASIC_INFORMATION memoryInformation)
         {
-            var memoryInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
-            Kernel32.VirtualQuery(address, (IntPtr)(&memoryInformation), (uint)sizeof(Kernel32.MEMORY_BASIC_INFORMATION));
-            return memoryInformation;
+            VirtualQuery(address, ref memoryInformation, (uint)sizeof(Kernel32.MEMORY_BASIC_INFORMATION));
         }
 
-        private static Kernel32.MEMORY_BASIC_INFORMATION VirtualQueryRemote(IntPtr processHandle, IntPtr address)
+        private static void VirtualQueryRemote(IntPtr processHandle, IntPtr address, ref Kernel32.MEMORY_BASIC_INFORMATION memoryInformation)
         {
-            var memoryInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
-            Kernel32.VirtualQueryEx(processHandle, address, (IntPtr)(&memoryInformation), (uint)sizeof(Kernel32.MEMORY_BASIC_INFORMATION));
-            return memoryInformation;
+            VirtualQueryEx(processHandle, address, ref memoryInformation, (uint)sizeof(Kernel32.MEMORY_BASIC_INFORMATION));
         }
     }
 }
