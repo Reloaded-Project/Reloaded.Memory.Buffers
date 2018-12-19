@@ -22,7 +22,7 @@
 Reloaded.Memory.Buffers is a library designed with a rather simple purpose:
 *Allocate and provide access to memory between a given minimum and maximum memory address.*
 
-The library provides an implementation of efficient, shared, concurrent and permanent storage of many small objects in memory in a static, non-changing locations that last the lifetime of the process.
+The library provides an implementation of efficient, shared, concurrent and permanent storage of many small objects in memory in static, non-changing locations that last the lifetime of the process.
 
 The goal is to allow multiple applications to access and write to shared contiguous memory regions *(in user defined min - max memory regions)* without wasting memory or time because due to memory micro allocations.
 
