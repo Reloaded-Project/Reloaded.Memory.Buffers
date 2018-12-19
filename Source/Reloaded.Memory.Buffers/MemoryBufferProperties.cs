@@ -10,9 +10,6 @@ namespace Reloaded.Memory.Buffers
     [StructLayout(LayoutKind.Sequential)]
     public struct MemoryBufferProperties
     {
-        /// <summary>Describes the current state of the buffer.</summary>
-        public BufferState State;
-
         /// <summary> The location of the raw data stored in the buffer. </summary>
         public IntPtr DataPointer   { get; internal set; }
 
@@ -31,16 +28,6 @@ namespace Reloaded.Memory.Buffers
         /// <summary> Returns the current write pointer in the buffer. (Address of next element to be written) </summary>
         public IntPtr WritePointer => DataPointer + Offset;
 
-        /// <summary/>
-        public enum BufferState
-        {
-            /// <summary>The buffer is currently not being written to/read from.</summary>
-            Unlocked,
-
-            /// <summary>The buffer is currently being written to/read from.</summary>
-            Locked
-        }
-
         /// <summary>
         /// Creates a new <see cref="MemoryBufferProperties"/> given the location of the raw data
         /// and the amount of raw data available at that location.
@@ -53,7 +40,6 @@ namespace Reloaded.Memory.Buffers
             this.DataPointer    = dataPointer;
             this.Offset         = 0;
             this.Size           = size;
-            State               = BufferState.Unlocked;
         }
 
         /// <summary>
@@ -65,24 +51,6 @@ namespace Reloaded.Memory.Buffers
         {
             Alignment = alignment;
             Align();
-        }
-
-        /// <summary>
-        /// Locks the buffer with a flag.
-        /// Use this before any memory read/write and <see cref="Unlock"/> when done.
-        /// </summary>
-        internal void Lock()
-        {
-            State = BufferState.Locked;
-        }
-
-        /// <summary>
-        /// Unlocks the buffer with a flag to allow for other applications (DLLs)
-        /// within the same process to access the memory.
-        /// </summary>
-        internal void Unlock()
-        {
-            State = BufferState.Unlocked;
         }
 
         /// <summary>

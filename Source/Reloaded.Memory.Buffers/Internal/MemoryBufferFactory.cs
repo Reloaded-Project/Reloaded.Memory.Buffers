@@ -48,7 +48,9 @@ namespace Reloaded.Memory.Buffers.Internal
             var realBufSize        = allocationSize - BufferOverhead;
             var memoryBufferProperties = new MemoryBufferProperties(dataPtr, realBufSize);
 
-            return new MemoryBuffer(memorySource, headerAddress, memoryBufferProperties);
+            var buffer = new MemoryBuffer(memorySource, headerAddress, memoryBufferProperties);
+            buffer.SetupMutex(process);
+            return buffer;
         }
 
         /// <summary>
@@ -64,7 +66,11 @@ namespace Reloaded.Memory.Buffers.Internal
             if (memoryInformation.State != (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE)
             {
                 if (IsBuffer(process, bufferMagicAddress))
-                    return new MemoryBuffer(GetMemorySource(process), bufferMagicAddress + sizeof(MemoryBufferMagic));
+                {
+                    var buffer = new MemoryBuffer(GetMemorySource(process), bufferMagicAddress + sizeof(MemoryBufferMagic));
+                    buffer.SetupMutex(process);
+                    return buffer;
+                }
             }
 
             return null;

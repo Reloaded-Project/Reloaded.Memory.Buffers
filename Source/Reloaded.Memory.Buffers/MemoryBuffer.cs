@@ -19,6 +19,12 @@ namespace Reloaded.Memory.Buffers
     /// </summary>
     public unsafe class MemoryBuffer
     {
+        /// <summary>
+        /// Stores the reference to a system-wide mutex which prevents concurrent access
+        /// modifying/adding elements of the <see cref="MemoryBuffer"/>.
+        /// </summary>
+        private Mutex _bufferMutex;
+        
         /// <summary> Defines where Memory will be read in or written to. </summary>
         public IMemory MemorySource   { get; private set; }
 
@@ -56,6 +62,32 @@ namespace Reloaded.Memory.Buffers
             Properties = memoryBufferProperties;
         }
 
+        /// <summary>
+        /// Sets up the mutex to be used by this instance of the <see cref="MemoryBuffer"/>.
+        /// The factory methods in <see cref="MemoryBufferFactory"/> SHOULD call this method.
+        /// </summary>
+        internal void SetupMutex(Process process)
+        {
+            try
+            {
+                _bufferMutex = Mutex.OpenExisting(GetMutexName(process));
+            }
+            catch (WaitHandleCannotBeOpenedException ex)
+            {
+                // Mutex does not exist.
+                _bufferMutex = new Mutex(false, GetMutexName(process));
+            }
+        }
+
+        /// <summary>
+        /// Generates the name of the named system-wide mutex for this class.
+        /// </summary>
+        internal string GetMutexName(Process process)
+        {
+            return $"Reloaded.Memory.Buffers | PID: {process.Id} | Memory Address: {_headerAddress.ToString("X")}";
+        }
+
+
         /*
             --------------
             Core Functions
@@ -70,43 +102,25 @@ namespace Reloaded.Memory.Buffers
         /// <returns>Pointer to the passed in bytes written to memory. Null pointer, if it cannot fit into the buffer.</returns>
         public IntPtr Add(byte[] bytesToWrite)
         {
-            /* A lock for the threads of the current application (DLL); just in case as extra backup. */
-            lock (_threadLock)
-            {
-                /* The following is application (DLL) lock to ensure that various different modules
-                   do not try reading/writing to the same buffer at once.
-                */
-                while (Properties.State == MemoryBufferProperties.BufferState.Locked)
-                    Thread.Sleep(1);
+            _bufferMutex.WaitOne();
+            var bufferProperties = Properties;
 
-                // Lock the buffer and locally store header for modification.
-                var bufferProperties = Properties;
+            // Check if item can fit in buffer and buffer address is valid.
+            if (!CanItemFit(bytesToWrite.Length) || _headerAddress == IntPtr.Zero)
+                return IntPtr.Zero;
 
-                /* Below we lock the buffer. Note that we cannot access the struct by pointer as it
-                   may be in another process (remember we are using arbitrary memory sources) */
-                bufferProperties.Lock();
-                Properties = bufferProperties;
+            // Append the item to the buffer.
+            IntPtr appendAddress = bufferProperties.WritePointer;
+            MemorySource.WriteRaw(appendAddress, bytesToWrite);
+            bufferProperties.Offset += bytesToWrite.Length;
 
-                // Check if item can fit in buffer and buffer address is valid.
-                if (!CanItemFit(bytesToWrite.Length) || _headerAddress == IntPtr.Zero)
-                {
-                    bufferProperties.Unlock();
-                    Properties = bufferProperties;
-                    return IntPtr.Zero;
-                }
+            // Re-align the buffer for next write operation, unlock and write back to memory.
+            bufferProperties.Align();
+            Properties = bufferProperties;
 
-                // Append the item to the buffer.
-                IntPtr appendAddress = bufferProperties.WritePointer;
-                MemorySource.WriteRaw(appendAddress, bytesToWrite);
-                bufferProperties.Offset += bytesToWrite.Length;
+            _bufferMutex.ReleaseMutex();
 
-                // Re-align, unlock and write back to memory.
-                bufferProperties.Align();
-                bufferProperties.Unlock();
-                Properties = bufferProperties;
-
-                return appendAddress;
-            }
+            return appendAddress;
         }
 
         /// <summary>
