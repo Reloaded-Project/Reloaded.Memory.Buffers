@@ -211,23 +211,11 @@ namespace Reloaded.Memory.Buffers
                and check if they satisfy our conditions.
             */
 
-            // Order:
-            // End of page range.
-            // Start of page range.
-            // Max ptr
-            // Min ptr
-
             /* Try placing range at start and end of page boundaries.
                Since we are allocating in page boundaries, we must compare against Min-Max. */
 
             // Note: We are rounding page boundary addresses up/down, possibly beyond the original ends/starts of page.
             //       We need to validate that we are still in the bounds of the actual page itself.
-
-            var allocPtrPageMaxAligned = Mathematics.RoundDown(pageRange.EndPointer - bufferSize, allocationGranularity);
-            var allocRangePageMaxStart = new AddressRange(allocPtrPageMaxAligned, allocPtrPageMaxAligned + bufferSize);
-
-            if (pageRange.Contains(ref allocRangePageMaxStart) && minMaxRange.Contains(ref allocRangePageMaxStart))
-                return (IntPtr)allocRangePageMaxStart.StartPointer;
 
             var allocPtrPageMinAligned = Mathematics.RoundUp(pageRange.StartPointer, allocationGranularity);
             var allocRangePageMinStart = new AddressRange(allocPtrPageMinAligned, allocPtrPageMinAligned + bufferSize);
@@ -235,23 +223,29 @@ namespace Reloaded.Memory.Buffers
             if (pageRange.Contains(ref allocRangePageMinStart) && minMaxRange.Contains(ref allocRangePageMinStart))
                 return (IntPtr)allocRangePageMinStart.StartPointer;
 
+            var allocPtrPageMaxAligned = Mathematics.RoundDown(pageRange.EndPointer - bufferSize, allocationGranularity);
+            var allocRangePageMaxStart = new AddressRange(allocPtrPageMaxAligned, allocPtrPageMaxAligned + bufferSize);
+
+            if (pageRange.Contains(ref allocRangePageMaxStart) && minMaxRange.Contains(ref allocRangePageMaxStart))
+                return (IntPtr)allocRangePageMaxStart.StartPointer;
+
             /* Try placing range at start and end of given minimum-maximum.
                Since we are allocating in Min-Max, we must compare against Page Boundaries. */
 
             // Note: Remember that rounding is dangerous and could potentially cause max and min to cross as usual,
             //       must check proposed page range against both given min-max and page memory range.
 
-            var allocPtrMaxAligned = Mathematics.RoundDown((long)maximumPtr - bufferSize, allocationGranularity);
-            var allocRangeMaxStart = new AddressRange(allocPtrMaxAligned, allocPtrMaxAligned + bufferSize);
-
-            if (pageRange.Contains(ref allocRangeMaxStart) && minMaxRange.Contains(ref allocRangeMaxStart))
-                return (IntPtr)allocRangeMaxStart.StartPointer;
-
             var allocPtrMinAligned = Mathematics.RoundUp((long)minimumPtr, allocationGranularity);
             var allocRangeMinStart = new AddressRange(allocPtrMinAligned, allocPtrMinAligned + bufferSize);
 
             if (pageRange.Contains(ref allocRangeMinStart) && minMaxRange.Contains(ref allocRangeMinStart))
                 return (IntPtr)allocRangeMinStart.StartPointer;
+
+            var allocPtrMaxAligned = Mathematics.RoundDown((long)maximumPtr - bufferSize, allocationGranularity);
+            var allocRangeMaxStart = new AddressRange(allocPtrMaxAligned, allocPtrMaxAligned + bufferSize);
+
+            if (pageRange.Contains(ref allocRangeMaxStart) && minMaxRange.Contains(ref allocRangeMaxStart))
+                return (IntPtr)allocRangeMaxStart.StartPointer;
 
             return IntPtr.Zero;
         }
