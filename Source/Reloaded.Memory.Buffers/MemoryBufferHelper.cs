@@ -23,8 +23,13 @@ namespace Reloaded.Memory.Buffers
         /// <summary> Contains the default size of memory pages to be allocated. </summary>
         internal const int DefaultPageSize = 0x1000;
 
+        /// <summary> Contains all of the memory pages found in the last scan through the target process. </summary>
+        private Kernel32.MEMORY_BASIC_INFORMATION[] _pageCache;
+
         /// <summary> Implementation of the Searcher that scans and finds existing <see cref="MemoryBuffer"/>s within the current process. </summary>
         private MemoryBufferSearcher _bufferSearcher;
+        
+        private VirtualQueryUtility.VirtualQueryFunction _virtualQueryFunction;
 
         /// <summary> The process on which the MemoryBuffer acts upon. </summary>
         public Process Process { get; private set; }
@@ -37,6 +42,7 @@ namespace Reloaded.Memory.Buffers
         {
             Process = process;
             _bufferSearcher = new MemoryBufferSearcher(process);
+            _virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
         }
 
         /*
@@ -54,13 +60,35 @@ namespace Reloaded.Memory.Buffers
         /// <param name="maximumAddress">The maximum absolute address to find a buffer in.</param>
         public BufferAllocationProperties FindBufferLocation(int size, IntPtr minimumAddress, IntPtr maximumAddress)
         {
-            var memoryPages = MemoryPages.GetPages(Process);
-            int bufferSize  = GetBufferSize(size);
+            int bufferSize = GetBufferSize(size);
 
-            // Find a free page that satisfies the necessary properties to create a new buffer there.
-            foreach (var page in memoryPages)
+            // Search through the buffer cache first.
+            if (_pageCache != null)
             {
-                var pointer = GetBufferPointerInPageRange(page, bufferSize, minimumAddress, maximumAddress);
+                for (int x = 0; x < _pageCache.Length; x++)
+                {
+                    var pointer = GetBufferPointerInPageRange(ref _pageCache[x], bufferSize, minimumAddress, maximumAddress);
+                    if (pointer != IntPtr.Zero)
+                    {
+                        // Page cache contains a page that can "work". Check if this page is still valid by running VirtualQuery on it 
+                        // and rechecking the new page.
+                        var memoryBasicInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
+                        _virtualQueryFunction(Process.Handle, pointer, ref memoryBasicInformation);
+
+                        var newPointer = GetBufferPointerInPageRange(ref memoryBasicInformation, bufferSize, minimumAddress, maximumAddress);
+                        if (newPointer != IntPtr.Zero)
+                            return new BufferAllocationProperties(newPointer, bufferSize);
+                    }
+                }
+            }
+
+            // Not found in cache, get all real pages and try find appropriate spot.
+            var memoryPages = MemoryPages.GetPages(Process).ToArray();
+            _pageCache      = memoryPages;
+
+            for (int x = 0; x < memoryPages.Length; x++)
+            {
+                var pointer = GetBufferPointerInPageRange(ref memoryPages[x], bufferSize, minimumAddress, maximumAddress);
                 if (pointer != IntPtr.Zero)
                     return new BufferAllocationProperties(pointer, bufferSize);
             }
@@ -179,7 +207,7 @@ namespace Reloaded.Memory.Buffers
         /// <param name="minimumPtr">The maximum pointer a <see cref="MemoryBuffer"/> can occupy.</param>
         /// <param name="maximumPtr">The minimum pointer a <see cref="MemoryBuffer"/> can occupy.</param>
         /// <returns>Zero if the operation fails; otherwise positive value.</returns>
-        private IntPtr GetBufferPointerInPageRange(Kernel32.MEMORY_BASIC_INFORMATION pageInfo, int bufferSize, IntPtr minimumPtr, IntPtr maximumPtr)
+        private IntPtr GetBufferPointerInPageRange(ref Kernel32.MEMORY_BASIC_INFORMATION pageInfo, int bufferSize, IntPtr minimumPtr, IntPtr maximumPtr)
         {
             // Fast return if page is not free.
             if (pageInfo.State != (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE)
@@ -217,17 +245,17 @@ namespace Reloaded.Memory.Buffers
             // Note: We are rounding page boundary addresses up/down, possibly beyond the original ends/starts of page.
             //       We need to validate that we are still in the bounds of the actual page itself.
 
-            var allocPtrPageMinAligned = Mathematics.RoundUp(pageRange.StartPointer, allocationGranularity);
-            var allocRangePageMinStart = new AddressRange(allocPtrPageMinAligned, allocPtrPageMinAligned + bufferSize);
-
-            if (pageRange.Contains(ref allocRangePageMinStart) && minMaxRange.Contains(ref allocRangePageMinStart))
-                return (IntPtr)allocRangePageMinStart.StartPointer;
-
             var allocPtrPageMaxAligned = Mathematics.RoundDown(pageRange.EndPointer - bufferSize, allocationGranularity);
             var allocRangePageMaxStart = new AddressRange(allocPtrPageMaxAligned, allocPtrPageMaxAligned + bufferSize);
 
             if (pageRange.Contains(ref allocRangePageMaxStart) && minMaxRange.Contains(ref allocRangePageMaxStart))
                 return (IntPtr)allocRangePageMaxStart.StartPointer;
+
+            var allocPtrPageMinAligned = Mathematics.RoundUp(pageRange.StartPointer, allocationGranularity);
+            var allocRangePageMinStart = new AddressRange(allocPtrPageMinAligned, allocPtrPageMinAligned + bufferSize);
+
+            if (pageRange.Contains(ref allocRangePageMinStart) && minMaxRange.Contains(ref allocRangePageMinStart))
+                return (IntPtr)allocRangePageMinStart.StartPointer;
 
             /* Try placing range at start and end of given minimum-maximum.
                Since we are allocating in Min-Max, we must compare against Page Boundaries. */
@@ -235,17 +263,17 @@ namespace Reloaded.Memory.Buffers
             // Note: Remember that rounding is dangerous and could potentially cause max and min to cross as usual,
             //       must check proposed page range against both given min-max and page memory range.
 
-            var allocPtrMinAligned = Mathematics.RoundUp((long)minimumPtr, allocationGranularity);
-            var allocRangeMinStart = new AddressRange(allocPtrMinAligned, allocPtrMinAligned + bufferSize);
-
-            if (pageRange.Contains(ref allocRangeMinStart) && minMaxRange.Contains(ref allocRangeMinStart))
-                return (IntPtr)allocRangeMinStart.StartPointer;
-
             var allocPtrMaxAligned = Mathematics.RoundDown((long)maximumPtr - bufferSize, allocationGranularity);
             var allocRangeMaxStart = new AddressRange(allocPtrMaxAligned, allocPtrMaxAligned + bufferSize);
 
             if (pageRange.Contains(ref allocRangeMaxStart) && minMaxRange.Contains(ref allocRangeMaxStart))
                 return (IntPtr)allocRangeMaxStart.StartPointer;
+
+            var allocPtrMinAligned = Mathematics.RoundUp((long)minimumPtr, allocationGranularity);
+            var allocRangeMinStart = new AddressRange(allocPtrMinAligned, allocPtrMinAligned + bufferSize);
+
+            if (pageRange.Contains(ref allocRangeMinStart) && minMaxRange.Contains(ref allocRangeMinStart))
+                return (IntPtr)allocRangeMinStart.StartPointer;
 
             return IntPtr.Zero;
         }
