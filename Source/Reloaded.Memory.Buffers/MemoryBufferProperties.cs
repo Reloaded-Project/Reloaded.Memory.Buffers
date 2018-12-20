@@ -43,11 +43,11 @@ namespace Reloaded.Memory.Buffers
         }
 
         /// <summary>
-        /// Sets a new alignment (in bytes) for the buffer.
+        /// Sets a new alignment (in bytes) for the buffer and auto-aligns the buffer.
         /// Note that setting the alignment will move the buffer offset to the next multiple of "alignment",
         /// unless it is already aligned.
         /// </summary>
-        public void SetAlignment(int alignment)
+        internal void SetAlignment(int alignment)
         {
             Alignment = alignment;
             Align();

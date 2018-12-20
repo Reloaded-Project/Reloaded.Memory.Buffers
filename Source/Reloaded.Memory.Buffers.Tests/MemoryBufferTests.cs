@@ -209,7 +209,6 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Disable item alignment.
             var bufferHeader = buffer.Properties;
-            bufferHeader.SetAlignment(1);
             buffer.Properties = bufferHeader;
 
             // Get remaining space, items to place.
@@ -226,7 +225,7 @@ namespace Reloaded.Memory.Buffers.Tests
             // Fill the buffer and verify each item as it's added.
             for (int x = 0; x < itemsToFit; x++)
             {
-                IntPtr writeAddress = buffer.Add(ref randomIntStructs[x]);
+                IntPtr writeAddress = buffer.Add(ref randomIntStructs[x], false, 1);
 
                 // Read back and compare.
                 externalMemory.Read(writeAddress, out RandomIntStruct actual);
@@ -249,7 +248,7 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Likewise, calling Add should return IntPtr.Zero.
             var randIntStr = RandomIntStruct.BuildRandomStruct();
-            Assert.Equal(IntPtr.Zero, buffer.Add(ref randIntStr));
+            Assert.Equal(IntPtr.Zero, buffer.Add(ref randIntStr, false, 1));
         }
 
         /// <summary>
@@ -264,7 +263,6 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Disable item alignment.
             var bufferHeader = buffer.Properties;
-            bufferHeader.SetAlignment(1);
             buffer.Properties = bufferHeader;
 
             // Get remaining space, items to place.
@@ -273,7 +271,7 @@ namespace Reloaded.Memory.Buffers.Tests
             byte[] rawArray          = randomByteArray.Array;
 
             // Fill the buffer with the whole array.
-            buffer.Add(rawArray);
+            buffer.Add(rawArray, 1);
 
             // Compare against the array written.
             IntPtr bufferStartPtr = bufferHeader.DataPointer;
@@ -291,7 +289,7 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Likewise, calling Add should return IntPtr.Zero.
             byte testByte = 55;
-            Assert.Equal(IntPtr.Zero, buffer.Add(ref testByte));
+            Assert.Equal(IntPtr.Zero, buffer.Add(ref testByte, false, 1));
         }
 
         /*

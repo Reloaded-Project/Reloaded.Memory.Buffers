@@ -42,9 +42,6 @@ namespace Reloaded.Memory.Buffers
         /// <summary> Stores the location of the <see cref="MemoryBufferProperties"/> structure. </summary>
         private readonly IntPtr _headerAddress;
 
-        /// <summary> Used to ensure only one thread in the current application can access buffer at once. </summary>
-        private readonly object _threadLock = new object();
-
         /*
             --------------
             Constructor(s)
@@ -99,11 +96,15 @@ namespace Reloaded.Memory.Buffers
         /// for the memory location of the written bytes.
         /// </summary>
         /// <param name="bytesToWrite">Individual bytes to be written onto the buffer.</param>
+        /// <param name="alignment">The memory alignment of the item to be added to the buffer.</param>
         /// <returns>Pointer to the passed in bytes written to memory. Null pointer, if it cannot fit into the buffer.</returns>
-        public IntPtr Add(byte[] bytesToWrite)
+        public IntPtr Add(byte[] bytesToWrite, int alignment = 4)
         {
             _bufferAddMutex.WaitOne();
             var bufferProperties = Properties;
+
+            // Re-align the buffer before write operation.
+            bufferProperties.SetAlignment(alignment);
 
             // Check if item can fit in buffer and buffer address is valid.
             if (Properties.Remaining < bytesToWrite.Length) // Inlined CanItemFit to prevent reading Properties from memory again.
@@ -113,13 +114,9 @@ namespace Reloaded.Memory.Buffers
             IntPtr appendAddress = bufferProperties.WritePointer;
             MemorySource.WriteRaw(appendAddress, bytesToWrite);
             bufferProperties.Offset += bytesToWrite.Length;
-
-            // Re-align the buffer for next write operation, unlock and write back to memory.
-            bufferProperties.Align();
             Properties = bufferProperties;
 
             _bufferAddMutex.ReleaseMutex();
-
             return appendAddress;
         }
 
@@ -129,13 +126,17 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         /// <param name="bytesToWrite">A structure to be converted into individual bytes to be written onto the buffer.</param>
         /// <param name="marshalElement">Set this to true to marshal the given parameter before writing it to the buffer, else false.</param>
+        /// <param name="alignment">The memory alignment of the item to be added to the buffer.</param>
         /// <returns>Pointer to the newly written structure in memory. Null pointer, if it cannot fit into the buffer.</returns>
-        public IntPtr Add<TStructure>(ref TStructure bytesToWrite, bool marshalElement = false)
+        public IntPtr Add<TStructure>(ref TStructure bytesToWrite, bool marshalElement = false, int alignment = 4)
         {
             _bufferAddMutex.WaitOne();
             var bufferProperties = Properties;
 
             int structLength = Struct.GetSize<TStructure>(marshalElement);
+
+            // Re-align the buffer before write operation.
+            bufferProperties.SetAlignment(alignment);
 
             // Check if item can fit in buffer and buffer address is valid.
             if (Properties.Remaining < structLength) // Inlined CanItemFit to prevent reading Properties from memory again.
@@ -144,14 +145,10 @@ namespace Reloaded.Memory.Buffers
             // Append the item to the buffer.
             IntPtr appendAddress = bufferProperties.WritePointer;
             MemorySource.Write(appendAddress, ref bytesToWrite, marshalElement);
-            bufferProperties.Offset += structLength;
-
-            // Re-align the buffer for next write operation, unlock and write back to memory.
-            bufferProperties.Align();
+            bufferProperties.Offset += structLength;            
             Properties = bufferProperties;
 
             _bufferAddMutex.ReleaseMutex();
-
             return appendAddress;
         }
 
