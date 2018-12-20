@@ -166,6 +166,16 @@ namespace Reloaded.Memory.Buffers
             return Properties.Remaining >= objectSize;
         }
 
+        /// <summary>
+        /// Returns true if the object can fit into the buffer, else false.
+        /// </summary>
+        /// <param name="item">The item to check if it can fit into the buffer.</param>
+        /// <param name="marshalElement">True if the item is to be marshalled, else false.</param>
+        public bool CanItemFit<TGeneric>(ref TGeneric item, bool marshalElement = false)
+        {
+            return CanItemFit(Struct.GetSize<TGeneric>(marshalElement));
+        }
+
         /*
             --------------
             Misc Functions

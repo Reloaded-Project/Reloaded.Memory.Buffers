@@ -245,7 +245,7 @@ namespace Reloaded.Memory.Buffers.Tests
             }
 
             // The array is full, calling CanItemFit should return false.
-            Assert.False(buffer.CanItemFit(structSize));
+            Assert.False(buffer.CanItemFit(ref randomIntStructs[0]));
 
             // Likewise, calling Add should return IntPtr.Zero.
             var randIntStr = RandomIntStruct.BuildRandomStruct();
