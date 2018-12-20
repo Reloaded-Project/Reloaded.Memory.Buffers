@@ -46,7 +46,7 @@ For more details please see [what this library is not](https://github.com/Reload
 
 The following below are links aimed to help you get started with the library, they cover the basics of use:
 
-+ [Getting Started](https://github.com/Reloaded-Project/Reloaded.Memory/blob/master/Docs/Getting-Started.md)
++ [Getting Started](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/blob/master/Docs/Getting-Started.md)
 + [Why this library was made](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/blob/master/Docs/Why-was-this-made.md)
 + [What this library is not](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/blob/master/Docs/What-this-library-is-not.md)
 
