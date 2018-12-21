@@ -1,7 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>
+      net452;
+      net47;
+      netstandard2.0
+    </TargetFrameworks>
     <RootNamespace>Reloaded.Memory.Buffers</RootNamespace>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -11,11 +15,12 @@
     <RepositoryUrl>https://github.com/Reloaded-Project/Reloaded.Memory.Buffers</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>An implementation of efficient, shared, concurrent and permanent storage of objects in unmanaged memory in static, non-changing locations that last the lifetime of a given process.</Description>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Sewer56</Authors>
     <Company></Company>
     <Product>Project Reloaded</Product>
     <Copyright>LGPL V3</Copyright>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -26,14 +31,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Reloaded.Memory.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Reloaded.Memory.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
