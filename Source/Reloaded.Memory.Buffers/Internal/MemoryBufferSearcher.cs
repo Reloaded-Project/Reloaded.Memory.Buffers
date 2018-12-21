@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Vanara.PInvoke;
+using static Reloaded.Memory.Kernel32.Kernel32;
 
 namespace Reloaded.Memory.Buffers.Internal
 {
@@ -41,8 +41,8 @@ namespace Reloaded.Memory.Buffers.Internal
             // Check if each page is the start of a buffer, and add it conditionally.
             for (int x = 0; x < memoryBasicInformation.Count; x++)
             {
-                if (memoryBasicInformation[x].State == (uint)(Kernel32.MEM_ALLOCATION_TYPE.MEM_COMMIT) &&
-                    memoryBasicInformation[x].Type == (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_PRIVATE &&
+                if (memoryBasicInformation[x].State == (uint)(MEM_ALLOCATION_TYPE.MEM_COMMIT) &&
+                    memoryBasicInformation[x].Type == (uint)MEM_ALLOCATION_TYPE.MEM_PRIVATE &&
                     MemoryBufferFactory.IsBuffer(_process, memoryBasicInformation[x].BaseAddress))
                 {
                     var address = memoryBasicInformation[x].BaseAddress;

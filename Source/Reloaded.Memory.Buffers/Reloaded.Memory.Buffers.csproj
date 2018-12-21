@@ -41,10 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reloaded.Memory" Version="1.0.2" />
+    <PackageReference Include="Reloaded.Memory" Version="1.0.3" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
-    <PackageReference Include="Vanara.PInvoke.Kernel32" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

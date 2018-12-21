@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Reloaded.Memory.Buffers.Internal;
 using Reloaded.Memory.Buffers.Internal.Structs;
-using Reloaded.Memory.Buffers.Internal.Utilities;
 using Reloaded.Memory.Sources;
-using Vanara.PInvoke;
-using static Reloaded.Memory.Buffers.Internal.Utilities.VirtualQueryUtility;
 
 namespace Reloaded.Memory.Buffers
 {

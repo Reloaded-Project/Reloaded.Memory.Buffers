@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Reloaded.Memory.Buffers.Internal;
 using Reloaded.Memory.Buffers.Internal.Structs;
 using Reloaded.Memory.Buffers.Internal.Utilities;
-using Vanara.PInvoke;
+using static Reloaded.Memory.Buffers.Internal.Kernel32.Kernel32;
+using static Reloaded.Memory.Kernel32.Kernel32;
 
 namespace Reloaded.Memory.Buffers
 {
@@ -24,7 +23,7 @@ namespace Reloaded.Memory.Buffers
         internal const int DefaultPageSize = 0x1000;
 
         /// <summary> Contains all of the memory pages found in the last scan through the target process. </summary>
-        private Kernel32.MEMORY_BASIC_INFORMATION[] _pageCache;
+        private MEMORY_BASIC_INFORMATION[] _pageCache;
 
         /// <summary> Implementation of the Searcher that scans and finds existing <see cref="MemoryBuffer"/>s within the current process. </summary>
         private MemoryBufferSearcher _bufferSearcher;
@@ -72,7 +71,7 @@ namespace Reloaded.Memory.Buffers
                     {
                         // Page cache contains a page that can "work". Check if this page is still valid by running VirtualQuery on it 
                         // and rechecking the new page.
-                        var memoryBasicInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
+                        var memoryBasicInformation = new MEMORY_BASIC_INFORMATION();
                         _virtualQueryFunction(Process.Handle, pointer, ref memoryBasicInformation);
 
                         var newPointer = GetBufferPointerInPageRange(ref memoryBasicInformation, bufferSize, minimumAddress, maximumAddress);
@@ -186,7 +185,7 @@ namespace Reloaded.Memory.Buffers
         public int GetBufferSize(int size)
         {
             // Get size of buffer; allocation granularity or larger if greater than the granularity.
-            Kernel32.GetSystemInfo(out var systemInfo);
+            GetSystemInfo(out var systemInfo);
 
             // Guard to ensure that page size is at least the minimum supported by the processor
             // While Reloaded is only intended for X86/64; this may be useful in the future.
@@ -207,10 +206,10 @@ namespace Reloaded.Memory.Buffers
         /// <param name="minimumPtr">The maximum pointer a <see cref="MemoryBuffer"/> can occupy.</param>
         /// <param name="maximumPtr">The minimum pointer a <see cref="MemoryBuffer"/> can occupy.</param>
         /// <returns>Zero if the operation fails; otherwise positive value.</returns>
-        private IntPtr GetBufferPointerInPageRange(ref Kernel32.MEMORY_BASIC_INFORMATION pageInfo, int bufferSize, IntPtr minimumPtr, IntPtr maximumPtr)
+        private IntPtr GetBufferPointerInPageRange(ref MEMORY_BASIC_INFORMATION pageInfo, int bufferSize, IntPtr minimumPtr, IntPtr maximumPtr)
         {
             // Fast return if page is not free.
-            if (pageInfo.State != (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE)
+            if (pageInfo.State != (uint)MEM_ALLOCATION_TYPE.MEM_FREE)
                 return IntPtr.Zero;
 
             // This is valid in both 32bit and 64bit Windows.
@@ -220,7 +219,7 @@ namespace Reloaded.Memory.Buffers
             // Do not align page start/end to allocation granularity yet.
             // Align it when we map the possible buffer ranges in the pages.
             long pageStart = (long)pageInfo.BaseAddress;
-            long pageEnd   = (long)pageInfo.BaseAddress + (long)pageInfo.RegionSize.Value;
+            long pageEnd   = (long)pageInfo.BaseAddress + (long)pageInfo.RegionSize;
 
             // Get range for page and min-max region.
             var minMaxRange  = new AddressRange((long)minimumPtr, (long)maximumPtr);

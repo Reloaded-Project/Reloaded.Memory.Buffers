@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using Reloaded.Memory.Buffers.Tests.Helpers;
 using Reloaded.Memory.Sources;
-using Vanara.PInvoke;
 using Xunit;
+using static Reloaded.Memory.Buffers.Internal.Kernel32.Kernel32;
 
 namespace Reloaded.Memory.Buffers.Tests
 {
@@ -317,8 +312,8 @@ namespace Reloaded.Memory.Buffers.Tests
         private IntPtr GetMaxAddress(MemoryBufferHelper helper)
         {
             // Is this Windows on Windows 64? (x86 app running on x64 Windows)
-            Kernel32.IsWow64Process(helper.Process.Handle, out bool isWow64);
-            Kernel32.GetSystemInfo(out Kernel32.SYSTEM_INFO systemInfo);
+            IsWow64Process(helper.Process.Handle, out bool isWow64);
+            GetSystemInfo(out SYSTEM_INFO systemInfo);
             long maxAddress = 0xFFFFFFFF;
 
             // Check if 64bit.

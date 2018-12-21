@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using Reloaded.Memory.Buffers.Internal.Structs;
 using Reloaded.Memory.Buffers.Internal.Utilities;
 using Reloaded.Memory.Sources;
-using Vanara.PInvoke;
 
 namespace Reloaded.Memory.Buffers.Internal
 {
@@ -61,10 +58,10 @@ namespace Reloaded.Memory.Buffers.Internal
         {
             // Query the region we are going to create a buffer in.
             var virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
-            var memoryInformation = new Kernel32.MEMORY_BASIC_INFORMATION();
+            var memoryInformation = new Kernel32.Kernel32.MEMORY_BASIC_INFORMATION();
             virtualQueryFunction(process.Handle, bufferMagicAddress, ref memoryInformation);
 
-            if (memoryInformation.State != (uint)Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE)
+            if (memoryInformation.State != (uint)Memory.Kernel32.Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE)
             {
                 if (IsBuffer(process, bufferMagicAddress))
                 {

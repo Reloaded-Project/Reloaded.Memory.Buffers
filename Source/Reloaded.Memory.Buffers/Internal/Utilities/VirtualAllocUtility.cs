@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Vanara.PInvoke;
+using static Reloaded.Memory.Kernel32.Kernel32;
 
 namespace Reloaded.Memory.Buffers.Internal.Utilities
 {
@@ -36,24 +36,24 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
 
         private static IntPtr VirtualAllocLocal(IntPtr processHandle, IntPtr address, ulong size)
         {
-            return Kernel32.VirtualAlloc
+            return VirtualAlloc
             (
                 address,
-                size,
-                Kernel32.MEM_ALLOCATION_TYPE.MEM_RESERVE | Kernel32.MEM_ALLOCATION_TYPE.MEM_COMMIT,
-                Kernel32.MEM_PROTECTION.PAGE_EXECUTE_READWRITE
+                (UIntPtr) size,
+                MEM_ALLOCATION_TYPE.MEM_RESERVE | MEM_ALLOCATION_TYPE.MEM_COMMIT,
+                MEM_PROTECTION.PAGE_EXECUTE_READWRITE
             );
         }
 
         private static IntPtr VirtualAllocRemote(IntPtr processHandle, IntPtr address, ulong size)
         {
-            return Kernel32.VirtualAllocEx
+            return VirtualAllocEx
             (
                 processHandle,
                 address,
-                size,
-                Kernel32.MEM_ALLOCATION_TYPE.MEM_RESERVE | Kernel32.MEM_ALLOCATION_TYPE.MEM_COMMIT,
-                Kernel32.MEM_PROTECTION.PAGE_EXECUTE_READWRITE
+                (UIntPtr) size,
+                MEM_ALLOCATION_TYPE.MEM_RESERVE | MEM_ALLOCATION_TYPE.MEM_COMMIT,
+                MEM_PROTECTION.PAGE_EXECUTE_READWRITE
             );
         }
     }
