@@ -24,7 +24,7 @@ namespace Reloaded.Memory.Buffers
 
             // This should work.
             long currentAddress = 0;
-            long maxAddress     = 0xFFFFFFFF; // 32bit (with Address Range Extension)
+            long maxAddress     = 0x7FFFFFFF; // 32bit (with Address Range Extension)
 
             // Check if 64bit.
             if (systemInfo.wProcessorArchitecture == ProcessorArchitecture.PROCESSOR_ARCHITECTURE_AMD64 && !isWow64)

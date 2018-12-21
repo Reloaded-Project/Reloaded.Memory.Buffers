@@ -104,7 +104,7 @@ namespace Reloaded.Memory.Buffers
         /// <param name="maximumAddress">The maximum absolute address to create a buffer in.</param>
         /// <param name="retryCount">In the case the memory allocation fails; the amount of times memory allocation is to be retried.</param>
         /// <exception cref="System.Exception">Memory allocation failure due to possible race condition with other process/process itself/Windows scheduling.</exception>
-        public MemoryBuffer CreateMemoryBuffer(int size, long minimumAddress = 0, long maximumAddress = long.MaxValue, int retryCount = 3)
+        public MemoryBuffer CreateMemoryBuffer(int size, long minimumAddress = 0, long maximumAddress = 0x7FFFFFFF, int retryCount = 3)
         {
             // Keep retrying memory allocation.
             lock (_threadLock)
