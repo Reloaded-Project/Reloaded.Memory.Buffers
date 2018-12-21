@@ -33,14 +33,30 @@
         /// </summary>
         public bool Overlaps(ref AddressRange otherRange)
         {
-            if (this.StartPointer >= otherRange.StartPointer &&
-                this.StartPointer <= otherRange.EndPointer)
+            if (PointInRange(ref otherRange, this.StartPointer))
                 return true;
 
-            if (this.EndPointer >= otherRange.StartPointer &&
-                this.EndPointer <= otherRange.EndPointer)
+            if (PointInRange(ref otherRange, this.EndPointer))
                 return true;
-            
+
+            if (PointInRange(ref this, otherRange.StartPointer))
+                return true;
+
+            if (PointInRange(ref this, otherRange.EndPointer))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if a number "point", is between min and max of address range.
+        /// </summary>
+        private bool PointInRange(ref AddressRange range, long point)
+        {
+            if (point >= range.StartPointer &&
+                point <= range.EndPointer)
+                return true;
+
             return false;
         }
     }
