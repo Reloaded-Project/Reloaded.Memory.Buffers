@@ -57,8 +57,12 @@ namespace Reloaded.Memory.Buffers
         /// <param name = "size" > The space in bytes that the specific <see cref="MemoryBuffer"/> would require to accomodate.</param>
         /// <param name="minimumAddress">The minimum absolute address to find a buffer in.</param>
         /// <param name="maximumAddress">The maximum absolute address to find a buffer in.</param>
-        public BufferAllocationProperties FindBufferLocation(int size, IntPtr minimumAddress, IntPtr maximumAddress)
+        public BufferAllocationProperties FindBufferLocation(int size, long minimumAddress, long maximumAddress)
         {
+            if (minimumAddress <= 0)
+                throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
+                                            "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
+
             int bufferSize = GetBufferSize(size);
 
             // Search through the buffer cache first.
@@ -66,7 +70,7 @@ namespace Reloaded.Memory.Buffers
             {
                 for (int x = 0; x < _pageCache.Length; x++)
                 {
-                    var pointer = GetBufferPointerInPageRange(ref _pageCache[x], bufferSize, minimumAddress, maximumAddress);
+                    var pointer = GetBufferPointerInPageRange(ref _pageCache[x], bufferSize, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
                     if (pointer != IntPtr.Zero)
                     {
                         // Page cache contains a page that can "work". Check if this page is still valid by running VirtualQuery on it 
@@ -74,7 +78,7 @@ namespace Reloaded.Memory.Buffers
                         var memoryBasicInformation = new MEMORY_BASIC_INFORMATION();
                         _virtualQueryFunction(Process.Handle, pointer, ref memoryBasicInformation);
 
-                        var newPointer = GetBufferPointerInPageRange(ref memoryBasicInformation, bufferSize, minimumAddress, maximumAddress);
+                        var newPointer = GetBufferPointerInPageRange(ref memoryBasicInformation, bufferSize, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
                         if (newPointer != IntPtr.Zero)
                             return new BufferAllocationProperties(newPointer, bufferSize);
                     }
@@ -87,7 +91,7 @@ namespace Reloaded.Memory.Buffers
 
             for (int x = 0; x < memoryPages.Length; x++)
             {
-                var pointer = GetBufferPointerInPageRange(ref memoryPages[x], bufferSize, minimumAddress, maximumAddress);
+                var pointer = GetBufferPointerInPageRange(ref memoryPages[x], bufferSize, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
                 if (pointer != IntPtr.Zero)
                     return new BufferAllocationProperties(pointer, bufferSize);
             }
@@ -104,8 +108,12 @@ namespace Reloaded.Memory.Buffers
         /// <param name="maximumAddress">The maximum absolute address to create a buffer in.</param>
         /// <param name="retryCount">In the case the memory allocation fails; the amount of times memory allocation is to be retried.</param>
         /// <exception cref="System.Exception">Memory allocation failure due to possible race condition with other process/process itself/Windows scheduling.</exception>
-        public MemoryBuffer CreateMemoryBuffer(int size, long minimumAddress = 0, long maximumAddress = 0x7FFFFFFF, int retryCount = 3)
+        public MemoryBuffer CreateMemoryBuffer(int size, long minimumAddress = 0x10000, long maximumAddress = 0x7FFFFFFF, int retryCount = 3)
         {
+            if (minimumAddress <= 0)
+                throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
+                                            "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
+
             // Keep retrying memory allocation.
             lock (_threadLock)
             {
@@ -114,7 +122,7 @@ namespace Reloaded.Memory.Buffers
                 {
                     try
                     {
-                        var memoryLocation = FindBufferLocation(size, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
+                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress);
                         return MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
                     }
                     catch (Exception ex) { caughtException = ex; }
