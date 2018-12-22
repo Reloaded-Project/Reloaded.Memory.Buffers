@@ -12,8 +12,8 @@
 		<img src="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers/branch/master/graph/badge.svg" alt="Coverage" />
 	</a>
 	<!-- NuGet -->
-	<a href="https://www.nuget.org/packages/Reloaded.Memory">
-		<img src="https://img.shields.io/nuget/v/Reloaded.Memory.svg" alt="NuGet" />
+	<a href="https://www.nuget.org/packages/Reloaded.Memory.Buffers">
+		<img src="https://img.shields.io/nuget/v/Reloaded.Memory.Buffers.svg" alt="NuGet" />
 	</a>
 	<!-- Build Status -->
 	<a href="https://ci.appveyor.com/project/sewer56lol/reloaded-memory-buffers">
