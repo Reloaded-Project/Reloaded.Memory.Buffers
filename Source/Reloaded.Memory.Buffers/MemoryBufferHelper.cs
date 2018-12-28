@@ -123,7 +123,9 @@ namespace Reloaded.Memory.Buffers
                     try
                     {
                         var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress);
-                        return MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+                        var buffer = MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+                        _bufferSearcher.AddBuffer(buffer);
+                        return buffer;
                     }
                     catch (Exception ex) { caughtException = ex; }
                 }
@@ -165,7 +167,7 @@ namespace Reloaded.Memory.Buffers
 
             // Get all MemoryBuffers where their raw data range fits into the given minimum and maximum address.
             AddressRange allowedRange = new AddressRange((long) minimumAddress, (long) maximumAddress);
-            var memoryBuffers = new List<MemoryBuffer>(buffers.Length);
+            var memoryBuffers         = new List<MemoryBuffer>(buffers.Length);
 
             foreach (var buffer in buffers)
             {
@@ -177,6 +179,8 @@ namespace Reloaded.Memory.Buffers
 
             return memoryBuffers.ToArray();
         }
+
+
 
         /*
             -----------------------

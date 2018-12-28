@@ -29,6 +29,16 @@ namespace Reloaded.Memory.Buffers.Internal
         }
 
         /// <summary>
+        /// Adds a new <see cref="MemoryBuffer"/> to the internal buffer cache.
+        /// </summary>
+        /// <param name="buffer">The buffer which to add to cache.</param>
+        internal void AddBuffer(MemoryBuffer buffer)
+        {
+            if (!_bufferCache.ContainsKey(buffer.AllocationAddress))
+                _bufferCache.Add(buffer.AllocationAddress, buffer);
+        }
+
+        /// <summary>
         /// Scans the whole process for buffers and returns a list of found buffers.
         /// </summary>
         /// <remarks>Running this function updates the internal module cache.</remarks>
@@ -47,9 +57,7 @@ namespace Reloaded.Memory.Buffers.Internal
                 {
                     var address = memoryBasicInformation[x].BaseAddress;
                     MemoryBuffer buffer = MemoryBufferFactory.FromAddress(_process, address);
-
-                    if (! _bufferCache.ContainsKey(address))
-                        _bufferCache.Add(address, buffer);
+                    AddBuffer(buffer);
                 }
             }
 
