@@ -14,6 +14,12 @@
 
 The following is a small, quick, non-exhaustive resource to help you get started with the *Reloaded.Memory.Buffers* library - providing an introduction to writing code using the library. This serves as a guide to help you get going, covering the basics and essentials.
 
+## Adding Reloaded.Memory to your project.
+1.  Open/Create project in Visual Studio.
+2.  Right-click your project within the `Solution Explorer` and select `Manage NuGet Packages`.
+3.  Search for `Reloaded.Hooks`.
+4.  Install the package.
+
 ## Prologue
 Reloaded.Memory.Buffers, part of Project-Reloaded (also known as Reloaded 3.X) exposes a class called `MemoryBufferHelper` to help you get started with buffers.
 
