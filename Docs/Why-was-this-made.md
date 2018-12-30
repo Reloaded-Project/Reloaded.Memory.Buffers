@@ -42,7 +42,7 @@ Well, after some research, which is well... rather hard for anything x86 related
 jmp qword [0xDEDBEEF] // FASM syntax requires explicit operand size
 ```
 
-6 bytes. Glorious.
+7 bytes. Glorious.
 
 Now the only problem left is how we place a pointer in 32bit address space, specifically at a place like `0xDEDBEEF`.
 
