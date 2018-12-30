@@ -62,6 +62,14 @@ namespace Reloaded.Memory.Buffers.Tests
         [Fact]
         public unsafe void GetBuffersInRangeExternal() => GetBuffersInRange(_externalBufferHelper, GetMaxAddress(_externalBufferHelper));
 
+        /* Same as above, except without cache. */
+
+        [Fact]
+        public unsafe void GetBuffersInRangeInternalNoCache() => GetBuffersInRangeNoCache(_bufferHelper, GetMaxAddress(_bufferHelper));
+        
+        [Fact]
+        public unsafe void GetBuffersInRangeExternalNoCache() => GetBuffersInRangeNoCache(_externalBufferHelper, GetMaxAddress(_externalBufferHelper));
+
         /// <summary>
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>; including
         /// the return of the correct pointer and CanItemFit.
@@ -185,6 +193,53 @@ namespace Reloaded.Memory.Buffers.Tests
 
                 foreach (var buffer in foundBuffers)
                     AssertBufferInRange(buffer, (IntPtr) minAddress, (IntPtr) maxAddress);
+            }
+
+            // Cleanup
+            for (int x = 0; x < buffers.Length; x++)
+                Internal.Testing.Buffers.FreeBuffer(buffers[x]);
+        }
+
+        /// <summary>
+        /// Same as <see cref="GetBuffersInRange"/>, except disables the caching when acquiring <see cref="MemoryBuffer"/>s.
+        /// </summary>
+        private unsafe void GetBuffersInRangeNoCache(MemoryBufferHelper bufferHelper, IntPtr maxApplicationAddress)
+        {
+            /* The reason that testing the upper half is sufficient is because the buffer allocation
+               functions work in such a manner that they allocate from the lowest address.
+               As such, normally the only allocated addresses would be in the lower half... until enough memory is allocated to cross the upper half.
+            */
+
+            // Options
+            int sizeStart = 0;    // Default page size for x86 and x64.
+            int repetitions = 128;
+            int increment = 4096; // Equal to allocation granularity.
+
+            // Minimum address is start of upper half of 32/64 bit address range.
+            // Maximum is the maximum address in 32/64 bit address range.
+            long minAddress = (long)maxApplicationAddress - ((long)maxApplicationAddress / 2);
+            long maxAddress = (long)maxApplicationAddress;
+
+            MemoryBuffer[] buffers = new MemoryBuffer[repetitions];
+
+            // Allocate <repetitions> buffers, and try to find them all.
+            for (int x = 0; x < repetitions; x++)
+            {
+                int newSize = sizeStart + (x * increment);
+                buffers[x] = bufferHelper.CreateMemoryBuffer(newSize, (long)minAddress, (long)maxAddress);
+            }
+
+            // Validate whether each buffer is present and in range.
+            for (int x = 0; x < repetitions; x++)
+            {
+                int newSize = sizeStart + (x * increment);
+                var foundBuffers = bufferHelper.FindBuffers(newSize, (IntPtr)minAddress, (IntPtr)maxAddress, false);
+
+                if (!foundBuffers.Contains(buffers[x]))
+                    Assert.True(false, $"Failed to find existing buffer in memory of minimum size {newSize} bytes.");
+
+                foreach (var buffer in foundBuffers)
+                    AssertBufferInRange(buffer, (IntPtr)minAddress, (IntPtr)maxAddress);
             }
 
             // Cleanup
