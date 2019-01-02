@@ -38,6 +38,8 @@ Below is a list of ideas as to what you can do/should expect from this library:
 + Easy to use method for finding existing `MemoryBuffers` in both current and external processes.
 + The ability to allocate `MemoryBuffers` in user specified memory address range.
 
+If you don't like sharing memory with others or want to store data not lasting the lifetime of the process that you can later dispose (free), `PrivateMemoryBuffers` are also now available.
+
 ## Non-Features
 Below is a list of ideas as to what you should NOT expect from this library:
 + The straight up fastest, most performant solution. (Not possible without limiting functionality)

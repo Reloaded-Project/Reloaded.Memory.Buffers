@@ -57,13 +57,14 @@ namespace Reloaded.Memory.Buffers
         /// <param name = "size" > The space in bytes that the specific <see cref="MemoryBuffer"/> would require to accomodate.</param>
         /// <param name="minimumAddress">The minimum absolute address to find a buffer in.</param>
         /// <param name="maximumAddress">The maximum absolute address to find a buffer in.</param>
-        public BufferAllocationProperties FindBufferLocation(int size, long minimumAddress, long maximumAddress)
+        /// <param name="isPrivateBuffer">Defines whether the buffer type created is a shared or private buffer.</param>
+        public BufferAllocationProperties FindBufferLocation(int size, long minimumAddress, long maximumAddress, bool isPrivateBuffer = false)
         {
             if (minimumAddress <= 0)
                 throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
 
-            int bufferSize = GetBufferSize(size);
+            int bufferSize = GetBufferSize(size, isPrivateBuffer);
 
             // Search through the buffer cache first.
             if (_pageCache != null)
@@ -132,7 +133,41 @@ namespace Reloaded.Memory.Buffers
 
                 throw caughtException;
             }
-        }        
+        }
+
+
+        /// <summary>
+        /// Creates a <see cref="PrivateMemoryBuffer"/> that satisfies a set size constraint and proximity to a set address.
+        /// </summary>
+        /// <param name="size">The minimum size the <see cref="PrivateMemoryBuffer"/> will have to accomodate.</param>
+        /// <param name="minimumAddress">The minimum absolute address to create a buffer in.</param>
+        /// <param name="maximumAddress">The maximum absolute address to create a buffer in.</param>
+        /// <param name="retryCount">In the case the memory allocation fails; the amount of times memory allocation is to be retried.</param>
+        /// <exception cref="System.Exception">Memory allocation failure due to possible race condition with other process/process itself/Windows scheduling.</exception>
+        public PrivateMemoryBuffer CreatePrivateMemoryBuffer(int size, long minimumAddress = 0x10000, long maximumAddress = 0x7FFFFFFF, int retryCount = 3)
+        {
+            if (minimumAddress <= 0)
+                throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
+                                            "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
+
+            // Keep retrying memory allocation.
+            lock (_threadLock)
+            {
+                Exception caughtException = new Exception("Temp Exception in CreatePrivateMemoryBuffer(). This should not throw.");
+                for (int retries = 0; retries < retryCount; retries++)
+                {
+                    try
+                    {
+                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
+                        var buffer = MemoryBufferFactory.CreatePrivateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+                        return buffer;
+                    }
+                    catch (Exception ex) { caughtException = ex; }
+                }
+
+                throw caughtException;
+            }
+        }
 
         /*
             -------------------
@@ -193,8 +228,9 @@ namespace Reloaded.Memory.Buffers
         /// of raw data, taking into consideration buffer overhead.
         /// </summary>
         /// <param name="size">The size of the buffer to be allocated.</param>
+        /// <param name="isPrivateBuffer">Defines whether the buffer type created is a shared or private buffer.</param>
         /// <returns>A calculated buffer size based off of the requested capacity in bytes.</returns>
-        public int GetBufferSize(int size)
+        public int GetBufferSize(int size, bool isPrivateBuffer = false)
         {
             // Get size of buffer; allocation granularity or larger if greater than the granularity.
             GetSystemInfo(out var systemInfo);
@@ -205,6 +241,9 @@ namespace Reloaded.Memory.Buffers
             int pageSize = DefaultPageSize;
             if (systemInfo.dwPageSize > pageSize || (pageSize % systemInfo.dwPageSize != 0))
                 pageSize = (int)systemInfo.dwPageSize;
+
+            if (isPrivateBuffer)
+                return Mathematics.RoundUp(size + MemoryBufferFactory.PrivateBufferOverhead, pageSize);
 
             return Mathematics.RoundUp(size + MemoryBufferFactory.BufferOverhead, pageSize);
         }

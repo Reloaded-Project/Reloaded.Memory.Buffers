@@ -37,6 +37,18 @@ namespace Reloaded.Memory.Buffers.Tests
         public void CreateBufferExternal() => CreateBufferBase(_externalBufferHelper);
 
         /// <summary>
+        /// Tests if a <see cref="PrivateMemoryBuffer"/> can be successfully created.
+        /// </summary>
+        [Fact]
+        public void CreatePrivateBufferInternal() => CreatePrivateBufferBase(_bufferHelper);
+
+        /// <summary>
+        /// Tests if a <see cref="PrivateMemoryBuffer"/> can be successfully created.
+        /// </summary>
+        [Fact]
+        public void CreaterivateBufferExternal() => CreatePrivateBufferBase(_externalBufferHelper);
+
+        /// <summary>
         /// Creates a <see cref="MemoryBuffer"/> and attempts to retrieve it by searching for it in memory.
         /// </summary>
         [Fact]
@@ -75,28 +87,56 @@ namespace Reloaded.Memory.Buffers.Tests
         /// the return of the correct pointer and CanItemFit.
         /// </summary>
         [Fact]
-        private void MemoryBufferAddGenericInternal() => MemoryBufferAddGeneric(_bufferHelper);
+        private void MemoryBufferAddGenericInternal() => MemoryBufferAddGeneric(CreateMemoryBuffer(_bufferHelper), _bufferHelper.Process);
 
         /// <summary>
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>; including
         /// the return of the correct pointer and CanItemFit.
         /// </summary>
         [Fact]
-        private void MemoryBufferAddGenericExternal() => MemoryBufferAddGeneric(_externalBufferHelper);
+        private void MemoryBufferAddGenericExternal() => MemoryBufferAddGeneric(CreateMemoryBuffer(_externalBufferHelper), _externalBufferHelper.Process);
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="PrivateMemoryBuffer"/>; including
+        /// the return of the correct pointer and CanItemFit.
+        /// </summary>
+        [Fact]
+        private void PrivateMemoryBufferAddGenericInternal() => MemoryBufferAddGeneric(CreatePrivateMemoryBuffer(_bufferHelper), _bufferHelper.Process);
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="PrivateMemoryBuffer"/>; including
+        /// the return of the correct pointer and CanItemFit.
+        /// </summary>
+        [Fact]
+        private void PrivateMemoryBufferAddGenericExternal() => MemoryBufferAddGeneric(CreatePrivateMemoryBuffer(_externalBufferHelper), _externalBufferHelper.Process);
 
         /// <summary>
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>, with raw data;
         /// including the return of the correct pointer and CanItemFit.
         /// </summary>
         [Fact]
-        private unsafe void MemoryBufferAddByteArrayInternal() => MemoryBufferAddByteArray(_bufferHelper);
+        private unsafe void MemoryBufferAddByteArrayInternal() => MemoryBufferAddByteArray(CreateMemoryBuffer(_bufferHelper), _bufferHelper.Process);
 
         /// <summary>
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>, with raw data;
         /// including the return of the correct pointer and CanItemFit.
         /// </summary>
         [Fact]
-        private unsafe void MemoryBufferAddByteArrayExternal() => MemoryBufferAddByteArray(_externalBufferHelper);
+        private unsafe void MemoryBufferAddByteArrayExternal() => MemoryBufferAddByteArray(CreateMemoryBuffer(_externalBufferHelper), _externalBufferHelper.Process);
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="PrivateMemoryBuffer"/>, with raw data;
+        /// including the return of the correct pointer and CanItemFit.
+        /// </summary>
+        [Fact]
+        private unsafe void PrivateMemoryBufferAddByteArrayInternal() => MemoryBufferAddByteArray(CreatePrivateMemoryBuffer(_bufferHelper), _bufferHelper.Process);
+
+        /// <summary>
+        /// Tests the "Add" functionality of the <see cref="PrivateMemoryBuffer"/>, with raw data;
+        /// including the return of the correct pointer and CanItemFit.
+        /// </summary>
+        [Fact]
+        private unsafe void PrivateMemoryBufferAddByteArrayExternal() => MemoryBufferAddByteArray(CreatePrivateMemoryBuffer(_externalBufferHelper), _externalBufferHelper.Process);
 
 
         /*
@@ -116,6 +156,18 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Cleanup
             Internal.Testing.Buffers.FreeBuffer(buffer);
+        }
+
+        /// <summary>
+        /// [Testing Purposes]
+        /// Creates a buffer, then frees the memory belonging to the buffer.
+        /// </summary>
+        private void CreatePrivateBufferBase(MemoryBufferHelper bufferHelper)
+        {
+            var buffer = bufferHelper.CreatePrivateMemoryBuffer(4096);
+
+            // Cleanup
+            buffer.Dispose();
         }
 
         /// <summary>
@@ -251,11 +303,10 @@ namespace Reloaded.Memory.Buffers.Tests
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>; including
         /// the return of the correct pointer and CanItemFit.
         /// </summary>
-        private unsafe void MemoryBufferAddGeneric(MemoryBufferHelper bufferHelper)
+        private unsafe void MemoryBufferAddGeneric(MemoryBuffer buffer, Process process)
         {
             // Setup test.
-            ExternalMemory externalMemory = new ExternalMemory(bufferHelper.Process);
-            var buffer = bufferHelper.CreateMemoryBuffer(1000);
+            ExternalMemory externalMemory = new ExternalMemory(process);
 
             // Disable item alignment.
             var bufferHeader = buffer.Properties;
@@ -305,11 +356,10 @@ namespace Reloaded.Memory.Buffers.Tests
         /// Tests the "Add" functionality of the <see cref="MemoryBuffer"/>, with raw data;
         /// including the return of the correct pointer and CanItemFit.
         /// </summary>
-        private unsafe void MemoryBufferAddByteArray(MemoryBufferHelper bufferHelper)
+        private unsafe void MemoryBufferAddByteArray(MemoryBuffer buffer, Process process)
         {
             // Setup test.
-            ExternalMemory externalMemory = new ExternalMemory(bufferHelper.Process);
-            var buffer = bufferHelper.CreateMemoryBuffer(1000);
+            ExternalMemory externalMemory = new ExternalMemory(process);
 
             // Disable item alignment.
             var bufferHeader = buffer.Properties;
@@ -347,6 +397,16 @@ namespace Reloaded.Memory.Buffers.Tests
          * Utility Methods
          * ---------------
         */
+
+        private MemoryBuffer CreateMemoryBuffer(MemoryBufferHelper helper)
+        {
+            return helper.CreateMemoryBuffer(4096);
+        }
+
+        private MemoryBuffer CreatePrivateMemoryBuffer(MemoryBufferHelper helper)
+        {
+            return helper.CreatePrivateMemoryBuffer(4096);
+        }
 
         /// <summary>
         /// Asserts whether the contents of a given <see cref="MemoryBuffer"/> lie in the <see cref="minAddress"/> to <see cref="maxAddress"/> address range.

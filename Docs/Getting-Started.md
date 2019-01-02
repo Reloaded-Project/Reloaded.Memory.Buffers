@@ -34,6 +34,9 @@ Process Process { get; }
    given minimum and maximum memory address. */
 MemoryBuffer CreateMemoryBuffer(int size, long minimumAddress = 0, long maximumAddress = long.MaxValue, int retryCount = 3);
 
+/* Creates a non-shared PrivateMemoryBuffer that can be disposed of (memory freed) after usage. */
+PrivateMemoryBuffer CreatePrivateMemoryBuffer(int size, long minimumAddress = 0, long maximumAddress = long.MaxValue, int retryCount = 3);
+
 /* Finds existing MemoryBuffers in a process between minimumAddress and 
    maximumAddress */
 MemoryBuffer[] FindBuffers(int size, IntPtr minimumAddress, IntPtr maximumAddress, bool useCache = true);
