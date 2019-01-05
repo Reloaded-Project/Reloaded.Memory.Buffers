@@ -15,6 +15,14 @@ namespace Reloaded.Memory.Buffers
         /* Constructors */
         internal PrivateMemoryBuffer(IMemory memorySource, IntPtr headerAddress, MemoryBufferProperties memoryBufferProperties) : base(memorySource, headerAddress, memoryBufferProperties) { }
 
+        /// <summary>
+        /// Destroys this object.
+        /// </summary>
+        ~PrivateMemoryBuffer()
+        {
+            Dispose();
+        }
+
         /*
             ------------------------
             Additional Functionality
