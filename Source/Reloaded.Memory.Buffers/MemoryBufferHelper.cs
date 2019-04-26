@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using Reloaded.Memory.Buffers.Internal;
 using Reloaded.Memory.Buffers.Internal.Structs;
 using Reloaded.Memory.Buffers.Internal.Utilities;
@@ -16,11 +17,14 @@ namespace Reloaded.Memory.Buffers
     /// </summary>
     public class MemoryBufferHelper
     {
-        /// <summary> Attempts to mitigate synchronization issues by locking the thread creating a new buffer. </summary>
-        private readonly object _threadLock = new object();
-
         /// <summary> Contains the default size of memory pages to be allocated. </summary>
         internal const int DefaultPageSize = 0x1000;
+
+        /// <summary> Name of the systemwide mutex used for allocation synchronization. </summary>
+        internal string CreateBufferMutexName() => $"Reloaded.Memory.Buffers.MemoryBufferHelper | Allocate Memory | PID: {Process.Id}";
+
+        /// <summary> Mutex used to mutually exclude runs of all functions which internally allocate memory leading to a change of internal state. </summary>
+        private Mutex _allocateMemoryMutex;
 
         /// <summary> Contains all of the memory pages found in the last scan through the target process. </summary>
         private MEMORY_BASIC_INFORMATION[] _pageCache;
@@ -42,6 +46,7 @@ namespace Reloaded.Memory.Buffers
             Process = process;
             _bufferSearcher = new MemoryBufferSearcher(process);
             _virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
+            _allocateMemoryMutex = MutexObtainer.MakeMutex(CreateBufferMutexName());
         }
 
         /*
@@ -53,11 +58,18 @@ namespace Reloaded.Memory.Buffers
         /// <summary>
         /// Finds an appropriate location where a <see cref="MemoryBuffer"/>;
         /// or other memory allocation could be performed.
+        /// Note: Please see remarks for this function.
         /// </summary>
         /// <param name = "size" > The space in bytes that the specific <see cref="MemoryBuffer"/> would require to accomodate.</param>
         /// <param name="minimumAddress">The minimum absolute address to find a buffer in.</param>
         /// <param name="maximumAddress">The maximum absolute address to find a buffer in.</param>
         /// <param name="isPrivateBuffer">Defines whether the buffer type created is a shared or private buffer.</param>
+        /// <remarks>
+        /// WARNING:
+        ///     Using this in a multithreaded environment can be dangerous, be careful.
+        ///     It is possible to have a race condition on memory allocation.
+        ///     If you want to just allocate memory, please use the provided <see cref="Allocate"/> function instead.
+        /// </remarks>
         public BufferAllocationProperties FindBufferLocation(int size, long minimumAddress, long maximumAddress, bool isPrivateBuffer = false)
         {
             if (minimumAddress <= 0)
@@ -65,7 +77,7 @@ namespace Reloaded.Memory.Buffers
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
 
             int bufferSize = GetBufferSize(size, isPrivateBuffer);
-
+            
             // Search through the buffer cache first.
             if (_pageCache != null)
             {
@@ -116,23 +128,26 @@ namespace Reloaded.Memory.Buffers
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
 
             // Keep retrying memory allocation.
-            lock (_threadLock)
-            {
-                Exception caughtException = new Exception("Temp Exception in CreateMemoryBuffer(). This should not throw.");
-                for (int retries = 0; retries < retryCount; retries++)
-                {
-                    try
-                    {
-                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress);
-                        var buffer = MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
-                        _bufferSearcher.AddBuffer(buffer);
-                        return buffer;
-                    }
-                    catch (Exception ex) { caughtException = ex; }
-                }
+            _allocateMemoryMutex.WaitOne();
 
-                throw caughtException;
+            try
+            {
+                return Run(retryCount, () =>
+                {
+                    var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress);
+                    var buffer = MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+                    _bufferSearcher.AddBuffer(buffer);
+
+                    _allocateMemoryMutex.ReleaseMutex();
+                    return buffer;
+                });
             }
+            catch (Exception)
+            {
+                _allocateMemoryMutex.ReleaseMutex();
+                throw;
+            }
+
         }
 
 
@@ -151,21 +166,23 @@ namespace Reloaded.Memory.Buffers
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
 
             // Keep retrying memory allocation.
-            lock (_threadLock)
-            {
-                Exception caughtException = new Exception("Temp Exception in CreatePrivateMemoryBuffer(). This should not throw.");
-                for (int retries = 0; retries < retryCount; retries++)
-                {
-                    try
-                    {
-                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
-                        var buffer = MemoryBufferFactory.CreatePrivateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
-                        return buffer;
-                    }
-                    catch (Exception ex) { caughtException = ex; }
-                }
+            _allocateMemoryMutex.WaitOne();
 
-                throw caughtException;
+            try
+            {
+                return Run(retryCount, () =>
+                {
+                    var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
+                    var buffer = MemoryBufferFactory.CreatePrivateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+
+                    _allocateMemoryMutex.ReleaseMutex();
+                    return buffer;
+                });
+            }
+            catch (Exception)
+            {
+                _allocateMemoryMutex.ReleaseMutex();
+                throw;
             }
         }
 
@@ -215,6 +232,66 @@ namespace Reloaded.Memory.Buffers
             return memoryBuffers.ToArray();
         }
 
+        /// <summary>
+        /// Allocates memory that satisfies a set size constraint and proximity to a set address.
+        /// </summary>
+        /// <param name="size">The minimum size of the memory to be allocated.</param>
+        /// <param name="minimumAddress">The minimum absolute address to allocate in.</param>
+        /// <param name="maximumAddress">The maximum absolute address to allocate in.</param>
+        /// <param name="retryCount">In the case the memory allocation fails; the amount of times memory allocation is to be retried.</param>
+        /// <exception cref="System.Exception">Memory allocation failure due to possible race condition with other process/process itself/Windows scheduling.</exception>
+        /// <remarks>
+        ///     This function is virtually the same to running <see cref="FindBufferLocation"/> and then running Windows'
+        ///     VirtualAlloc yourself. Except for the extra added safety of mutual exclusion (Mutex).
+        ///     The memory is allocated with the PAGE_EXECUTE_READWRITE permissions.
+        /// </remarks>
+        public BufferAllocationProperties Allocate(int size, int minimumAddress = 0x10000, int maximumAddress = 0x7FFFFFFF, int retryCount = 3)
+        {
+            if (minimumAddress <= 0)
+                throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
+                                            "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
+
+            // Keep retrying memory allocation.
+            _allocateMemoryMutex.WaitOne();
+
+            try
+            {
+                return Run(retryCount, () =>
+                {
+                    var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
+                    var virtualAllocFunction = VirtualAllocUtility.GetVirtualAllocFunction(Process);
+                    virtualAllocFunction(Process.Handle, memoryLocation.MemoryAddress, (ulong)memoryLocation.Size);
+
+                    _allocateMemoryMutex.ReleaseMutex();
+                    return memoryLocation;
+                });
+            }
+            catch (Exception)
+            {
+                _allocateMemoryMutex.ReleaseMutex();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Frees memory that has been allocated by <see cref="Allocate"/>.
+        /// </summary>
+        /// <param name="address">The address of the memory originally received from the call to <see cref="Allocate"/>.</param>
+        public void Free(IntPtr address)
+        {
+            _allocateMemoryMutex.WaitOne();
+
+            try
+            {
+                VirtualFreeUtility.GetVirtualFreeFunction(Process)(Process.Handle, address);
+                _allocateMemoryMutex.ReleaseMutex();
+            }
+            catch (Exception)
+            {
+                _allocateMemoryMutex.ReleaseMutex();
+                throw;
+            }
+        }
 
 
         /*
@@ -246,6 +323,25 @@ namespace Reloaded.Memory.Buffers
                 return Mathematics.RoundUp(size + MemoryBufferFactory.PrivateBufferOverhead, pageSize);
 
             return Mathematics.RoundUp(size + MemoryBufferFactory.BufferOverhead, pageSize);
+        }
+
+
+        /// <summary>
+        /// Runs a given function with a specified number of retries if an exception is thrown.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="retries">The number of times to retry the function.</param>
+        /// <param name="function">The function to run.</param>
+        private T Run<T>(int retries, Func<T> function)
+        {
+            Exception caughtException = new Exception("This should not throw");
+            for (int x = 0; x < retries; x++)
+            {
+                try  { return function();  }
+                catch (Exception ex) { caughtException = ex; }
+            }
+
+            throw caughtException;
         }
 
         /// <summary>

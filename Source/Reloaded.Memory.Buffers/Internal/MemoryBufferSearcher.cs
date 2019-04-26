@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Reloaded.Memory.Buffers.Internal
     internal class MemoryBufferSearcher
     {
         /// <summary> Maintains address to buffer mappings. </summary>
-        private Dictionary<IntPtr, MemoryBuffer> _bufferCache = new Dictionary<IntPtr, MemoryBuffer>(100);
+        private ConcurrentDictionary<IntPtr, MemoryBuffer> _bufferCache = new ConcurrentDictionary<IntPtr, MemoryBuffer>();
 
         /// <summary> The process in which the buffers are being searched for. </summary>
         private Process _process;

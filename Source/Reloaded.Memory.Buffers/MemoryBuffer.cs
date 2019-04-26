@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Reloaded.Memory.Buffers.Internal;
 using Reloaded.Memory.Buffers.Internal.Structs;
+using Reloaded.Memory.Buffers.Internal.Utilities;
 using Reloaded.Memory.Sources;
 
 namespace Reloaded.Memory.Buffers
@@ -76,7 +77,7 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         internal string GetMutexName(Process process)
         {
-            return $"Reloaded.Memory.Buffers | PID: {process.Id} | Memory Address: {_headerAddress.ToString("X")}";
+            return $"Reloaded.Memory.Buffers.MemoryBuffer | PID: {process.Id} | Memory Address: {_headerAddress.ToString("X")}";
         }
 
 
