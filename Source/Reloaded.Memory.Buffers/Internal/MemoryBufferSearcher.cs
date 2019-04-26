@@ -53,6 +53,7 @@ namespace Reloaded.Memory.Buffers.Internal
             {
                 if (memoryBasicInformation[x].State == (uint)(MEM_ALLOCATION_TYPE.MEM_COMMIT) &&
                     memoryBasicInformation[x].Type == (uint)MEM_ALLOCATION_TYPE.MEM_PRIVATE &&
+                    memoryBasicInformation[x].Protect == (uint)MEM_PROTECTION.PAGE_EXECUTE_READWRITE &&
                     MemoryBufferFactory.IsBuffer(_process, memoryBasicInformation[x].BaseAddress))
                 {
                     var address = memoryBasicInformation[x].BaseAddress;
