@@ -4,6 +4,7 @@ using System.Security;
 
 namespace Reloaded.Memory.Buffers.Internal.Kernel32
 {
+    /// <summary/>
     public class Kernel32
     {
         /// <summary>Determines whether the specified process is running under WOW64.</summary>

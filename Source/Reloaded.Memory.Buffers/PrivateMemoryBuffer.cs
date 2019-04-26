@@ -32,9 +32,11 @@ namespace Reloaded.Memory.Buffers
         /// <summary>
         /// Disposes of the memory used by this buffer.
         /// </summary>
-        public void Dispose()
+        public new void Dispose()
         {
             MemorySource.Free(AllocationAddress);
+            base.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

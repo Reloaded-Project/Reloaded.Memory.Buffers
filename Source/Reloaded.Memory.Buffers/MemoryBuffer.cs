@@ -13,7 +13,7 @@ namespace Reloaded.Memory.Buffers
     /// Provides a buffer for permanent (until the process dies) general small size memory storage, reusable 
     /// concurrently between different DLLs within the same process.
     /// </summary>
-    public unsafe class MemoryBuffer
+    public unsafe class MemoryBuffer : IDisposable
     {
         /// <summary>
         /// Stores the reference to a system-wide mutex which prevents concurrent access
@@ -53,6 +53,25 @@ namespace Reloaded.Memory.Buffers
         internal MemoryBuffer(IMemory memorySource, IntPtr headerAddress, MemoryBufferProperties memoryBufferProperties) : this(memorySource, headerAddress)
         {
             Properties = memoryBufferProperties;
+        }
+
+        /*
+            ----------
+            Destructor
+            ----------
+        */
+
+        /// <summary/>
+        ~MemoryBuffer()
+        {
+            Dispose();
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            _bufferAddMutex?.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
