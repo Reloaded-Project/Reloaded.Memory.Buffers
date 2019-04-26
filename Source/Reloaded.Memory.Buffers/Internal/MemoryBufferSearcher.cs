@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using static Reloaded.Memory.Kernel32.Kernel32;
 
 namespace Reloaded.Memory.Buffers.Internal
@@ -34,8 +35,7 @@ namespace Reloaded.Memory.Buffers.Internal
         /// <param name="buffer">The buffer which to add to cache.</param>
         internal void AddBuffer(MemoryBuffer buffer)
         {
-            if (!_bufferCache.ContainsKey(buffer.AllocationAddress))
-                _bufferCache.Add(buffer.AllocationAddress, buffer);
+            _bufferCache[buffer.AllocationAddress] = buffer;
         }
 
         /// <summary>
