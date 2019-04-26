@@ -47,6 +47,7 @@ namespace Reloaded.Memory.Buffers.Internal
         {
             // Get a list of all pages.
             var memoryBasicInformation = MemoryPages.GetPages(_process);
+            List<MemoryBuffer> buffers = new List<MemoryBuffer>();
 
             // Check if each page is the start of a buffer, and add it conditionally.
             for (int x = 0; x < memoryBasicInformation.Count; x++)
@@ -59,10 +60,11 @@ namespace Reloaded.Memory.Buffers.Internal
                     var address = memoryBasicInformation[x].BaseAddress;
                     MemoryBuffer buffer = MemoryBufferFactory.FromAddress(_process, address);
                     AddBuffer(buffer);
+                    buffers.Add(buffer);
                 }
             }
 
-            return _bufferCache.Values.ToArray();
+            return buffers.ToArray();
         }
 
 
@@ -88,11 +90,19 @@ namespace Reloaded.Memory.Buffers.Internal
             }
 
             // No cached buffers meet the criteria; find a set of new buffers.
-            FindBuffers();
+            var newBuffers = FindBuffers();
 
             // Retry finding buffers that meet requirements.
-            var memoryBuffers = _bufferCache.Values.Where(x => x.CanItemFit(size)).ToArray();
-            return memoryBuffers;
+            if (useCache)
+            {
+                var memoryBuffers = _bufferCache.Values.Where(x => x.CanItemFit(size)).ToArray();
+                return memoryBuffers;
+            }
+            else
+            {
+                var memoryBuffers = newBuffers.Where(x => x.CanItemFit(size)).ToArray();
+                return memoryBuffers;
+            }
         }
     }
 }
