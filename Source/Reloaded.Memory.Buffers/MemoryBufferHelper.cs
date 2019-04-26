@@ -260,7 +260,10 @@ namespace Reloaded.Memory.Buffers
                 {
                     var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
                     var virtualAllocFunction = VirtualAllocUtility.GetVirtualAllocFunction(Process);
-                    virtualAllocFunction(Process.Handle, memoryLocation.MemoryAddress, (ulong)memoryLocation.Size);
+                    var result = virtualAllocFunction(Process.Handle, memoryLocation.MemoryAddress, (ulong)memoryLocation.Size);
+
+                    if (result == IntPtr.Zero)
+                        throw new Exception("Failed to allocate memory using VirtualAlloc/VirtualAllocEx");
 
                     _allocateMemoryMutex.ReleaseMutex();
                     return memoryLocation;

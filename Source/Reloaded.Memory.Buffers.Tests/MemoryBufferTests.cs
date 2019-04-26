@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Reloaded.Memory.Buffers.Tests.Helpers;
 using Reloaded.Memory.Sources;
 using Xunit;
@@ -145,6 +147,43 @@ namespace Reloaded.Memory.Buffers.Tests
          * ----------
         */
 
+        [Fact]
+        private void AllocateFree()
+        {
+            for (int x = 0; x < 20; x++)
+            {
+                // Commit
+                var buf = _bufferHelper.Allocate(4096);
+                var extBuf = _externalBufferHelper.Allocate(4096);
+
+                // Write something to start of buffers to test allocation.
+                var bufMem = new Sources.Memory();
+                var extBufMem = new ExternalMemory(_externalBufferHelper.Process);
+
+                bufMem.Write(buf.MemoryAddress, 5);
+                extBufMem.Write(extBuf.MemoryAddress, 5);
+
+                // Release
+                _bufferHelper.Free(buf.MemoryAddress);
+                _externalBufferHelper.Free(extBuf.MemoryAddress);
+            }
+        }
+
+        [Fact]
+        private void AllocateConcurrent()
+        {
+            int numThreads = 100;
+            var threads = new Thread[numThreads];
+
+            for (int x = 0; x < numThreads; x++)
+            {
+                threads[x] = new Thread(AllocateFree); 
+                threads[x].Start();
+            }
+
+            foreach (var thread in threads)
+                thread.Join();
+        }
 
         /// <summary>
         /// [Testing Purposes]
