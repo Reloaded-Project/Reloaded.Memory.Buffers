@@ -107,6 +107,27 @@ namespace Reloaded.Memory.Buffers
         */
 
         /// <summary>
+        /// Locks a buffer from use by others and executes a given function.
+        /// </summary>
+        /// <param name="func">The function to execute while preventing others' access to the buffer.</param>
+        public T ExecuteWithLock<T>(Func<T> func)
+        {
+            try
+            {
+                _bufferAddMutex.WaitOne();
+                var result = func();
+                _bufferAddMutex.ReleaseMutex();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _bufferAddMutex.ReleaseMutex();
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Writes your own memory bytes into process' memory and gives you the address
         /// for the memory location of the written bytes.
         /// </summary>
@@ -115,24 +136,25 @@ namespace Reloaded.Memory.Buffers
         /// <returns>Pointer to the passed in bytes written to memory. Null pointer, if it cannot fit into the buffer.</returns>
         public IntPtr Add(byte[] bytesToWrite, int alignment = 4)
         {
-            _bufferAddMutex.WaitOne();
-            var bufferProperties = Properties;
+            return ExecuteWithLock(() =>
+            {
+                var bufferProperties = Properties;
 
-            // Re-align the buffer before write operation.
-            bufferProperties.SetAlignment(alignment);
+                // Re-align the buffer before write operation.
+                bufferProperties.SetAlignment(alignment);
 
-            // Check if item can fit in buffer and buffer address is valid.
-            if (Properties.Remaining < bytesToWrite.Length) // Inlined CanItemFit to prevent reading Properties from memory again.
-                return IntPtr.Zero;
+                // Check if item can fit in buffer and buffer address is valid.
+                if (Properties.Remaining < bytesToWrite.Length) // Inlined CanItemFit to prevent reading Properties from memory again.
+                    return IntPtr.Zero;
 
-            // Append the item to the buffer.
-            IntPtr appendAddress = bufferProperties.WritePointer;
-            MemorySource.WriteRaw(appendAddress, bytesToWrite);
-            bufferProperties.Offset += bytesToWrite.Length;
-            Properties = bufferProperties;
+                // Append the item to the buffer.
+                IntPtr appendAddress = bufferProperties.WritePointer;
+                MemorySource.WriteRaw(appendAddress, bytesToWrite);
+                bufferProperties.Offset += bytesToWrite.Length;
+                Properties = bufferProperties;
 
-            _bufferAddMutex.ReleaseMutex();
-            return appendAddress;
+                return appendAddress;
+            });
         }
 
         /// <summary>
@@ -145,26 +167,28 @@ namespace Reloaded.Memory.Buffers
         /// <returns>Pointer to the newly written structure in memory. Null pointer, if it cannot fit into the buffer.</returns>
         public IntPtr Add<TStructure>(ref TStructure bytesToWrite, bool marshalElement = false, int alignment = 4)
         {
-            _bufferAddMutex.WaitOne();
-            var bufferProperties = Properties;
+            var bytesToWriteByVal = bytesToWrite;
+            return ExecuteWithLock(() =>
+            {
+                var bufferProperties = Properties;
 
-            int structLength = Struct.GetSize<TStructure>(marshalElement);
+                int structLength = Struct.GetSize<TStructure>(marshalElement);
 
-            // Re-align the buffer before write operation.
-            bufferProperties.SetAlignment(alignment);
+                // Re-align the buffer before write operation.
+                bufferProperties.SetAlignment(alignment);
 
-            // Check if item can fit in buffer and buffer address is valid.
-            if (Properties.Remaining < structLength) // Inlined CanItemFit to prevent reading Properties from memory again.
-                return IntPtr.Zero;
+                // Check if item can fit in buffer and buffer address is valid.
+                if (Properties.Remaining < structLength) // Inlined CanItemFit to prevent reading Properties from memory again.
+                    return IntPtr.Zero;
 
-            // Append the item to the buffer.
-            IntPtr appendAddress = bufferProperties.WritePointer;
-            MemorySource.Write(appendAddress, ref bytesToWrite, marshalElement);
-            bufferProperties.Offset += structLength;            
-            Properties = bufferProperties;
+                // Append the item to the buffer.
+                IntPtr appendAddress = bufferProperties.WritePointer;
+                MemorySource.Write(appendAddress, ref bytesToWriteByVal, marshalElement);
+                bufferProperties.Offset += structLength;
+                Properties = bufferProperties;
 
-            _bufferAddMutex.ReleaseMutex();
-            return appendAddress;
+                return appendAddress;
+            });
         }
 
         /// <summary>
