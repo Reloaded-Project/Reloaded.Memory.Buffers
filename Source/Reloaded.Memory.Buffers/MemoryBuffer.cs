@@ -128,6 +128,23 @@ namespace Reloaded.Memory.Buffers
         }
 
         /// <summary>
+        /// Sets a new alignment (in bytes) for the buffer and auto-aligns the buffer.
+        /// Note that setting the alignment will move the buffer offset to the next multiple of "alignment",
+        /// unless it is already aligned.
+        /// </summary>
+        public void SetAlignment(int alignment)
+        {
+            ExecuteWithLock(() =>
+            {
+                var bufferProperties = Properties;
+                bufferProperties.SetAlignment(alignment);
+                Properties = bufferProperties;
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Writes your own memory bytes into process' memory and gives you the address
         /// for the memory location of the written bytes.
         /// </summary>

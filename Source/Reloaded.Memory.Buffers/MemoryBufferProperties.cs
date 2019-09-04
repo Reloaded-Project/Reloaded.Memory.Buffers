@@ -47,7 +47,7 @@ namespace Reloaded.Memory.Buffers
         /// Note that setting the alignment will move the buffer offset to the next multiple of "alignment",
         /// unless it is already aligned.
         /// </summary>
-        public void SetAlignment(int alignment)
+        internal void SetAlignment(int alignment)
         {
             Alignment = alignment;
             Align();
