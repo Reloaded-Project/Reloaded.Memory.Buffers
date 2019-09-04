@@ -58,7 +58,7 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         internal void Align()
         {
-            Mathematics.RoundUp(Offset, Alignment);
+            Offset = Mathematics.RoundUp(Offset, Alignment);
         }
     }
 }
