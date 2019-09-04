@@ -107,7 +107,7 @@ namespace Reloaded.Memory.Buffers
         */
 
         /// <summary>
-        /// Locks a buffer from use by others and executes a given function.
+        /// Locks a buffer from use by other threads and executes a given function.
         /// </summary>
         /// <param name="func">The function to execute while preventing others' access to the buffer.</param>
         public T ExecuteWithLock<T>(Func<T> func)
@@ -120,7 +120,7 @@ namespace Reloaded.Memory.Buffers
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _bufferAddMutex.ReleaseMutex();
                 throw;
