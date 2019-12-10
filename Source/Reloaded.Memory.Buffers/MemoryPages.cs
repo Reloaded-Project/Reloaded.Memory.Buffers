@@ -33,7 +33,7 @@ namespace Reloaded.Memory.Buffers
             // Get the VirtualQuery function implementation to use.
             // Local is faster and works for current process; Remote is for another process.
             VirtualQueryUtility.VirtualQueryFunction virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
-            
+
             // Shorthand for convenience.
             List<MEMORY_BASIC_INFORMATION> memoryPages = new List<MEMORY_BASIC_INFORMATION>(8192);
 
@@ -42,7 +42,9 @@ namespace Reloaded.Memory.Buffers
             {
                 // Get our info from VirtualQueryEx.
                 var memoryInformation = new MEMORY_BASIC_INFORMATION();
-                virtualQueryFunction(process.Handle, (IntPtr)currentAddress, ref memoryInformation);
+                var result = virtualQueryFunction(process.Handle, (IntPtr)currentAddress, ref memoryInformation);
+                if (result == (UIntPtr) 0)
+                    break;
 
                 // Add the page and increment address iterator to go to next page.
                 memoryPages.Add(memoryInformation);
