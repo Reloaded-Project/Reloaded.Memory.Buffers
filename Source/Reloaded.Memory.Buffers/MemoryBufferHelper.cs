@@ -77,7 +77,7 @@ namespace Reloaded.Memory.Buffers
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
 
             int bufferSize = GetBufferSize(size, isPrivateBuffer);
-            
+
             // Search through the buffer cache first.
             if (_pageCache != null)
             {
@@ -89,7 +89,9 @@ namespace Reloaded.Memory.Buffers
                         // Page cache contains a page that can "work". Check if this page is still valid by running VirtualQuery on it 
                         // and rechecking the new page.
                         var memoryBasicInformation = new MEMORY_BASIC_INFORMATION();
-                        _virtualQueryFunction(Process.Handle, pointer, ref memoryBasicInformation);
+                        var result =_virtualQueryFunction(Process.Handle, pointer, ref memoryBasicInformation);
+                        if (result == (UIntPtr)0)
+                            throw new Exception("VirtualQuery failed. Result is 0.");
 
                         var newPointer = GetBufferPointerInPageRange(ref memoryBasicInformation, bufferSize, (IntPtr) minimumAddress, (IntPtr) maximumAddress);
                         if (newPointer != IntPtr.Zero)
