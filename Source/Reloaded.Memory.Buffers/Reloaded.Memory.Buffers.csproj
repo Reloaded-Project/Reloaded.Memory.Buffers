@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Reloaded-Project/Reloaded.Memory.Buffers</PackageProjectUrl>
-    <PackageIconUrl>https://avatars1.githubusercontent.com/u/45473408</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/Reloaded-Project/Reloaded.Memory.Buffers</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>An implementation of efficient, shared, concurrent and permanent storage of objects in unmanaged memory in static, non-changing locations that last the lifetime of a given process.</Description>
@@ -23,6 +23,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Platforms>AnyCPU;x86</Platforms>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>Icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,6 +49,10 @@
   <ItemGroup>
     <None Remove="MemoryBufferHelper.cs~RFdc4141.TMP" />
     <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\Icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
