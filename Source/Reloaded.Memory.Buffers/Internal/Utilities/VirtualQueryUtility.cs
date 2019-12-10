@@ -18,7 +18,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
         private static extern UIntPtr VirtualQuery(IntPtr lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, UIntPtr dwLength);
 
         /// <summary/>
-        public delegate void VirtualQueryFunction(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation);
+        public delegate UIntPtr VirtualQueryFunction(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation);
 
         /// <summary>
         /// Retrieves the function to use in place of VirtualQuery.
@@ -44,14 +44,14 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
          * The Remote one; runs it for another process; being the slower of the two.
          */
 
-        private static void VirtualQueryLocal(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation)
+        private static UIntPtr VirtualQueryLocal(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation)
         {
-            VirtualQuery(address, ref memoryInformation, (UIntPtr) sizeof(MEMORY_BASIC_INFORMATION));
+            return VirtualQuery(address, ref memoryInformation, (UIntPtr) sizeof(MEMORY_BASIC_INFORMATION));
         }
 
-        private static void VirtualQueryRemote(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation)
+        private static UIntPtr VirtualQueryRemote(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation)
         {
-            VirtualQueryEx(processHandle, address, ref memoryInformation, (UIntPtr) sizeof(MEMORY_BASIC_INFORMATION));
+            return VirtualQueryEx(processHandle, address, ref memoryInformation, (UIntPtr) sizeof(MEMORY_BASIC_INFORMATION));
         }
     }
 }
