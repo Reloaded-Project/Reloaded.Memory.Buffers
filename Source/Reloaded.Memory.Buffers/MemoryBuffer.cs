@@ -29,7 +29,7 @@ namespace Reloaded.Memory.Buffers
         {
             get
             {
-                MemorySource.SafeRead(_headerAddress, out MemoryBufferProperties bufferHeader);
+                MemorySource.Read(_headerAddress, out MemoryBufferProperties bufferHeader);
                 return bufferHeader;
             }
             set => MemorySource.Write(_headerAddress, ref value);
@@ -141,6 +141,34 @@ namespace Reloaded.Memory.Buffers
                 Properties = bufferProperties;
 
                 return true;
+            });
+        }
+
+        /// <summary>
+        /// Allocates a fixed amount of memory on the buffer for your own data to be stored.
+        /// </summary>
+        /// <param name="numBytes">Number of bytes to write..</param>
+        /// <param name="alignment">The memory alignment of the item to be added to the buffer.</param>
+        /// <returns>Pointer to the passed in bytes written to memory. Null pointer, if it cannot fit into the buffer.</returns>
+        public IntPtr Add(int numBytes, int alignment = 4)
+        {
+            return ExecuteWithLock(() =>
+            {
+                var bufferProperties = Properties;
+
+                // Re-align the buffer before write operation.
+                bufferProperties.SetAlignment(alignment);
+
+                // Check if item can fit in buffer and buffer address is valid.
+                if (Properties.Remaining < numBytes) // Inlined CanItemFit to prevent reading Properties from memory again.
+                    return IntPtr.Zero;
+
+                // Append the item to the buffer.
+                IntPtr appendAddress = bufferProperties.WritePointer;
+                bufferProperties.Offset += numBytes;
+                Properties = bufferProperties;
+
+                return appendAddress;
             });
         }
 
