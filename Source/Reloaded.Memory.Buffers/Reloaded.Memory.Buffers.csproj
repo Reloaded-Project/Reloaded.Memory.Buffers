@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/Reloaded-Project/Reloaded.Memory.Buffers</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>An implementation of efficient, shared, concurrent and permanent storage of objects in unmanaged memory in static, non-changing locations that last the lifetime of a given process.</Description>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <Authors>Sewer56</Authors>
     <Company></Company>
     <Product>Project Reloaded</Product>

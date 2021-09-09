@@ -58,7 +58,7 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         internal void Align()
         {
-            Offset = Mathematics.RoundUp(Offset, Alignment);
+            Offset = (int)(Mathematics.RoundUp((ulong)WritePointer, (ulong)Alignment) - (ulong) DataPointer);
         }
     }
 }
