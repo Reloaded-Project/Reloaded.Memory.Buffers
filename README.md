@@ -16,8 +16,8 @@
 		<img src="https://img.shields.io/nuget/v/Reloaded.Memory.Buffers.svg" alt="NuGet" />
 	</a>
 	<!-- Build Status -->
-	<a href="https://ci.appveyor.com/project/sewer56lol/reloaded-memory-buffers">
-		<img src="https://ci.appveyor.com/api/projects/status/mlcow0611h61datr/branch/master?svg=true" alt="Build Status" />
+	<a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/actions/workflows/build-and-publish.yml">
+		<img src="https://img.shields.io/github/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/Build%20and%20Publish" alt="Build Status" />
 	</a>
 </div>
 
