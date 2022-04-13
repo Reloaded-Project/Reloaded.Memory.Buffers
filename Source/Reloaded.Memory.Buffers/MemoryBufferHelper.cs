@@ -240,11 +240,12 @@ namespace Reloaded.Memory.Buffers
         /// <param name="size">The minimum size of the memory to be allocated.</param>
         /// <param name="minimumAddress">The minimum absolute address to allocate in.</param>
         /// <param name="maximumAddress">The maximum absolute address to allocate in.</param>
-        /// <param name="retryCount">In the case the memory allocation fails; the amount of times memory allocation is to be retried.</param>
+        /// <param name="retryCount">In the case the memory allocation for a potential location fails; the amount of times memory allocation is to be retried.</param>
         /// <exception cref="System.Exception">Memory allocation failure due to possible race condition with other process/process itself/Windows scheduling.</exception>
         /// <remarks>
         ///     This function is virtually the same to running <see cref="FindBufferLocation"/> and then running Windows'
-        ///     VirtualAlloc yourself. Except for the extra added safety of mutual exclusion (Mutex).
+        ///     VirtualAlloc yourself. Except for the extra added safety of mutual exclusion (Mutex) and mitigating a wine bug
+        ///     where allocation can fail on the first free pages repeatedly.
         ///     The memory is allocated with the PAGE_EXECUTE_READWRITE permissions.
         /// </remarks>
         public BufferAllocationProperties Allocate(int size, int minimumAddress = 0x10000, int maximumAddress = 0x7FFFFFFF, int retryCount = 3)
@@ -252,30 +253,34 @@ namespace Reloaded.Memory.Buffers
             if (minimumAddress <= 0)
                 throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
+            Exception allocationException = new("Failed to allocate memory using VirtualAlloc/ VirtualAllocEx");
 
             // Keep retrying memory allocation.
             _allocateMemoryMutex.WaitOne();
 
-            try
+            while (minimumAddress < maximumAddress)
             {
-                return Run(retryCount, () =>
+                try
                 {
-                    var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
-                    var virtualAllocFunction = VirtualAllocUtility.GetVirtualAllocFunction(Process);
-                    var result = virtualAllocFunction(Process.Handle, memoryLocation.MemoryAddress, (ulong)memoryLocation.Size);
+                    return Run(retryCount, () =>
+                    {
+                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
+                        var virtualAllocFunction = VirtualAllocUtility.GetVirtualAllocFunction(Process);
+                        var result = virtualAllocFunction(Process.Handle, memoryLocation.MemoryAddress, (ulong)memoryLocation.Size);
 
-                    if (result == IntPtr.Zero)
-                        throw new Exception("Failed to allocate memory using VirtualAlloc/VirtualAllocEx");
-
-                    _allocateMemoryMutex.ReleaseMutex();
-                    return memoryLocation;
-                });
+                        if (result == IntPtr.Zero)
+                            throw allocationException;
+                        _allocateMemoryMutex.ReleaseMutex();
+                        return memoryLocation;
+                    });
+                }
+                catch (Exception)
+                {
+                    minimumAddress += 0x10000;
+                }
             }
-            catch (Exception)
-            {
-                _allocateMemoryMutex.ReleaseMutex();
-                throw;
-            }
+            _allocateMemoryMutex.ReleaseMutex();
+            throw allocationException;
         }
 
         /// <summary>
