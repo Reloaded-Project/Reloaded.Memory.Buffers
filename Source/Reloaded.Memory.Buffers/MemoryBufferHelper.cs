@@ -128,28 +128,32 @@ namespace Reloaded.Memory.Buffers
             if (minimumAddress <= 0)
                 throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
-
+            var exception = new Exception();
             // Keep retrying memory allocation.
             _allocateMemoryMutex.WaitOne();
 
-            try
+            while (minimumAddress < maximumAddress)
             {
-                return Run(retryCount, () =>
+                try
                 {
-                    var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress);
-                    var buffer = MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
-                    _bufferSearcher.AddBuffer(buffer);
+                    return Run(retryCount, () =>
+                    {
+                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress);
+                        var buffer = MemoryBufferFactory.CreateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+                        _bufferSearcher.AddBuffer(buffer);
 
-                    _allocateMemoryMutex.ReleaseMutex();
-                    return buffer;
-                });
+                        _allocateMemoryMutex.ReleaseMutex();
+                        return buffer;
+                    });
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                    minimumAddress += 0x10000;
+                }
             }
-            catch (Exception)
-            {
-                _allocateMemoryMutex.ReleaseMutex();
-                throw;
-            }
-
+            _allocateMemoryMutex.ReleaseMutex();
+            throw exception;
         }
 
 
@@ -166,26 +170,32 @@ namespace Reloaded.Memory.Buffers
             if (minimumAddress <= 0)
                 throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
+            var exception = new Exception();
 
             // Keep retrying memory allocation.
             _allocateMemoryMutex.WaitOne();
 
-            try
+            while (minimumAddress < maximumAddress)
             {
-                return Run(retryCount, () =>
+                try
                 {
-                    var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
-                    var buffer = MemoryBufferFactory.CreatePrivateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
+                    return Run(retryCount, () =>
+                    {
+                        var memoryLocation = FindBufferLocation(size, minimumAddress, maximumAddress, true);
+                        var buffer = MemoryBufferFactory.CreatePrivateBuffer(Process, memoryLocation.MemoryAddress, memoryLocation.Size);
 
-                    _allocateMemoryMutex.ReleaseMutex();
-                    return buffer;
-                });
+                        _allocateMemoryMutex.ReleaseMutex();
+                        return buffer;
+                    });
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                    minimumAddress += 0x10000;
+                }
             }
-            catch (Exception)
-            {
-                _allocateMemoryMutex.ReleaseMutex();
-                throw;
-            }
+            _allocateMemoryMutex.ReleaseMutex();
+            throw exception;
         }
 
         /*
@@ -253,7 +263,7 @@ namespace Reloaded.Memory.Buffers
             if (minimumAddress <= 0)
                 throw new ArgumentException("Please do not set the minimum address to 0 or negative. It collides with the return values of Windows API functions" +
                                             "where e.g. 0 is returned on failure but you can also allocate successfully on 0.");
-            Exception allocationException = new("Failed to allocate memory using VirtualAlloc/ VirtualAllocEx");
+            var exception = new Exception();
 
             // Keep retrying memory allocation.
             _allocateMemoryMutex.WaitOne();
@@ -269,18 +279,19 @@ namespace Reloaded.Memory.Buffers
                         var result = virtualAllocFunction(Process.Handle, memoryLocation.MemoryAddress, (ulong)memoryLocation.Size);
 
                         if (result == IntPtr.Zero)
-                            throw allocationException;
+                            throw new Exception("Failed to allocate memory using VirtualAlloc/VirtualAllocEx");
                         _allocateMemoryMutex.ReleaseMutex();
                         return memoryLocation;
                     });
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    exception = e;
                     minimumAddress += 0x10000;
                 }
             }
             _allocateMemoryMutex.ReleaseMutex();
-            throw allocationException;
+            throw exception;
         }
 
         /// <summary>
