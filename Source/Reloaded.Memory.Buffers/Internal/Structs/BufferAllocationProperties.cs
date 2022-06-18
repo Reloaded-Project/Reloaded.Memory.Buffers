@@ -8,7 +8,7 @@ namespace Reloaded.Memory.Buffers.Internal.Structs
     public struct BufferAllocationProperties
     {
         /// <summary> The address of where memory may be allocated. </summary>
-        public IntPtr MemoryAddress;
+        public nuint MemoryAddress;
 
         /// <summary> The amount of bytes it is possible to allocate. </summary>
         public int Size;
@@ -16,7 +16,7 @@ namespace Reloaded.Memory.Buffers.Internal.Structs
         /// <summary>
         /// Creates a new instance of <see cref="BufferAllocationProperties"/>.
         /// </summary>
-        public BufferAllocationProperties(IntPtr memoryAddress, int size)
+        public BufferAllocationProperties(nuint memoryAddress, int size)
         {
             MemoryAddress = memoryAddress;
             Size = size;

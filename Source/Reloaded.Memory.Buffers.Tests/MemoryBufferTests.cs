@@ -76,6 +76,37 @@ namespace Reloaded.Memory.Buffers.Tests
         [Fact]
         public unsafe void GetBuffersInRangeExternal() => GetBuffersInRange(_externalBufferHelper, GetMaxAddress(_externalBufferHelper));
 
+#if X86
+        /// <summary>
+        /// Attempts to create a set of <see cref="MemoryBuffer"/>s at the beginning and end of the
+        /// address space, and then find the given buffers.
+        /// </summary>
+        [Fact]
+        public unsafe void GetBuffersInRangeInternal_LargeAddressAware()
+        {
+            AssertLargeAddressAware();
+            GetBuffersInRange(_bufferHelper, int.MaxValue, uint.MaxValue);
+        }
+
+        /// <summary>
+        /// Attempts to create a set of <see cref="MemoryBuffer"/>s at the beginning and end of the
+        /// address space, and then find the given buffers.
+        /// </summary>
+        [Fact]
+        public unsafe void GetBuffersInRangeExternal_LargeAddressAware()
+        {
+            AssertLargeAddressAware();
+            GetBuffersInRange(_externalBufferHelper, int.MaxValue, uint.MaxValue);
+        }
+
+        void AssertLargeAddressAware()
+        {
+            var maxAddress = GetMaxAddress(_externalBufferHelper, true);
+            if ((long)maxAddress <= int.MaxValue)
+                Assert.False(true, "Test host is not large address aware!!");
+        }
+#endif
+
         /* Same as above, except without cache. */
 
         [Fact]
@@ -247,7 +278,7 @@ namespace Reloaded.Memory.Buffers.Tests
         /// Attempts to create a set of <see cref="MemoryBuffer"/>s at the beginning and end of the
         /// address space, and then find the given buffers.
         /// </summary>
-        private unsafe void GetBuffersInRange(MemoryBufferHelper bufferHelper, IntPtr maxApplicationAddress)
+        private unsafe void GetBuffersInRange(MemoryBufferHelper bufferHelper, nuint minAddress, nuint maxAddress)
         {
             /* The reason that testing the upper half is sufficient is because the buffer allocation
                functions work in such a manner that they allocate from the lowest address.
@@ -255,14 +286,9 @@ namespace Reloaded.Memory.Buffers.Tests
             */
 
             // Options
-            int sizeStart   = 0;    // Default page size for x86 and x64.
+            int sizeStart = 0;    // Default page size for x86 and x64.
             int repetitions = 128;
-            int increment   = 4096; // Equal to allocation granularity.
-
-            // Minimum address is start of upper half of 32/64 bit address range.
-            // Maximum is the maximum address in 32/64 bit address range.
-            long minAddress = (long) maxApplicationAddress - ((long)maxApplicationAddress / 2);
-            long maxAddress = (long) maxApplicationAddress;
+            int increment = 4096; // Equal to allocation granularity.
 
             MemoryBuffer[] buffers = new MemoryBuffer[repetitions];
 
@@ -270,20 +296,20 @@ namespace Reloaded.Memory.Buffers.Tests
             for (int x = 0; x < repetitions; x++)
             {
                 int newSize = sizeStart + (x * increment);
-                buffers[x] = bufferHelper.CreateMemoryBuffer(newSize, (long) minAddress, (long) maxAddress);
+                buffers[x] = bufferHelper.CreateMemoryBuffer(newSize, minAddress, maxAddress);
             }
 
             // Validate whether each buffer is present and in range.
             for (int x = 0; x < repetitions; x++)
             {
                 int newSize = sizeStart + (x * increment);
-                var foundBuffers = bufferHelper.FindBuffers(newSize, (IntPtr) minAddress, (IntPtr) maxAddress);
+                var foundBuffers = bufferHelper.FindBuffers(newSize, minAddress, maxAddress);
 
                 if (!foundBuffers.Contains(buffers[x]))
                     Assert.True(false, $"Failed to find existing buffer in memory of minimum size {newSize} bytes.");
 
                 foreach (var buffer in foundBuffers)
-                    AssertBufferInRange(buffer, (IntPtr) minAddress, (IntPtr) maxAddress);
+                    AssertBufferInRange(buffer, minAddress, maxAddress);
             }
 
             // Cleanup
@@ -292,9 +318,27 @@ namespace Reloaded.Memory.Buffers.Tests
         }
 
         /// <summary>
+        /// Attempts to create a set of <see cref="MemoryBuffer"/>s at the beginning and end of the
+        /// address space, and then find the given buffers.
+        /// </summary>
+        private unsafe void GetBuffersInRange(MemoryBufferHelper bufferHelper, UIntPtr maxApplicationAddress)
+        {
+            /* The reason that testing the upper half is sufficient is because the buffer allocation
+               functions work in such a manner that they allocate from the lowest address.
+               As such, normally the only allocated addresses would be in the lower half... until enough memory is allocated to cross the upper half.
+            */
+
+            // Minimum address is start of upper half of 32/64 bit address range.
+            // Maximum is the maximum address in 32/64 bit address range.
+            long minAddress = (long)maxApplicationAddress - ((long)maxApplicationAddress / 2);
+            long maxAddress = (long)maxApplicationAddress;
+            GetBuffersInRange(bufferHelper, (nuint)minAddress, (nuint)maxAddress);
+        }
+
+        /// <summary>
         /// Same as <see cref="GetBuffersInRange"/>, except disables the caching when acquiring <see cref="MemoryBuffer"/>s.
         /// </summary>
-        private unsafe void GetBuffersInRangeNoCache(MemoryBufferHelper bufferHelper, IntPtr maxApplicationAddress)
+        private unsafe void GetBuffersInRangeNoCache(MemoryBufferHelper bufferHelper, UIntPtr maxApplicationAddress)
         {
             /* The reason that testing the upper half is sufficient is because the buffer allocation
                functions work in such a manner that they allocate from the lowest address.
@@ -308,8 +352,8 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Minimum address is start of upper half of 32/64 bit address range.
             // Maximum is the maximum address in 32/64 bit address range.
-            long minAddress = (long)maxApplicationAddress - ((long)maxApplicationAddress / 2);
-            long maxAddress = (long)maxApplicationAddress;
+            nuint minAddress = (nuint)maxApplicationAddress - ((nuint)maxApplicationAddress / 2);
+            nuint maxAddress = (nuint)maxApplicationAddress;
 
             MemoryBuffer[] buffers = new MemoryBuffer[repetitions];
 
@@ -317,20 +361,20 @@ namespace Reloaded.Memory.Buffers.Tests
             for (int x = 0; x < repetitions; x++)
             {
                 int newSize = sizeStart + (x * increment);
-                buffers[x] = bufferHelper.CreateMemoryBuffer(newSize, (long)minAddress, (long)maxAddress);
+                buffers[x] = bufferHelper.CreateMemoryBuffer(newSize, minAddress, maxAddress);
             }
 
             // Validate whether each buffer is present and in range.
             for (int x = 0; x < repetitions; x++)
             {
                 int newSize = sizeStart + (x * increment);
-                var foundBuffers = bufferHelper.FindBuffers(newSize, (IntPtr)minAddress, (IntPtr)maxAddress, false);
+                var foundBuffers = bufferHelper.FindBuffers(newSize, minAddress, maxAddress, false);
 
                 if (!foundBuffers.Contains(buffers[x]))
                     Assert.True(false, $"Failed to find existing buffer in memory of minimum size {newSize} bytes.");
 
                 foreach (var buffer in foundBuffers)
-                    AssertBufferInRange(buffer, (IntPtr)minAddress, (IntPtr)maxAddress);
+                    AssertBufferInRange(buffer, minAddress, maxAddress);
             }
 
             // Cleanup
@@ -365,7 +409,7 @@ namespace Reloaded.Memory.Buffers.Tests
             // Fill the buffer and verify each item as it's added.
             for (int x = 0; x < itemsToFit; x++)
             {
-                IntPtr writeAddress = buffer.Add(ref randomIntStructs[x], false, 1);
+                nuint writeAddress = buffer.Add(ref randomIntStructs[x], false, 1);
 
                 // Read back and compare.
                 externalMemory.Read(writeAddress, out RandomIntStruct actual);
@@ -373,10 +417,10 @@ namespace Reloaded.Memory.Buffers.Tests
             }
 
             // Compare again, running the entire array this time.
-            IntPtr bufferStartPtr = bufferHeader.DataPointer;
+            nuint bufferStartPtr = bufferHeader.DataPointer;
             for (int x = 0; x < itemsToFit; x++)
             {
-                IntPtr readAddress = bufferStartPtr + (x * structSize);
+                nuint readAddress = (UIntPtr)bufferStartPtr + (x * structSize);
 
                 // Read back and compare.
                 externalMemory.Read(readAddress, out RandomIntStruct actual);
@@ -388,7 +432,7 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Likewise, calling Add should return IntPtr.Zero.
             var randIntStr = RandomIntStruct.BuildRandomStruct();
-            Assert.Equal(IntPtr.Zero, buffer.Add(ref randIntStr, false, 1));
+            Assert.Equal((nuint)0, buffer.Add(ref randIntStr, false, 1));
         }
 
         /// <summary>
@@ -413,10 +457,10 @@ namespace Reloaded.Memory.Buffers.Tests
             buffer.Add(rawArray, 1);
 
             // Compare against the array written.
-            IntPtr bufferStartPtr = bufferHeader.DataPointer;
+            nuint bufferStartPtr = bufferHeader.DataPointer;
             for (int x = 0; x < remainingBufferSpace; x++)
             {
-                IntPtr readAddress = bufferStartPtr + x;
+                nuint readAddress = (UIntPtr)bufferStartPtr + x;
 
                 // Read back and compare.
                 externalMemory.Read(readAddress, out byte actual);
@@ -428,7 +472,7 @@ namespace Reloaded.Memory.Buffers.Tests
 
             // Likewise, calling Add should return IntPtr.Zero.
             byte testByte = 55;
-            Assert.Equal(IntPtr.Zero, buffer.Add(ref testByte, false, 1));
+            Assert.Equal((nuint)0, buffer.Add(ref testByte, false, 1));
         }
 
         /*
@@ -450,9 +494,9 @@ namespace Reloaded.Memory.Buffers.Tests
         /// <summary>
         /// Asserts whether the contents of a given <see cref="MemoryBuffer"/> lie in the <see cref="minAddress"/> to <see cref="maxAddress"/> address range.
         /// </summary>
-        private unsafe void AssertBufferInRange(MemoryBuffer buffer, IntPtr minAddress, IntPtr maxAddress)
+        private unsafe void AssertBufferInRange(MemoryBuffer buffer, nuint minAddress, nuint maxAddress)
         {
-            IntPtr bufferDataPtr = buffer.Properties.DataPointer;
+            nuint bufferDataPtr = buffer.Properties.DataPointer;
             if ((void*)bufferDataPtr < (void*)minAddress ||
                 (void*)bufferDataPtr > (void*)maxAddress)
             {
@@ -463,18 +507,22 @@ namespace Reloaded.Memory.Buffers.Tests
         /// <summary>
         /// Returns the max addressable address of the process sitting behind the <see cref="MemoryBufferHelper"/>.
         /// </summary>
-        private IntPtr GetMaxAddress(MemoryBufferHelper helper)
+        private UIntPtr GetMaxAddress(MemoryBufferHelper helper, bool largeAddressAware = false)
         {
             // Is this Windows on Windows 64? (x86 app running on x64 Windows)
             IsWow64Process(helper.Process.Handle, out bool isWow64);
             GetSystemInfo(out SYSTEM_INFO systemInfo);
             long maxAddress = 0x7FFFFFFF;
 
+            // Check for large address aware
+            if (largeAddressAware && IntPtr.Size == 4 && (uint)systemInfo.lpMaximumApplicationAddress > maxAddress)
+                maxAddress = (uint)systemInfo.lpMaximumApplicationAddress;
+
             // Check if 64bit.
             if (systemInfo.wProcessorArchitecture == ProcessorArchitecture.PROCESSOR_ARCHITECTURE_AMD64 && !isWow64)
                 maxAddress = (long)systemInfo.lpMaximumApplicationAddress;
 
-            return (IntPtr) maxAddress;
+            return (UIntPtr)maxAddress;
         }
     }
 }

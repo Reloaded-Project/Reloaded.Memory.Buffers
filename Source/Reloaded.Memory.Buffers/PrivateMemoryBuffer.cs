@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using Reloaded.Memory.Buffers.Internal;
 using Reloaded.Memory.Sources;
 
 namespace Reloaded.Memory.Buffers
@@ -13,7 +9,7 @@ namespace Reloaded.Memory.Buffers
     public unsafe class PrivateMemoryBuffer : MemoryBuffer, IDisposable
     {
         /* Constructors */
-        internal PrivateMemoryBuffer(IMemory memorySource, IntPtr headerAddress, MemoryBufferProperties memoryBufferProperties) : base(memorySource, headerAddress, memoryBufferProperties) { }
+        internal PrivateMemoryBuffer(IMemory memorySource, nuint headerAddress, MemoryBufferProperties memoryBufferProperties) : base(memorySource, headerAddress, memoryBufferProperties) { }
 
         /// <summary>
         /// Destroys this object.

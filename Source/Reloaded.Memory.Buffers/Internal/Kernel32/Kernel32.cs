@@ -88,9 +88,9 @@ namespace Reloaded.Memory.Buffers.Internal.Kernel32
             /// </summary>
             public uint dwPageSize;
             /// <summary>A pointer to the lowest memory address accessible to applications and dynamic-link libraries (DLLs).</summary>
-            public IntPtr lpMinimumApplicationAddress;
+            public nuint lpMinimumApplicationAddress;
             /// <summary>A pointer to the highest memory address accessible to applications and DLLs.</summary>
-            public IntPtr lpMaximumApplicationAddress;
+            public nuint lpMaximumApplicationAddress;
             /// <summary>
             /// A mask representing the set of processors configured into the system. Bit 0 is processor 0; bit 31 is processor 31.
             /// </summary>
@@ -152,7 +152,7 @@ namespace Reloaded.Memory.Buffers.Internal.Kernel32
             /// </summary>
             public ushort wProcessorRevision;
         }
-
+        
         /// <summary>
         /// <para>
         /// Contains information about a range of pages in the virtual address space of a process. The VirtualQuery and VirtualQueryEx
@@ -170,14 +170,14 @@ namespace Reloaded.Memory.Buffers.Internal.Kernel32
             /// <summary>
             /// <para>A pointer to the base address of the region of pages.</para>
             /// </summary>
-            public IntPtr BaseAddress;
+            public nuint BaseAddress;
             /// <summary>
             /// <para>
             /// A pointer to the base address of a range of pages allocated by the VirtualAlloc function. The page pointed to by the
             /// <c>BaseAddress</c> member is contained within this allocation range.
             /// </para>
             /// </summary>
-            public IntPtr AllocationBase;
+            public nuint AllocationBase;
             /// <summary>
             /// <para>
             /// The memory protection option when the region was initially allocated. This member can be one of the memory protection
@@ -188,7 +188,7 @@ namespace Reloaded.Memory.Buffers.Internal.Kernel32
             /// <summary>
             /// <para>The size of the region beginning at the base address in which all pages have identical attributes, in bytes.</para>
             /// </summary>
-            public UIntPtr RegionSize;
+            public nuint RegionSize;
             /// <summary>
             /// <para>The state of the pages in the region. This member can be one of the following values.</para>
             /// <list type="table">

@@ -8,7 +8,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
     public static unsafe class VirtualAllocUtility
     {
         /// <summary/>
-        public delegate IntPtr VirtualAllocFunction(IntPtr processHandle, IntPtr address, ulong size);
+        public delegate UIntPtr VirtualAllocFunction(IntPtr processHandle, nuint address, ulong size);
 
         /// <summary>
         /// Retrieves the function to use in place of VirtualAlloc.
@@ -34,7 +34,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
          * The Remote one; runs it for another process; being the slower of the two.
          */
 
-        private static IntPtr VirtualAllocLocal(IntPtr processHandle, IntPtr address, ulong size)
+        private static UIntPtr VirtualAllocLocal(IntPtr processHandle, nuint address, ulong size)
         {
             return VirtualAlloc
             (
@@ -45,7 +45,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
             );
         }
 
-        private static IntPtr VirtualAllocRemote(IntPtr processHandle, IntPtr address, ulong size)
+        private static UIntPtr VirtualAllocRemote(IntPtr processHandle, nuint address, ulong size)
         {
             return VirtualAllocEx
             (

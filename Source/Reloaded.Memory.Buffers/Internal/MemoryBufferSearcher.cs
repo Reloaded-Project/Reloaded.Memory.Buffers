@@ -15,7 +15,7 @@ namespace Reloaded.Memory.Buffers.Internal
     internal class MemoryBufferSearcher
     {
         /// <summary> Maintains address to buffer mappings. </summary>
-        private ConcurrentDictionary<IntPtr, MemoryBuffer> _bufferCache = new ConcurrentDictionary<IntPtr, MemoryBuffer>();
+        private ConcurrentDictionary<nuint, MemoryBuffer> _bufferCache = new();
 
         /// <summary> The process in which the buffers are being searched for. </summary>
         private Process _process;

@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>x86</Platforms>
+    <DefineConstants>$(DefineConstants);X86</DefineConstants>
+
+    <!-- Prevent warnings from unused code in dependencies -->
+    <TrimmerDefaultAction>link</TrimmerDefaultAction>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Reloaded.Memory.Buffers.Tests\Helpers\RandomByteArray.cs" Link="Helpers/RandomByteArray.cs" />
+    <Compile Include="..\Reloaded.Memory.Buffers.Tests\Helpers\RandomIntStruct.cs" Link="Helpers/RandomIntStruct.cs" />
+    <Compile Include="..\Reloaded.Memory.Buffers.Tests\MemoryBufferTests.cs" Link="MemoryBufferTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Reloaded.Memory.Buffers.Tests\HelloWorld.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="../Reloaded.Memory.Buffers.Tests/HelloWorld.exe" Link="HelloWorld.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="../Reloaded.Memory.Buffers.Tests/HelloWorldCore.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="../Reloaded.Memory.Buffers.Tests/xunit.runner.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <!-- Analyze the whole library, even if attributed with "IsTrimmable" -->
+    <TrimmerRootAssembly Include="Reloaded.Memory.Buffers" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="3.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reloaded.Memory.Buffers\Reloaded.Memory.Buffers.csproj" />
+  </ItemGroup>
+
+</Project>

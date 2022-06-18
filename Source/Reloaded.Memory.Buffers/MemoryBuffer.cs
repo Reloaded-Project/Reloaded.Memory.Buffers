@@ -36,7 +36,7 @@ namespace Reloaded.Memory.Buffers
         }
 
         /// <summary> Stores the location of the <see cref="MemoryBufferProperties"/> structure. </summary>
-        private readonly IntPtr _headerAddress;
+        private readonly nuint _headerAddress;
 
         /*
             --------------
@@ -44,13 +44,13 @@ namespace Reloaded.Memory.Buffers
             --------------
         */
 
-        internal MemoryBuffer(IMemory memorySource, IntPtr headerAddress)
+        internal MemoryBuffer(IMemory memorySource, nuint headerAddress)
         {
             _headerAddress = headerAddress;
             MemorySource   = memorySource;
         }
 
-        internal MemoryBuffer(IMemory memorySource, IntPtr headerAddress, MemoryBufferProperties memoryBufferProperties) : this(memorySource, headerAddress)
+        internal MemoryBuffer(IMemory memorySource, nuint headerAddress, MemoryBufferProperties memoryBufferProperties) : this(memorySource, headerAddress)
         {
             Properties = memoryBufferProperties;
         }
@@ -96,7 +96,7 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         internal string GetMutexName(Process process)
         {
-            return $"Reloaded.Memory.Buffers.MemoryBuffer | PID: {process.Id} | Memory Address: {_headerAddress.ToString("X")}";
+            return $"Reloaded.Memory.Buffers.MemoryBuffer | PID: {process.Id} | Memory Address: {_headerAddress.ToString()}";
         }
 
 
@@ -150,7 +150,7 @@ namespace Reloaded.Memory.Buffers
         /// <param name="numBytes">Number of bytes to write..</param>
         /// <param name="alignment">The memory alignment of the item to be added to the buffer.</param>
         /// <returns>Pointer to the passed in bytes written to memory. Null pointer, if it cannot fit into the buffer.</returns>
-        public IntPtr Add(int numBytes, int alignment = 4)
+        public nuint Add(int numBytes, int alignment = 4)
         {
             return ExecuteWithLock(() =>
             {
@@ -161,10 +161,10 @@ namespace Reloaded.Memory.Buffers
 
                 // Check if item can fit in buffer and buffer address is valid.
                 if (Properties.Remaining < numBytes) // Inlined CanItemFit to prevent reading Properties from memory again.
-                    return IntPtr.Zero;
+                    return (nuint)0;
 
                 // Append the item to the buffer.
-                IntPtr appendAddress = bufferProperties.WritePointer;
+                nuint appendAddress = bufferProperties.WritePointer;
                 bufferProperties.Offset += numBytes;
                 Properties = bufferProperties;
 
@@ -179,7 +179,7 @@ namespace Reloaded.Memory.Buffers
         /// <param name="bytesToWrite">Individual bytes to be written onto the buffer.</param>
         /// <param name="alignment">The memory alignment of the item to be added to the buffer.</param>
         /// <returns>Pointer to the passed in bytes written to memory. Null pointer, if it cannot fit into the buffer.</returns>
-        public IntPtr Add(byte[] bytesToWrite, int alignment = 4)
+        public nuint Add(byte[] bytesToWrite, int alignment = 4)
         {
             return ExecuteWithLock(() =>
             {
@@ -190,10 +190,10 @@ namespace Reloaded.Memory.Buffers
 
                 // Check if item can fit in buffer and buffer address is valid.
                 if (Properties.Remaining < bytesToWrite.Length) // Inlined CanItemFit to prevent reading Properties from memory again.
-                    return IntPtr.Zero;
+                    return (nuint)0;
 
                 // Append the item to the buffer.
-                IntPtr appendAddress = bufferProperties.WritePointer;
+                nuint appendAddress = bufferProperties.WritePointer;
                 MemorySource.WriteRaw(appendAddress, bytesToWrite);
                 bufferProperties.Offset += bytesToWrite.Length;
                 Properties = bufferProperties;
@@ -210,7 +210,7 @@ namespace Reloaded.Memory.Buffers
         /// <param name="marshalElement">Set this to true to marshal the given parameter before writing it to the buffer, else false.</param>
         /// <param name="alignment">The memory alignment of the item to be added to the buffer.</param>
         /// <returns>Pointer to the newly written structure in memory. Null pointer, if it cannot fit into the buffer.</returns>
-        public IntPtr Add<TStructure>(ref TStructure bytesToWrite, bool marshalElement = false, int alignment = 4)
+        public nuint Add<TStructure>(ref TStructure bytesToWrite, bool marshalElement = false, int alignment = 4)
         {
             var bytesToWriteByVal = bytesToWrite;
             return ExecuteWithLock(() =>
@@ -224,10 +224,10 @@ namespace Reloaded.Memory.Buffers
 
                 // Check if item can fit in buffer and buffer address is valid.
                 if (Properties.Remaining < structLength) // Inlined CanItemFit to prevent reading Properties from memory again.
-                    return IntPtr.Zero;
+                    return (nuint)0;
 
                 // Append the item to the buffer.
-                IntPtr appendAddress = bufferProperties.WritePointer;
+                nuint appendAddress = bufferProperties.WritePointer;
                 MemorySource.Write(appendAddress, ref bytesToWriteByVal, marshalElement);
                 bufferProperties.Offset += structLength;
                 Properties = bufferProperties;
@@ -267,7 +267,7 @@ namespace Reloaded.Memory.Buffers
         /// [Testing use only]
         /// The address where the individual buffer has been allocated.
         /// </summary>
-        internal IntPtr AllocationAddress => _headerAddress - sizeof(MemoryBufferMagic);
+        internal nuint AllocationAddress => (UIntPtr)_headerAddress - sizeof(MemoryBufferMagic);
 
         /// <summary/>
         public override bool Equals(object obj)

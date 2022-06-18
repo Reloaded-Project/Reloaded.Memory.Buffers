@@ -32,7 +32,7 @@ namespace Reloaded.Memory.Buffers.Internal
         /// This constructor will override any existing buffer! Please use <see cref="MemoryBufferFactory.FromAddress"/> instead
         /// if you wish to get a hold of an already existing buffer at the given bufferAddress.
         /// </remarks>
-        internal static MemoryBuffer CreateBuffer(Process process, IntPtr bufferAddress, int allocationSize, bool allocateMemory = true)
+        internal static MemoryBuffer CreateBuffer(Process process, nuint bufferAddress, int allocationSize, bool allocateMemory = true)
         {
             if (allocateMemory)
                 AllocateBuffer(process, bufferAddress, allocationSize);
@@ -43,8 +43,8 @@ namespace Reloaded.Memory.Buffers.Internal
             memorySource.Write(bufferAddress, ref _bufferMagic);
 
             // Setup buffer after Magic.
-            IntPtr headerAddress   = bufferAddress + sizeof(MemoryBufferMagic);
-            var dataPtr            = bufferAddress + BufferOverhead;
+            var headerAddress      = (UIntPtr)bufferAddress + sizeof(MemoryBufferMagic);
+            var dataPtr            = (UIntPtr)bufferAddress + BufferOverhead;
             var realBufSize        = allocationSize - BufferOverhead;
             var memoryBufferProperties = new MemoryBufferProperties(dataPtr, realBufSize);
 
@@ -56,7 +56,7 @@ namespace Reloaded.Memory.Buffers.Internal
         /// <summary>
         /// Creates a new private <see cref="MemoryBuffer"/> in a specified location in memory with a specified size.
         /// </summary>
-        internal static PrivateMemoryBuffer CreatePrivateBuffer(Process process, IntPtr bufferAddress, int allocationSize, bool allocateMemory = true)
+        internal static PrivateMemoryBuffer CreatePrivateBuffer(Process process, nuint bufferAddress, int allocationSize, bool allocateMemory = true)
         {
             if (allocateMemory)
                 AllocateBuffer(process, bufferAddress, allocationSize);
@@ -64,7 +64,7 @@ namespace Reloaded.Memory.Buffers.Internal
             var memorySource = GetMemorySource(process);
 
             // Setup buffer after Magic.
-            var dataPtr = bufferAddress + PrivateBufferOverhead;
+            var dataPtr = (UIntPtr)bufferAddress + PrivateBufferOverhead;
             var realBufSize = allocationSize - PrivateBufferOverhead;
             var memoryBufferProperties = new MemoryBufferProperties(dataPtr, realBufSize);
 
@@ -77,7 +77,7 @@ namespace Reloaded.Memory.Buffers.Internal
         /// Attempts to find an existing <see cref="MemoryBuffer"/> at the specified address and returns an instance of it.
         /// If the operation fails; the function returns null.
         /// </summary>
-        internal static unsafe MemoryBuffer FromAddress(Process process, IntPtr bufferMagicAddress)
+        internal static unsafe MemoryBuffer FromAddress(Process process, nuint bufferMagicAddress)
         {
             // Query the region we are going to create a buffer in.
             var virtualQueryFunction = VirtualQueryUtility.GetVirtualQueryFunction(process);
@@ -90,7 +90,7 @@ namespace Reloaded.Memory.Buffers.Internal
             {
                 if (IsBuffer(process, bufferMagicAddress))
                 {
-                    var buffer = new MemoryBuffer(GetMemorySource(process), bufferMagicAddress + sizeof(MemoryBufferMagic));
+                    var buffer = new MemoryBuffer(GetMemorySource(process), (UIntPtr) bufferMagicAddress + sizeof(MemoryBufferMagic));
                     buffer.SetupMutex(process);
                     return buffer;
                 }
@@ -102,14 +102,14 @@ namespace Reloaded.Memory.Buffers.Internal
         /// <summary>
         /// Allocates memory to store a <see cref="MemoryBuffer"/>s inside the target process/
         /// </summary>
-        internal static void AllocateBuffer(Process process, IntPtr bufferAddress, int bufferSize)
+        internal static void AllocateBuffer(Process process, nuint bufferAddress, int bufferSize)
         {
             // Get the function, commit the pages and check.
             var virtualAllocFunction = VirtualAllocUtility.GetVirtualAllocFunction(process);
             var address = virtualAllocFunction(process.Handle, bufferAddress, (uint)bufferSize);
 
-            if (address == IntPtr.Zero)
-                throw new Exception($"Failed to allocate MemoryBuffer of size {bufferSize} at address {bufferAddress.ToString("X")}. Last Win32 Error: {Marshal.GetLastWin32Error()}");
+            if (address == UIntPtr.Zero)
+                throw new Exception($"Failed to allocate MemoryBuffer of size {bufferSize} at address {bufferAddress}. Last Win32 Error: {Marshal.GetLastWin32Error()}");
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Reloaded.Memory.Buffers.Internal
         /// Checks if a <see cref="MemoryBuffer"/> exists at this location by comparing the bytes available here
         /// against the MemoryBuffer "Magic".
         /// </summary>
-        internal static bool IsBuffer(Process process, IntPtr bufferMagicAddress)
+        internal static bool IsBuffer(Process process, nuint bufferMagicAddress)
         {
             try
             {

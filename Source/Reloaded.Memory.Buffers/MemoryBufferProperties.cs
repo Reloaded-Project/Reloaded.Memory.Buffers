@@ -11,7 +11,7 @@ namespace Reloaded.Memory.Buffers
     public struct MemoryBufferProperties
     {
         /// <summary> The location of the raw data stored in the buffer. </summary>
-        public IntPtr DataPointer   { get; internal set; }
+        public nuint DataPointer   { get; internal set; }
 
         /// <summary> Specifies the byte alignment of each item that will be added onto the buffer. </summary>
         public int Alignment        { get; private set; }
@@ -26,7 +26,7 @@ namespace Reloaded.Memory.Buffers
         public int Remaining => Size - Offset;
 
         /// <summary> Returns the current write pointer in the buffer. (Address of next element to be written) </summary>
-        public IntPtr WritePointer => DataPointer + Offset;
+        public nuint WritePointer => (UIntPtr)DataPointer + Offset;
 
         /// <summary>
         /// Creates a new <see cref="MemoryBufferProperties"/> given the location of the raw data
@@ -34,7 +34,7 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         /// <param name="dataPointer">Pointer to raw data (normally following this header).</param>
         /// <param name="size">The amount of data available at the given pointer, in bytes.</param>
-        public MemoryBufferProperties(IntPtr dataPointer, int size)
+        public MemoryBufferProperties(nuint dataPointer, int size)
         {
             this.Alignment      = 4;
             this.DataPointer    = dataPointer;

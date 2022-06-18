@@ -12,13 +12,13 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
         /* Custom Kernel32 DLLImport statements for performance uptick. */
 
         [DllImport("kernel32.dll", SetLastError = true), SuppressUnmanagedCodeSecurity]
-        private static extern UIntPtr VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, UIntPtr dwLength);
+        private static extern UIntPtr VirtualQueryEx(IntPtr hProcess, nuint lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, UIntPtr dwLength);
 
         [DllImport("kernel32.dll", SetLastError = true), SuppressUnmanagedCodeSecurity]
-        private static extern UIntPtr VirtualQuery(IntPtr lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, UIntPtr dwLength);
+        private static extern UIntPtr VirtualQuery(nuint lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, UIntPtr dwLength);
 
         /// <summary/>
-        public delegate UIntPtr VirtualQueryFunction(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation);
+        public delegate UIntPtr VirtualQueryFunction(IntPtr processHandle, nuint address, ref MEMORY_BASIC_INFORMATION memoryInformation);
 
         /// <summary>
         /// Retrieves the function to use in place of VirtualQuery.
@@ -44,12 +44,12 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
          * The Remote one; runs it for another process; being the slower of the two.
          */
 
-        private static UIntPtr VirtualQueryLocal(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation)
+        private static nuint VirtualQueryLocal(IntPtr processHandle, nuint address, ref MEMORY_BASIC_INFORMATION memoryInformation)
         {
             return VirtualQuery(address, ref memoryInformation, (UIntPtr) sizeof(MEMORY_BASIC_INFORMATION));
         }
 
-        private static UIntPtr VirtualQueryRemote(IntPtr processHandle, IntPtr address, ref MEMORY_BASIC_INFORMATION memoryInformation)
+        private static nuint VirtualQueryRemote(IntPtr processHandle, nuint address, ref MEMORY_BASIC_INFORMATION memoryInformation)
         {
             return VirtualQueryEx(processHandle, address, ref memoryInformation, (UIntPtr) sizeof(MEMORY_BASIC_INFORMATION));
         }

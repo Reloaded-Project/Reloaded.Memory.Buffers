@@ -5,10 +5,10 @@
     /// </summary>
     internal struct AddressRange
     {
-        public long StartPointer;
-        public long EndPointer;
+        public nuint StartPointer;
+        public nuint EndPointer;
 
-        public AddressRange(long startPointer, long endPointer)
+        public AddressRange(nuint startPointer, nuint endPointer)
         {
             StartPointer = startPointer;
             EndPointer = endPointer;
@@ -51,7 +51,7 @@
         /// <summary>
         /// Returns true if a number "point", is between min and max of address range.
         /// </summary>
-        private bool PointInRange(ref AddressRange range, long point)
+        private bool PointInRange(ref AddressRange range, nuint point)
         {
             if (point >= range.StartPointer &&
                 point <= range.EndPointer)

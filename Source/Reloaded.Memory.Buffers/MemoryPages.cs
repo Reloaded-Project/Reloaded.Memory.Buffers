@@ -23,12 +23,16 @@ namespace Reloaded.Memory.Buffers
             GetSystemInfo(out SYSTEM_INFO systemInfo);
 
             // This should work.
-            long currentAddress = 0;
-            long maxAddress     = 0x7FFFFFFF; // 32bit (with Address Range Extension)
+            nuint currentAddress = 0;
+            nuint maxAddress     = 0x7FFFFFFF; // 32bit (with Address Range Extension)
 
             // Check if 64bit.
             if (systemInfo.wProcessorArchitecture == ProcessorArchitecture.PROCESSOR_ARCHITECTURE_AMD64 && !isWow64)
-                maxAddress = (long) systemInfo.lpMaximumApplicationAddress;
+                maxAddress = systemInfo.lpMaximumApplicationAddress;
+
+            // Support Large Address Aware
+            if (IntPtr.Size == 4 && (nuint)systemInfo.lpMaximumApplicationAddress > maxAddress)
+                maxAddress = (nuint)systemInfo.lpMaximumApplicationAddress;
 
             // Get the VirtualQuery function implementation to use.
             // Local is faster and works for current process; Remote is for another process.
@@ -42,13 +46,13 @@ namespace Reloaded.Memory.Buffers
             {
                 // Get our info from VirtualQueryEx.
                 var memoryInformation = new MEMORY_BASIC_INFORMATION();
-                var result = virtualQueryFunction(process.Handle, (IntPtr)currentAddress, ref memoryInformation);
+                var result = virtualQueryFunction(process.Handle, (nuint)currentAddress, ref memoryInformation);
                 if (result == (UIntPtr) 0)
                     break;
 
                 // Add the page and increment address iterator to go to next page.
                 memoryPages.Add(memoryInformation);
-                currentAddress += (long)memoryInformation.RegionSize;
+                currentAddress += memoryInformation.RegionSize;
             }
 
             return memoryPages;

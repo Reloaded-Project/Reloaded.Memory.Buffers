@@ -8,7 +8,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
     public static unsafe class VirtualFreeUtility
     {
         /// <summary/>
-        public delegate void VirtualFreeFunction(IntPtr processHandle, IntPtr address);
+        public delegate void VirtualFreeFunction(IntPtr processHandle, nuint address);
 
         /// <summary>
         /// Retrieves the function to use in place of VirtualFree.
@@ -34,7 +34,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
          * The Remote one; runs it for another process; being the slower of the two.
          */
 
-        private static void VirtualFreeLocal(IntPtr processHandle, IntPtr address)
+        private static void VirtualFreeLocal(IntPtr processHandle, nuint address)
         {
             VirtualFree
             (
@@ -44,7 +44,7 @@ namespace Reloaded.Memory.Buffers.Internal.Utilities
             );
         }
 
-        private static void VirtualFreeRemote(IntPtr processHandle, IntPtr address)
+        private static void VirtualFreeRemote(IntPtr processHandle, nuint address)
         {
             VirtualFreeEx
             (

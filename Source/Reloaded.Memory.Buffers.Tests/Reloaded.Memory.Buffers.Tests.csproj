@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Platforms>AnyCPU;x86</Platforms>
+    <Platforms>x64</Platforms>
 
     <!-- Prevent warnings from unused code in dependencies -->
     <TrimmerDefaultAction>link</TrimmerDefaultAction>
@@ -14,16 +14,6 @@
     <!-- Analyze the whole library, even if attributed with "IsTrimmable" -->
     <TrimmerRootAssembly Include="Reloaded.Memory.Buffers" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="3.1.2">
