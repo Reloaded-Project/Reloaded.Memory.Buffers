@@ -81,7 +81,7 @@ namespace Reloaded.Memory.Buffers.Tests
         /// Attempts to create a set of <see cref="MemoryBuffer"/>s at the beginning and end of the
         /// address space, and then find the given buffers.
         /// </summary>
-        [Fact]
+        [Fact(Skip = "This test needs to be ran manually with a patched test runner.")]
         public unsafe void GetBuffersInRangeInternal_LargeAddressAware()
         {
             AssertLargeAddressAware();
@@ -92,7 +92,7 @@ namespace Reloaded.Memory.Buffers.Tests
         /// Attempts to create a set of <see cref="MemoryBuffer"/>s at the beginning and end of the
         /// address space, and then find the given buffers.
         /// </summary>
-        [Fact]
+        [Fact(Skip = "This test needs to be ran manually with a patched test runner.")]
         public unsafe void GetBuffersInRangeExternal_LargeAddressAware()
         {
             AssertLargeAddressAware();
