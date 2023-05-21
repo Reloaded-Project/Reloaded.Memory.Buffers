@@ -4,42 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests.x86/Reloaded.Memory.Buffers.Tests.x86.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/HelloWorld.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Helpers/RandomByteArray.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Helpers/RandomIntStruct.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/MemoryBufferTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Reloaded.Memory.Buffers.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Reloaded.Memory.Buffers.Tests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/coverage.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/xunit.runner.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Kernel32/Kernel32.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/MemoryBufferFactory.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/MemoryBufferSearcher.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Structs/AddressRange.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Structs/BufferAllocationProperties.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Structs/MemoryBufferMagic.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Testing/Buffers.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Utilities/Mathematics.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Utilities/MutexObtainer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Utilities/VirtualAllocUtility.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Utilities/VirtualFreeUtility.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/Utilities/VirtualQueryUtility.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/MemoryBuffer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/MemoryBufferHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/MemoryBufferProperties.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/MemoryPages.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PrivateMemoryBuffer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" afterDir="false" />
-    </list>
+    <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/Reloaded.Project.Configurations" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Reloaded.Memory.Buffers/obj/Debug/netstandard2.0/Reloaded.Memory.Buffers.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="q1ruo67d" />
@@ -60,7 +35,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "refactor-reloaded3-compliance",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -90,6 +65,7 @@
       <workItem from="1682768142647" duration="119000" />
       <workItem from="1682768402105" duration="1919000" />
       <workItem from="1684703297078" duration="2299000" />
+      <workItem from="1684707476864" duration="1917000" />
     </task>
     <servers />
   </component>

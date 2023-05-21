@@ -7,6 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reloaded.Memory.Buffers.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reloaded.Memory.Buffers", "Reloaded.Memory.Buffers\Reloaded.Memory.Buffers.csproj", "{63205E76-CB23-4EA8-B58B-71A911EF3788}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solutionItems", ".solutionItems", "{163B7E2D-3AC3-4074-9A7C-9E050D67AA33}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build-and-publish.yml = ..\.github\workflows\build-and-publish.yml
+		..\mkdocs.yml = ..\mkdocs.yml
+		..\README.md = ..\README.md
+		..\LICENSE = ..\LICENSE
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
