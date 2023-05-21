@@ -256,6 +256,14 @@ namespace Reloaded.Memory.Buffers
         {
             return CanItemFit(Struct.GetSize<TGeneric>(marshalElement));
         }
+        
+        /// <summary>
+        /// Returns true if the buffer is locked, else false.
+        /// </summary>
+        public bool IsLocked()
+        {
+            return !_bufferAddMutex.WaitOne(0);
+        }
 
         /*
             --------------

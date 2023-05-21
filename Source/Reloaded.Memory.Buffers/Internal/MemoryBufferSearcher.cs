@@ -78,14 +78,15 @@ namespace Reloaded.Memory.Buffers.Internal
         ///     If one or more buffer meeting the size requirements is found in the cache, an array of found buffers will be returned.
         ///     If no buffer has been found in the cache, the function will scan the whole process for buffers and return the found
         ///     set of buffers which satisfy the size parameter.
-        /// However this may not find the buffers that have been added since the last time this function has called.</param>
+        ///     However this may not find the buffers that have been added since the last time this function has called.</param>
+        /// <param name="dontReturnLockedBuffers"></param>
         /// <returns></returns>
-        internal MemoryBuffer[] GetBuffers(int size, bool useCache = true)
+        internal MemoryBuffer[] GetBuffers(int size, bool useCache = true, bool dontReturnLockedBuffers = true)
         {
             // Return the already known buffers if there is a buffer that can fit the size.
             if (useCache)
             {
-                var cachedBuffers = _bufferCache.Values.Where(x => x.CanItemFit(size)).ToArray();
+                var cachedBuffers = _bufferCache.Values.Where(x => x.CanItemFit(size) && !x.IsLocked()).ToArray();
                 if (cachedBuffers.Length > 0)
                     return cachedBuffers;
             }

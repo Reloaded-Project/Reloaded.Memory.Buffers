@@ -37,6 +37,18 @@ namespace Reloaded.Memory.Buffers.Tests
         /// </summary>
         [Fact]
         public void CreateBufferExternal() => CreateBufferBase(_externalBufferHelper);
+        
+        /// <summary>
+        /// Tests if a <see cref="MemoryBuffer"/> can be successfully identified as 'locked'.
+        /// </summary>
+        [Fact]
+        public void IsBufferLockedInternal() => IsBufferLocked(_bufferHelper);
+
+        /// <summary>
+        /// Tests if a <see cref="MemoryBuffer"/> can be successfully identified as 'locked'.
+        /// </summary>
+        [Fact]
+        public void IsBufferLockedExternal() => IsBufferLocked(_externalBufferHelper);
 
         /// <summary>
         /// Tests if a <see cref="PrivateMemoryBuffer"/> can be successfully created.
@@ -224,6 +236,24 @@ namespace Reloaded.Memory.Buffers.Tests
         {
             var buffer = bufferHelper.CreateMemoryBuffer(4096);
 
+            // Cleanup
+            Internal.Testing.Buffers.FreeBuffer(buffer);
+        }
+        
+        /// <summary>
+        /// [Testing Purposes]
+        /// Creates a buffer, locks it and sees if lock state is currently returned.
+        /// </summary>
+        private void IsBufferLocked(MemoryBufferHelper bufferHelper)
+        {
+            var buffer = bufferHelper.CreateMemoryBuffer(4096);
+
+            buffer.ExecuteWithLock(() =>
+            {
+                Assert.True(buffer.IsLocked());
+                return 1;
+            });
+            
             // Cleanup
             Internal.Testing.Buffers.FreeBuffer(buffer);
         }

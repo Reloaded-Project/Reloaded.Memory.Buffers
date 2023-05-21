@@ -183,9 +183,21 @@ namespace Reloaded.Memory.Buffers
         /// </summary>
         /// <param name="size">The amount of bytes a buffer must have minimum.</param>
         /// <param name="useCache">See <see cref="MemoryBufferSearcher.GetBuffers"/></param>
-        public MemoryBuffer[] FindBuffers(int size, bool useCache = true)
+        public MemoryBuffer[] FindBuffers(int size, bool useCache)
         {
-            return _bufferSearcher.GetBuffers(size, useCache);
+            return FindBuffers(size, useCache, true);
+        }
+
+        /// <summary>
+        /// Searches unmanaged memory for pre-existing <see cref="MemoryBuffer"/>s that satisfy
+        /// the given size requirements.
+        /// </summary>
+        /// <param name="size">The amount of bytes a buffer must have minimum.</param>
+        /// <param name="useCache">See <see cref="MemoryBufferSearcher.GetBuffers"/></param>
+        /// <param name="dontReturnLockedBuffers">Refrains from returning locked buffers</param>
+        public MemoryBuffer[] FindBuffers(int size, bool useCache = true, bool dontReturnLockedBuffers = true)
+        {
+            return _bufferSearcher.GetBuffers(size, useCache, dontReturnLockedBuffers);
         }
 
         /// <summary>
