@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32519.111
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reloaded.Memory.Buffers.Tests", "Reloaded.Memory.Buffers.Tests\Reloaded.Memory.Buffers.Tests.csproj", "{7F503240-976D-44EF-9DCB-5C491EDB8A04}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reloaded.Memory.Buffers", "Reloaded.Memory.Buffers\Reloaded.Memory.Buffers.csproj", "{63205E76-CB23-4EA8-B58B-71A911EF3788}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F503240-976D-44EF-9DCB-5C491EDB8A04}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{7F503240-976D-44EF-9DCB-5C491EDB8A04}.Debug|Any CPU.Build.0 = Debug|x64
+		{7F503240-976D-44EF-9DCB-5C491EDB8A04}.Release|Any CPU.ActiveCfg = Release|x64
+		{7F503240-976D-44EF-9DCB-5C491EDB8A04}.Release|Any CPU.Build.0 = Release|x64
+		{63205E76-CB23-4EA8-B58B-71A911EF3788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63205E76-CB23-4EA8-B58B-71A911EF3788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63205E76-CB23-4EA8-B58B-71A911EF3788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63205E76-CB23-4EA8-B58B-71A911EF3788}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC37BD2F-63C3-4D66-A000-DB108F4709F4}
+	EndGlobalSection
+EndGlobal
