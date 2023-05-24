@@ -10,11 +10,15 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Update="Assets\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reloaded.Memory.Buffers\Reloaded.Memory.Buffers.csproj" />
   </ItemGroup>
 
 </Project>

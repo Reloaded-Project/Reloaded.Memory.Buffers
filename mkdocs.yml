@@ -1,8 +1,8 @@
-site_name: Reloaded MkDocs Theme
-site_url: https://github.com/Reloaded-Project/Reloaded.MkDocsMaterial.Themes.R2
+site_name: Reloaded Memory Buffers
+site_url: https://github.com/Reloaded-Project/Reloaded.Memory.Buffers
 
-repo_name: Reloaded-Project/Reloaded.MkDocsMaterial.Themes.R2
-repo_url: https://github.com/Reloaded-Project/Reloaded.MkDocsMaterial.Themes.R2
+repo_name: Reloaded-Project/Reloaded.Memory.Buffers
+repo_url: https://github.com/Reloaded-Project/Reloaded.Memory.Buffers
 
 extra:
   social:
@@ -39,7 +39,7 @@ markdown_extensions:
 theme:
   name: material
   palette:
-    scheme: reloaded-slate
+    scheme: reloaded3-slate
   features:
     - navigation.instant
 
@@ -48,3 +48,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Specification:
+      - Overview: specification/overview.md
+      - Buffer Locator: specification/buffer-locator.md
+      - Allocation Algorithm: specification/allocation-algorithm.md

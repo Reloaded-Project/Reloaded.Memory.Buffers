@@ -1,6 +1,3 @@
-
-
-
 <div align="center">
 	<h1>Project Reloaded: Buffers Library</h1>
 	<img src="https://i.imgur.com/BjPn7rU.png" width="150" align="center" />
