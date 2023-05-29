@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Native.Linux;
 using Reloaded.Memory.Buffers.Structs;
@@ -21,7 +22,8 @@ public static partial class BufferAllocator
         for (int x = 0; x < settings.RetryCount; x++)
         {
             // Until we get all of the pages.
-            foreach (MemoryMapEntry region in LinuxMapParser.GetFreeRegions(settings.TargetProcess))
+            var regions = LinuxMapParser.GetFreeRegions(settings.TargetProcess);
+            foreach (MemoryMapEntry region in regions)
             {
                 // Exit if we are done iterating.
                 if (region.StartAddress > settings.MaxAddress)
@@ -46,6 +48,7 @@ public static partial class BufferAllocator
             // ReSharper disable once RedundantCast
             // MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE = 0x100022
             nint allocated = Posix.mmap(addr, (nuint)settings.Size, (int)MemoryProtection.ReadWriteExecute, 0x100022, -1, 0);
+
             if (allocated == -1)
                 continue;
 

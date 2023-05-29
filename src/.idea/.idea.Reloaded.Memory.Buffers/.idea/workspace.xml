@@ -10,7 +10,6 @@
     <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../docs/Reloaded" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/Reloaded" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,19 +20,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/00cb8086736e480bb1c745be8e2178f515600/7b/4d6d134d/Kernel32.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0cf927f7f646436eb3fd7b1fa90196e515800/57/78eb4ee4/ArrayRental.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d1b0ef0f72fe4f2eabf760f59374c8e030c00/03/ac974f8b/Fixture.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/159be8d190cfdf77c9e33529f2e856c5b46ba1f2c86243059845f7c61b5/Process.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2b883b816c88923c5773a1ec36f43f7687c4311b/LibraryImports.g.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/36e740b59df23626d207e72ea77e34298e53dd99db463eee529f8c416b5664/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5b8da17bbdf5f8e4ace29ff2f6458c90ae519cd4d7147a61fabd6568e02f/RuntimeType.ActivatorCache.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6879c9ed20391a5ccfea363be5964fbcfe4f1dfde9558aa84b36df6b6ec92c6/List.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69ced031c35719782e852f09f21b2dd6492bb0a8a7b728fdcded848d74b84a/Environment.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/753d44b40e7dfcf2a0534343444ce1ebaac652db5adaf638d71f2ea97e562f/MethodInvoker.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/835b673da82b4e463080216d906a8886b151d6de80fac81377c2e781da41623b/Environment.Windows.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9a209f68f4ce1c95d56e8b81418cbd83292f43a099c856e312373bf7eed9e7/MemoryMappedFile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d5d3a3c589809668ab73b1cef238e8816d948670a8ae5d1bd6c0aeedc8e17fb/XUnit2TestFramework.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/64b2ee7c93834f36b6f86a9249b3d53415a00/fa/508aeeca/SpanExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c4913f3244baa8c16e621afdef1be1d96fa1c835e1740d85646a5c4a8127e87/Span.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d81d50aa37afb114327ac8c4d01d3b613a33760a32bdc25f64bc5165e552e4/Int32.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e1f5d57d5299b498d1e9127689fa526648fe27cd0892713df58df67ccb43eeb/IntPtr.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/fd495755bc5b3363eba9fd4b7bbd653483c3b258d07289d887a6a83bb7e1071/TargetInvocationException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reloaded.Memory.Buffers/obj/Debug/netstandard2.0/Reloaded.Memory.Buffers.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
@@ -55,14 +46,13 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.02739726&quot;,
     &quot;git-widget-placeholder&quot;: &quot;refactor-reloaded3-compliance&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propDebugger&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -99,6 +89,9 @@
       <workItem from="1685283377258" duration="15457000" />
       <workItem from="1685304551149" duration="1082000" />
       <workItem from="1685305638859" duration="980000" />
+      <workItem from="1685306884790" duration="286000" />
+      <workItem from="1685329978254" duration="7845000" />
+      <workItem from="1685387581041" duration="3621000" />
     </task>
     <servers />
   </component>
@@ -251,12 +244,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs</url>
-          <line>36</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\BufferAllocatorTests.Allocation.cs" initialLine="34" containingFunctionPresentation="Method 'CanAllocate_UpToMaxAddress'" />
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs</url>
           <line>26</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" initialLine="26" containingFunctionPresentation="Method 'CanAllocateIn2GiB'">
             <startOffsets>
@@ -269,32 +256,62 @@
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs</url>
-          <line>40</line>
-          <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs" initialLine="36" containingFunctionPresentation="Method 'TryAllocateBuffer'">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs</url>
+          <line>18</line>
+          <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs" initialLine="18" containingFunctionPresentation="Method 'Find_ShouldReturnAddress_WhenPreviouslyExists'">
             <startOffsets>
-              <option value="1451" />
+              <option value="460" />
             </startOffsets>
             <endOffsets>
-              <option value="1468" />
+              <option value="511" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="32" />
+          <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Common.cs</url>
-          <line>106</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\BufferAllocatorTests.Common.cs" initialLine="106" containingFunctionPresentation="Method 'RoundDownFromPageMax'">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Utilities/LinuxMapParserTests.cs</url>
+          <line>44</line>
+          <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Utilities/LinuxMapParserTests.cs" initialLine="44" containingFunctionPresentation="Method 'GetFreeRegions_Multiple_Gaps'">
             <startOffsets>
-              <option value="3549" />
+              <option value="1357" />
             </startOffsets>
             <endOffsets>
-              <option value="3675" />
+              <option value="1604" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="37" />
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs</url>
+          <line>24</line>
+          <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs" initialLine="24" containingFunctionPresentation="Method 'AllocateLinux'">
+            <startOffsets>
+              <option value="777" />
+            </startOffsets>
+            <endOffsets>
+              <option value="845" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="73" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs</url>
+          <line>49</line>
+          <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs" initialLine="49" containingFunctionPresentation="Method 'TryAllocateBuffer'">
+            <startOffsets>
+              <option value="1940" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2053" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="74" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

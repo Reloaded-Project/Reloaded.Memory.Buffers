@@ -43,11 +43,11 @@ internal static class LinuxMapParser
                 });
             }
 
-            lastEndAddress = entry.EndAddress + 1;
+            lastEndAddress = entry.EndAddress;
         }
 
         // After the last region, up to the end of memory
-        if (lastEndAddress <= Cached.GetMaxAddress())
+        if (lastEndAddress < Cached.GetMaxAddress())
         {
             freeRegions.Add(new MemoryMapEntry
             {

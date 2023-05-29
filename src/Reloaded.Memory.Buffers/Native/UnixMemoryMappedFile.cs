@@ -63,7 +63,7 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
 #endif
 
     public int FileDescriptor { get; }
-    public bool AlreadyExisted { get; }
+    public bool AlreadyExisted { get; } = true;
     public unsafe byte* Data { get; }
     public int Length { get; }
     public string FileName { get; }
@@ -79,6 +79,7 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
             // If it doesn't exist, create a new shared memory.
             FileDescriptor = shm_open(FileName, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
             ftruncate(FileDescriptor, Length);
+            AlreadyExisted = false;
         }
 
         Data = (byte*)mmap(IntPtr.Zero, Length, PROT_READ | PROT_WRITE, MAP_SHARED, FileDescriptor, 0);

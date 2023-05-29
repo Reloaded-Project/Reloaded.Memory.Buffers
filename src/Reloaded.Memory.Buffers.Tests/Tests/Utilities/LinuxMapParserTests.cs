@@ -14,8 +14,8 @@ public unsafe class LinuxMapParserTests
     {
         var regions = new MemoryMapEntry[]
         {
-            new() { StartAddress = 0, EndAddress = 9 },
-            new() { StartAddress = 10, EndAddress = 19 },
+            new() { StartAddress = 0, EndAddress = 10 },
+            new() { StartAddress = 10, EndAddress = 20 },
             new() { StartAddress = 20, EndAddress = Cached.GetMaxAddress() }
         };
 
@@ -28,8 +28,8 @@ public unsafe class LinuxMapParserTests
     {
         var regions = new MemoryMapEntry[]
         {
-            new() { StartAddress = 0, EndAddress = 9 },
-            new() { StartAddress = 10, EndAddress = 19 },
+            new() { StartAddress = 0, EndAddress = 10 },
+            new() { StartAddress = 10, EndAddress = 20 },
             new() { StartAddress = 30, EndAddress = Cached.GetMaxAddress() }
         };
 
@@ -44,8 +44,8 @@ public unsafe class LinuxMapParserTests
     {
         var regions = new MemoryMapEntry[]
         {
-            new() { StartAddress = 0, EndAddress = 9 },
-            new() { StartAddress = 20, EndAddress = 29 },
+            new() { StartAddress = 0, EndAddress = 10 },
+            new() { StartAddress = 20, EndAddress = 30 },
             new() { StartAddress = 40, EndAddress = Cached.GetMaxAddress() }
         };
 

@@ -1,6 +1,7 @@
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Native.Unix;
 using static Reloaded.Memory.Buffers.Native.Windows.Kernel32;
+// ReSharper disable RedundantOverflowCheckingContext
 
 namespace Reloaded.Memory.Buffers.Utilities;
 
@@ -14,7 +15,7 @@ internal static class Cached
     private const int ScPagesizeLinux = 30;
     private const int ScPagesizeOsx = 29;
 
-    static Cached()
+    static unsafe Cached()
     {
         #pragma warning disable CA1416 // Validate platform compatibility
         if (Polyfills.IsWindows())
@@ -25,14 +26,15 @@ internal static class Cached
         }
         // Note: On POSIX, applications are aware of full address space by default.
         // Technically a chunk of address space is reserved for kernel, however for our use case that's not a concern.
+        // Note 2: There is no API on Linux (or OSX) to get max address; so we'll restrict to signed 48-bits on x64 for now.
         else if (Polyfills.IsLinux())
         {
-            s_maxAddress = unchecked((nuint)(-1));
+            s_maxAddress = sizeof(nuint) == 4 ? unchecked((nuint)(-1)) : unchecked((nuint)0x7FFFFFFFFFFFL);
             s_allocationGranularity = (int)Posix.sysconf(ScPagesizeLinux);
         }
         else if (Polyfills.IsMacOS())
         {
-            s_maxAddress = unchecked((nuint)(-1));
+            s_maxAddress = sizeof(nuint) == 4 ? unchecked((nuint)(-1)) : unchecked((nuint)0x7FFFFFFFFFFFL);
             s_allocationGranularity = (int)Posix.sysconf(ScPagesizeOsx);
         }
         else
