@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Reloaded.Memory.Native.Unix;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
@@ -46,22 +47,6 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
     public static extern int ftruncate(int fd, long length);
 #endif
 
-#if NET7_0_OR_GREATER
-    [LibraryImport("libc", SetLastError = true)]
-    public static partial nint mmap(nint addr, long length, int prot, int flags, int fd, long offset);
-#else
-    [DllImport("libc", SetLastError = true)]
-    public static extern IntPtr mmap(IntPtr addr, long length, int prot, int flags, int fd, long offset);
-#endif
-
-#if NET7_0_OR_GREATER
-    [LibraryImport("libc", SetLastError = true)]
-    public static partial int munmap(nint addr, nint length);
-#else
-    [DllImport("libc", SetLastError = true)]
-    public static extern int munmap(IntPtr addr, IntPtr length);
-#endif
-
     public int FileDescriptor { get; }
     public bool AlreadyExisted { get; } = true;
     public unsafe byte* Data { get; }
@@ -82,14 +67,14 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
             AlreadyExisted = false;
         }
 
-        Data = (byte*)mmap(IntPtr.Zero, Length, PROT_READ | PROT_WRITE, MAP_SHARED, FileDescriptor, 0);
+        Data = (byte*)Posix.mmap(0, (nuint)Length, PROT_READ | PROT_WRITE, MAP_SHARED, FileDescriptor, 0);
     }
 
     /// <inheritdoc />
     public unsafe void Dispose()
     {
         if (Data != null)
-            munmap((nint)Data, (nint)Length);
+            Posix.munmap((nuint)Data, (nuint)Length);
 
         shm_unlink(FileName);
     }

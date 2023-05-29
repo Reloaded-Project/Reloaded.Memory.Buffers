@@ -25,6 +25,8 @@ public static partial class BufferAllocator
             return AllocateWindows(settings);
         else if (Polyfills.IsLinux())
             return AllocateLinux(settings);
+        else if (Polyfills.IsMacOS())
+            return AllocateOSX(settings);
 
         ThrowHelpers.ThrowPlatformNotSupportedException();
         return default;
