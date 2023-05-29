@@ -14,7 +14,7 @@ public struct LocatorItem
     public nuint BaseAddress;
 
     /// <summary>
-    /// True if he is allocated.
+    ///     True if he is allocated.
     /// </summary>
     public bool IsAllocated => BaseAddress != 0;
 
@@ -29,29 +29,41 @@ public struct LocatorItem
     public bool IsTaken => _isTaken == 1;
 
     /// <summary>
-    /// Size of the buffer.
+    ///     Size of the buffer.
     /// </summary>
     public uint Size;
 
     /// <summary>
-    /// Current position of the buffer.
+    ///     Current position of the buffer.
     /// </summary>
     public uint Position;
 
     /// <summary>
-    /// Available number of bytes in item.
+    ///     Available number of bytes in item.
     /// </summary>
     public uint BytesLeft => Size - Position;
 
     /// <summary>
-    /// Minimum address of the allocation.
+    ///     Minimum address of the allocation.
     /// </summary>
     public nuint MinAddress => BaseAddress;
 
     /// <summary>
-    /// Maximum address of the allocation.
+    ///     Maximum address of the allocation.
     /// </summary>
     public nuint MaxAddress => BaseAddress + Size;
+
+    /// <summary>
+    ///     Creates a new instance of <see cref="LocatorItem" /> given base address, size and position.
+    /// </summary>
+    /// <param name="baseAddress">The base address.</param>
+    /// <param name="size">The size.</param>
+    public LocatorItem(nuint baseAddress, uint size)
+    {
+        BaseAddress = baseAddress;
+        Size = size;
+        Position = 0;
+    }
 
     /// <summary>
     ///     Tries to acquire the lock.
@@ -93,23 +105,24 @@ public struct LocatorItem
     }
 
     /// <summary>
-    /// Determines if this locator item can be used given the constraints.
+    ///     Determines if this locator item can be used given the constraints.
     /// </summary>
-    /// <param name="size">Available bytes between <paramref name="minAddress"/> and <paramref name="maxAddress"/>.</param>
+    /// <param name="size">Available bytes between <paramref name="minAddress" /> and <paramref name="maxAddress" />.</param>
     /// <param name="minAddress">Minimum address accepted.</param>
     /// <param name="maxAddress">Maximum address accepted.</param>
     /// <returns>If this buffer can be used given the parameters.</returns>
     public bool CanUse(uint size, nuint minAddress, nuint maxAddress)
     {
         // Calculate the start and end positions within the buffer
-        nuint startAvailableAddress = BaseAddress + Position;
-        nuint endAvailableAddress = startAvailableAddress + size;
+        var startAvailableAddress = BaseAddress + Position;
+        var endAvailableAddress = startAvailableAddress + size;
 
         // Check if the requested memory lies within the remaining buffer and within the specified address range
         // If any of the checks fail, the buffer can't be used
         // [endAvailableAddress <= MaxAddress] checks if the data can fit.
         // [startAvailableAddress >= minAddress] checks if in range.
         // [endAvailableAddress <= maxAddress] checks if in range.
-        return endAvailableAddress <= MaxAddress && startAvailableAddress >= minAddress && endAvailableAddress <= maxAddress;
+        return endAvailableAddress <= MaxAddress && startAvailableAddress >= minAddress &&
+               endAvailableAddress <= maxAddress;
     }
 }

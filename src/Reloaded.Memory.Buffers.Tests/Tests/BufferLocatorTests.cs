@@ -1,5 +1,7 @@
+using System;
 using FluentAssertions;
 using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Utilities;
 using Xunit;
 
 namespace Reloaded.Memory.Buffers.Tests.Tests;
@@ -33,6 +35,25 @@ public unsafe class BufferLocatorTests
         // Assert
         ((nuint)address).Should().NotBeNull();
         reason.Should().Be(BufferLocatorFinder.FindReason.Created);
+    }
+
+    [Fact]
+    public void Find_ShouldInitializeCorrectly_WhenCreated()
+    {
+        // Act
+        LocatorHeader* address = BufferLocatorFinder.Find(out BufferLocatorFinder.FindReason _);
+
+        // Assert
+        var expected = Math.Round((Cached.GetAllocationGranularity() - sizeof(LocatorHeader)) / (float) LocatorHeader.LengthOfPreallocatedChunks);
+        address->NumItems.Should().Be((byte)expected);
+
+        for (int x = 0; x < address->NumItems; x++)
+        {
+            var item = address->GetItem(x);
+            item->Position.Should().Be(0);
+            item->BaseAddress.Should().NotBeNull();
+            item->Size.Should().BeGreaterThan(0);
+        }
     }
 
     [Fact]

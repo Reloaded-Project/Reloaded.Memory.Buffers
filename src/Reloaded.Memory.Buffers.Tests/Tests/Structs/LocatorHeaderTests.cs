@@ -127,7 +127,7 @@ public class LocatorHeaderTests
         secondItem->Position = 25;
 
         // Act
-        using var result = header->GetFirstAvailableItemLocked(25, 100, 300).Value;
+        using var result = header->GetFirstAvailableItemLocked(25, 100, 300)!.Value;
 
         // Assert
         result.Should().NotBeNull();

@@ -10,12 +10,25 @@ namespace Reloaded.Memory.Buffers.Structs;
 public unsafe struct LocatorHeader
 {
     /// <summary>
-    /// Static length of this locator.
+    ///     Static length of this locator.
     /// </summary>
     public const int Length = 4096;
 
     /// <summary>
-    /// Returns the maximum possible amount of items in this locator.
+    ///     Length of buffers preallocated in this locator.
+    /// </summary>
+    /// <remarks>
+    ///     On Windows there is an allocation granularity (normally 64KB) which means that
+    ///     minimum amount of bytes you can allocate is 64KB; even if you only need 1 byte.
+    ///
+    ///     Our locator is a 4096 byte structure which means that it would be a waste to not
+    ///     do anything with the remaining data. So we chunk the remaining data by this amount
+    ///     and pre-register them as buffers.
+    /// </remarks>
+    public const uint LengthOfPreallocatedChunks = 16384;
+
+    /// <summary>
+    ///     Returns the maximum possible amount of items in this locator.
     /// </summary>
     public static int MaxItemCount => (Length - sizeof(LocatorHeader)) / sizeof(LocatorItem);
 
@@ -61,9 +74,38 @@ public unsafe struct LocatorHeader
     public bool HasNextLocator => NextLocatorPtr != null;
 
     /// <summary>
-    /// True if this buffer is full.
+    ///     True if this buffer is full.
     /// </summary>
     public bool IsFull => NumItems >= MaxItemCount;
+
+    /// <summary>
+    ///     Initializes the locator header values at a specific address.
+    /// </summary>
+    /// <param name="length">Number of bytes available.</param>
+    public void Initialize(int length)
+    {
+        ThisAddress = (LocatorHeader*)Unsafe.AsPointer(ref this);
+        NextLocatorPtr = null;
+        _isLocked = 0;
+        _flags = 0;
+
+        byte numItems = 0;
+        var remainingBytes = (uint)(length - Length);
+        var bufferAddress = (byte*)ThisAddress + Length;
+        LocatorItem* currentItem = ThisAddress->GetFirstItem();
+
+        while (remainingBytes > 0)
+        {
+            var thisLength = Math.Min(LengthOfPreallocatedChunks, remainingBytes);
+            *currentItem = new LocatorItem((nuint)bufferAddress, thisLength);
+            currentItem++;
+            remainingBytes -= thisLength;
+            bufferAddress += thisLength;
+            numItems++;
+        }
+
+        NumItems = numItems;
+    }
 
     /// <summary>
     ///     Tries to acquire the lock.
@@ -105,30 +147,30 @@ public unsafe struct LocatorHeader
     }
 
     /// <summary>
-    /// Gets the item at a specific index.
+    ///     Gets the item at a specific index.
     /// </summary>
     public LocatorItem* GetFirstItem() => (LocatorItem*)((LocatorHeader*)Unsafe.AsPointer(ref this) + 1);
 
     /// <summary>
-    /// Gets the item at a specific index.
+    ///     Gets the item at a specific index.
     /// </summary>
     /// <param name="index">Index to get item at.</param>
     public LocatorItem* GetItem(int index) => GetFirstItem() + index;
 
     /// <summary>
-    /// Gets the item at a specific index, with lock.
+    ///     Gets the item at a specific index, with lock.
     /// </summary>
     /// <param name="index">Index to get item at.</param>
     /// <returns>Locked locator item. Make sure this is disposed with use of 'using' statement. Disposing will release lock.</returns>
     public SafeLocatorItem GetItemLocked(int index)
     {
-        var item = GetItem(index);
+        LocatorItem* item = GetItem(index);
         item->Lock();
         return new SafeLocatorItem(item);
     }
 
     /// <summary>
-    /// Gets the first available, with lock.
+    ///     Gets the first available, with lock.
     /// </summary>
     /// <param name="size">Required size of buffer.</param>
     /// <param name="minAddress">Minimum address for the allocation.</param>
@@ -136,8 +178,8 @@ public unsafe struct LocatorHeader
     /// <returns>Locked locator item. Make sure this is disposed with use of 'using' statement. Disposing will release lock.</returns>
     public SafeLocatorItem? GetFirstAvailableItemLocked(uint size, nuint minAddress, nuint maxAddress)
     {
-        ref var currentItem = ref Unsafe.AsRef<LocatorItem>(GetFirstItem());
-        ref var finalItem = ref Unsafe.Add(ref currentItem, NumItems);
+        ref LocatorItem currentItem = ref Unsafe.AsRef<LocatorItem>(GetFirstItem());
+        ref LocatorItem finalItem = ref Unsafe.Add(ref currentItem, NumItems);
         while (Unsafe.IsAddressLessThan(ref currentItem, ref finalItem))
         {
             if (currentItem.CanUse(size, minAddress, maxAddress) && currentItem.TryLock())

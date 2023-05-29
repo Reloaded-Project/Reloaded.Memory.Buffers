@@ -99,7 +99,7 @@ Code below shows basic use of `Memory Mapped Files`:
     try { mmf = MemoryMappedFile.OpenExisting(name); }
     catch (FileNotFoundException)
     {
-        mmf = MemoryMappedFile.CreateNew(name, 4096);
+        mmf = MemoryMappedFile.CreateNew(name, allocationGranularity);
         previouslyExisted = false;
     }
 
@@ -137,7 +137,7 @@ Code below shows basic use of `Memory Mapped Files`:
             NULL,                    // default security
             PAGE_READWRITE,          // read/write access
             0,                       // max. object size
-            4096,                    // buffer size
+            allocationGranularity,   // buffer size
             bufferName);             // name of mapping object
 
         previouslyExisted = false;
@@ -149,7 +149,7 @@ Code below shows basic use of `Memory Mapped Files`:
         FILE_MAP_ALL_ACCESS, // read/write permission
         0,
         0,
-        4096);
+        allocationGranularity);
     ```
 
 === "C++ (Linux & OSX)"
@@ -181,6 +181,10 @@ Code below shows basic use of `Memory Mapped Files`:
     // Map the view
     void* data = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ```
+
+!!! tip "Memory Mapped Files on Windows respect `allocationGranularity` (usually 64KiB) which you can get from `GetSystemInfo`."
+
+!!! tip "Register the remainder of that (usually 64K) buffer after header as first [Items](#item) in the locator."
 
 For the users implementing from other languages, here are the raw OS APIs for reference:  
 
@@ -220,13 +224,14 @@ Access to all buffers should look something like:
 using var buffer = BufferHelper.GetOrAllocateBuffer(minAddress, maxAddress, size);
 ```
 
-When the buffer is acquired, a the [IsTaken](#item) field is set to `1` using `Interlocked.CompareExchange` (cmpxchg).  
+When the buffer is acquired, a the [IsTaken](#item) field is set to `1` using `cmpxchg`.  
 
 ```csharp
+// C#
 item->IsTaken = Interlocked.CompareExchange(ref item->IsTaken, 1, 0);
 ```
 
-When the buffer is released, the `IsTaken` field is set to `0` using `Interlocked.CompareExchange`.  
+When the buffer is released, the `IsTaken` field is set to `0` using `cmpxchg`.  
 
 ```csharp
 item->IsTaken = 0;
