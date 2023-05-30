@@ -211,6 +211,114 @@ Here's what to do depending on situation:
     - Unmap the memory mapped file.  
     - Use address from static field (address of first memory map) in this and further accesses.  
 
+### Cleaning Up
+
+!!! warning "On Linux & OSX, Shared Memory Objects are *NOT* automatically destroyed when all processes close."
+
+!!! warning "Given expected use is in hooking frameworks where crashes are expected to be common on dev machines."
+
+In these scenarios, we cannot waste memory. For Linux, we can look through `/dev/shm` for any unused mapping, and unlink them.  
+In the reference library, the following code is ran upon successful opening of existing memory mapped file (i.e. only ever once per library instance).  
+
+=== "C#"
+
+    ```csharp
+    private static void Cleanup()
+    {
+        // Keep the view around forever for other mods/programs/etc. to use.
+
+        // Note: At runtime this is only ever executed once per library instance, so this should be okay.
+        // On Linux we need to execute a runtime check to ensure that after a crash, no MMF was left over.
+        // because the OS does not auto dispose them.
+        if (Polyfills.IsLinux())
+        {
+            const string shmDirectoryPath = "/dev/shm";
+            const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
+
+            // Read all files in /dev/shm
+            var files = Directory.EnumerateFiles(shmDirectoryPath);
+
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                if (!fileName.StartsWith(memoryMappedFilePrefix))
+                    continue;
+
+                // Extract PID from the file name
+                var pidStr = fileName.Substring(memoryMappedFilePrefix.Length);
+                if (!int.TryParse(pidStr, out var pid))
+                    continue;
+
+                // Check if the process is still running
+                if (!IsProcessRunning(pid))
+                    Posix.shm_unlink(fileName);
+            }
+        }
+    }
+
+    private static bool IsProcessRunning(int pid)
+    {
+        try
+        {
+            Process.GetProcessById(pid);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            // Process is not running
+            return false;
+        }
+    }
+    ```
+
+=== "C++"
+
+    ```cpp
+    // AI Generated.
+    // Note: This is untested code, for reference only.
+    // Note: This will only build on a Linux/OSX box due to included headers. You'll need to compile guard this.
+    #include <sys/stat.h>
+    #include <dirent.h>
+    #include <fcntl.h>
+    #include <signal.h>
+    #include <unistd.h>
+    #include <cstdlib>
+    #include <cstring>
+    #include <iostream>
+    #include <sys/mman.h>
+
+    bool isProcessRunning(int pid) {
+        return kill(pid, 0) == 0;
+    }    
+
+    void cleanup() {
+        const char* shmDirectoryPath = "/dev/shm";
+        const char* memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
+        size_t prefixLength = strlen(memoryMappedFilePrefix);
+    
+        DIR* dirp = opendir(shmDirectoryPath);
+        if (dirp == nullptr) {
+            perror("Could not open /dev/shm directory");
+            return;
+        }
+    
+        struct dirent* dp;
+        while ((dp = readdir(dirp)) != nullptr) {
+            if (strncmp(dp->d_name, memoryMappedFilePrefix, prefixLength) == 0) {
+                char* pidStr = dp->d_name + prefixLength;
+                int pid = std::atoi(pidStr);
+    
+                if (!isProcessRunning(pid)) {
+                    std::string filePath = std::string(shmDirectoryPath) + "/" + dp->d_name;
+                    shm_unlink(filePath.c_str());
+                }
+            }
+        }
+    
+        closedir(dirp);
+    }
+    ```
+
 ## Supporting Concurrency
 
 !!! info "Only one user may use a buffer at any time."

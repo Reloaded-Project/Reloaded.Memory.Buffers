@@ -7,7 +7,7 @@ namespace Reloaded.Memory.Buffers;
 /// <summary>
 ///     Class that locates the buffer locator.
 /// </summary>
-public static unsafe class BufferLocatorFinder
+public static unsafe partial class BufferLocatorFinder
 {
     private static LocatorHeader* _address;
     private static IMemoryMappedFile? _mmf;
@@ -44,7 +44,7 @@ public static unsafe class BufferLocatorFinder
             return _address;
         }
 
-        // Keep the view around forever for other mods/programs/etc. to use.
+        Cleanup();
         _mmf = mmf;
         _address = (LocatorHeader*)mmf.Data;
         _address->Initialize(mmf.Length);
@@ -55,6 +55,7 @@ public static unsafe class BufferLocatorFinder
     internal static IMemoryMappedFile OpenOrCreateMemoryMappedFile()
     {
         var name = $"/Reloaded.Memory.Buffers.MemoryBuffer, PID {Polyfills.GetProcessId().ToString()}";
+
 #pragma warning disable CA1416
         if (Polyfills.IsWindows())
             return new WindowsMemoryMappedFile(name, Cached.GetAllocationGranularity());

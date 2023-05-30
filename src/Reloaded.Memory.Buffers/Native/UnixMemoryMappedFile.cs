@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Reloaded.Memory.Buffers.Utilities;
 using Reloaded.Memory.Native.Unix;
+using static Reloaded.Memory.Buffers.Native.Posix;
+using static Reloaded.Memory.Native.Unix.Posix;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
@@ -27,29 +29,6 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
     private const int S_IRUSR = 0x100; // User has read permission.
     private const int S_IWUSR = 0x80;  // User has write permission.
 
-#if NET7_0_OR_GREATER
-    [LibraryImport("libc", SetLastError = true, StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int shm_open(string name, int oflag, int mode);
-#else
-    [DllImport("libc", SetLastError = true)]
-    public static extern int shm_open(string name, int oflag, int mode);
-#endif
-#if NET7_0_OR_GREATER
-    [LibraryImport("libc", SetLastError = true, StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int shm_unlink(string name);
-#else
-    [DllImport("libc", SetLastError = true)]
-    public static extern int shm_unlink(string name);
-#endif
-
-#if NET7_0_OR_GREATER
-    [LibraryImport("libc", SetLastError = true)]
-    public static partial int ftruncate(int fd, long length);
-#else
-    [DllImport("libc", SetLastError = true)]
-    public static extern int ftruncate(int fd, long length);
-#endif
-
     public int FileDescriptor { get; }
     public bool AlreadyExisted { get; } = true;
     public unsafe byte* Data { get; private set; }
@@ -71,7 +50,8 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
             AlreadyExisted = false;
         }
 
-        Data = (byte*)Posix.mmap(0, (nuint)Length, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, FileDescriptor, 0);
+        Data = (byte*)mmap(0, (nuint)Length, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, FileDescriptor, 0);
+        AppDomain.CurrentDomain.ProcessExit += CleanupOnExit;
     }
 
     ~UnixMemoryMappedFile() => Dispose();
@@ -81,11 +61,17 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
     {
         if (Data != null)
         {
-            Posix.munmap((nuint)Data, (nuint)Length);
+            munmap((nuint)Data, (nuint)Length);
             if (!AlreadyExisted)
                 shm_unlink(FileName);
         }
 
         Data = null!;
+    }
+
+    private void CleanupOnExit(object? sender, EventArgs e)
+    {
+        Dispose();
+        AppDomain.CurrentDomain.ProcessExit -= CleanupOnExit;
     }
 }
