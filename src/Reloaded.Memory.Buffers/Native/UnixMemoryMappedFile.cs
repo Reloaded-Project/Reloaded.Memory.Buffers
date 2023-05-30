@@ -26,8 +26,7 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
     private const int O_CREAT_OSX = 0x200; // Create the file if it doesn't exist.
     private const int O_CREAT = 0x40; // Create the file if it doesn't exist.
     private const int O_RDWR = 0x2;    // Open for read and write.
-    private const int S_IRUSR = 0x100; // User has read permission.
-    private const int S_IWUSR = 0x80;  // User has write permission.
+    private const int S_IRWXU = 0x1C0; // User has read, write, execute permission.
 
     public int FileDescriptor { get; }
     public bool AlreadyExisted { get; } = true;
@@ -45,7 +44,7 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
         {
             // If it doesn't exist, create a new shared memory.
             var creat = Polyfills.IsMacOS() ? O_CREAT_OSX : O_CREAT;
-            FileDescriptor = shm_open(FileName, creat | O_RDWR, S_IRUSR | S_IWUSR);
+            FileDescriptor = shm_open(FileName, creat | O_RDWR, S_IRWXU);
             ftruncate(FileDescriptor, Length);
             AlreadyExisted = false;
         }
