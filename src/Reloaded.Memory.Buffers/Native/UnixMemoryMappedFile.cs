@@ -82,7 +82,8 @@ internal partial class UnixMemoryMappedFile : IMemoryMappedFile
         if (Data != null)
         {
             Posix.munmap((nuint)Data, (nuint)Length);
-            shm_unlink(FileName);
+            if (!AlreadyExisted)
+                shm_unlink(FileName);
         }
 
         Data = null!;
