@@ -26,7 +26,7 @@ internal class WindowsMemoryMappedFile : IMemoryMappedFile
 
         try
         {
-            _memoryMappedFile = MemoryMappedFile.OpenExisting(name);
+            _memoryMappedFile = MemoryMappedFile.OpenExisting(name, MemoryMappedFileRights.ReadWriteExecute);
         }
         catch (FileNotFoundException)
         {
