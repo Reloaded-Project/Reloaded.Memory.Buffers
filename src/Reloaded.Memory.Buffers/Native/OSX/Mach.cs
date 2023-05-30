@@ -6,10 +6,10 @@ internal partial class Mach
 {
 #if NET7_0_OR_GREATER
     [LibraryImport("/usr/lib/system/libsystem_kernel.dylib")]
-    public static partial int vm_region(nint task, ref nuint address, ref nuint size, int flavor, out vm_region_basic_info_64 basicInfo64, ref uint infoCount, out int objectName);
+    public static partial int mach_vm_region(nint task, ref nuint address, ref nuint size, int flavor, out vm_region_basic_info_64 basicInfo64, ref uint infoCount, out int objectName);
 #else
     [DllImport("/usr/lib/system/libsystem_kernel.dylib")]
-    public static extern int vm_region(nint task, ref nuint address, ref nuint size, int flavor, out vm_region_basic_info_64 basicInfo64, ref uint infoCount, out int objectName);
+    public static extern int mach_vm_region(nint task, ref nuint address, ref nuint size, int flavor, out vm_region_basic_info_64 basicInfo64, ref uint infoCount, out int objectName);
 #endif
 
 #if NET7_0_OR_GREATER

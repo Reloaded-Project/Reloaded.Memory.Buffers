@@ -34,7 +34,7 @@ public static partial class BufferAllocator
             // Until we get all of the pages.
             while (currentAddress <= maxAddress)
             {
-                int kr = vm_region(mach_task_self(), ref address, ref size, flavor, out var info, ref infoCount, out int objectName);
+                int kr = mach_vm_region(mach_task_self(), ref address, ref size, flavor, out var info, ref infoCount, out int objectName);
                 if (kr != 0)
                     break;
 
