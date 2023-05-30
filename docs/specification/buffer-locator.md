@@ -84,7 +84,9 @@ Size: `16/20 bytes`
 !!! info "The locator structure is always located at the end of the buffer."
 
 Locators are allocated using `Memory Mapped Files`, with predefined name.  
-This name is: `Reloaded.Memory.Buffers.MemoryBuffer | PID: {processId}`.  
+This name is: `/Reloaded.Memory.Buffers.MemoryBuffer, PID {processId}`.  
+
+!!! note "The name starts with a backslash because this is required by some OSes based off of POSIX."
 
 Code below shows basic use of `Memory Mapped Files`:  
 
@@ -92,7 +94,7 @@ Code below shows basic use of `Memory Mapped Files`:
     
     ```csharp
     // Create or open the memory-mapped file
-    var name = $"Reloaded.Memory.Buffers.MemoryBuffer | PID: {System.Environment.ProcessId}";
+    var name = $"/Reloaded.Memory.Buffers.MemoryBuffer, PID {System.Environment.ProcessId}";
     
     MemoryMappedFile mmf;
     bool previouslyExisted = true;
@@ -122,7 +124,7 @@ Code below shows basic use of `Memory Mapped Files`:
     bool previouslyExisted = true;
     int pid = GetCurrentProcessId(); // Get current process ID
     char bufferName[256];
-    sprintf_s(bufferName, sizeof(bufferName), "Reloaded.Memory.Buffers.MemoryBuffer | PID: %d", pid);
+    sprintf_s(bufferName, sizeof(bufferName), "/Reloaded.Memory.Buffers.MemoryBuffer, PID %d", pid);
 
     // Open Memory Mapped File
     HANDLE hMapFile = OpenFileMappingA(
@@ -167,7 +169,7 @@ Code below shows basic use of `Memory Mapped Files`:
     bool previouslyExisted = true;
     int pid = getpid(); // Get current process ID
     char bufferName[256];
-    sprintf_s(bufferName, sizeof(bufferName), "Reloaded.Memory.Buffers.MemoryBuffer | PID: %d", pid); 
+    sprintf_s(bufferName, sizeof(bufferName), "/Reloaded.Memory.Buffers.MemoryBuffer, PID %d", pid); 
 
     // Open Memory Mapped File
     int fd = shm_open(bufferName, O_RDWR, S_IRUSR | S_IWUSR);

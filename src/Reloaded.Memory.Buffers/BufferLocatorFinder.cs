@@ -54,7 +54,7 @@ public static unsafe class BufferLocatorFinder
 
     internal static IMemoryMappedFile OpenOrCreateMemoryMappedFile()
     {
-        var name = $"Reloaded.Memory.Buffers.MemoryBuffer | PID: {Polyfills.GetProcessId().ToString()}";
+        var name = $"/Reloaded.Memory.Buffers.MemoryBuffer, PID {Polyfills.GetProcessId().ToString()}";
 #pragma warning disable CA1416
         if (Polyfills.IsWindows())
             return new WindowsMemoryMappedFile(name, Cached.GetAllocationGranularity());
