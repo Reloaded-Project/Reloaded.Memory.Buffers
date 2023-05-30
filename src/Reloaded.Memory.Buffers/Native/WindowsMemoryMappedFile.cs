@@ -30,11 +30,11 @@ internal class WindowsMemoryMappedFile : IMemoryMappedFile
         }
         catch (FileNotFoundException)
         {
-            _memoryMappedFile = MemoryMappedFile.CreateNew(name, Length);
+            _memoryMappedFile = MemoryMappedFile.CreateNew(name, Length, MemoryMappedFileAccess.ReadWriteExecute);
             AlreadyExisted = false;
         }
 
-        _view = _memoryMappedFile!.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWrite);
+        _view = _memoryMappedFile!.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWriteExecute);
         Data = (byte*)_view.SafeMemoryMappedViewHandle.DangerousGetHandle();
     }
 
