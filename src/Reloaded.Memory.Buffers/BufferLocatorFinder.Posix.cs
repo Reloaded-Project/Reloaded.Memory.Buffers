@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Reloaded.Memory.Buffers.Native;
 using Reloaded.Memory.Buffers.Utilities;
 using Reloaded.Memory.Native.Unix;
 using Posix = Reloaded.Memory.Buffers.Native.Posix;
@@ -20,26 +21,43 @@ public static unsafe partial class BufferLocatorFinder
         if (Polyfills.IsLinux())
         {
             const string shmDirectoryPath = "/dev/shm";
-            const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
-
-            // Read all files in /dev/shm
-            var files = Directory.EnumerateFiles(shmDirectoryPath);
-
-            foreach (var file in files)
+            CleanupPosix(shmDirectoryPath, (path) => Posix.shm_unlink(path));
+        }
+        else if (Polyfills.IsMacOS())
+        {
+#pragma warning disable RCS1075
+#pragma warning disable CA1416
+            CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
             {
-                var fileName = Path.GetFileName(file);
-                if (!fileName.StartsWith(memoryMappedFilePrefix))
-                    continue;
+                try { File.Delete(path); }
+                catch (Exception) { /* Ignored */ }
+            });
+#pragma warning restore RCS1075
+#pragma warning restore CA1416
+        }
+    }
 
-                // Extract PID from the file name
-                var pidStr = fileName.Substring(memoryMappedFilePrefix.Length);
-                if (!int.TryParse(pidStr, out var pid))
-                    continue;
+    private static void CleanupPosix(string mmfDirectory, Action<string> deleteFile)
+    {
+        const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
 
-                // Check if the process is still running
-                if (!IsProcessRunning(pid))
-                    Posix.shm_unlink(fileName);
-            }
+        // Read all files in /dev/shm
+        var files = Directory.EnumerateFiles(mmfDirectory);
+
+        foreach (var file in files)
+        {
+            var fileName = Path.GetFileName(file);
+            if (!fileName.StartsWith(memoryMappedFilePrefix))
+                continue;
+
+            // Extract PID from the file name
+            var pidStr = fileName.Substring(memoryMappedFilePrefix.Length);
+            if (!int.TryParse(pidStr, out var pid))
+                continue;
+
+            // Check if the process is still running
+            if (!IsProcessRunning(pid))
+                deleteFile(fileName);
         }
     }
 

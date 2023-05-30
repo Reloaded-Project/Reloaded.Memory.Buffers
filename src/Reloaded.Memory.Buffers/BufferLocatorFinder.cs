@@ -1,3 +1,4 @@
+using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Native;
 using Reloaded.Memory.Buffers.Structs;
 using Reloaded.Memory.Buffers.Utilities;
@@ -60,7 +61,14 @@ public static unsafe partial class BufferLocatorFinder
         if (Polyfills.IsWindows())
             return new WindowsMemoryMappedFile(name, Cached.GetAllocationGranularity());
 
-        return new UnixMemoryMappedFile(name, Cached.GetAllocationGranularity());
+        if (Polyfills.IsLinux())
+            return new LinuxMemoryMappedFile(name, Cached.GetAllocationGranularity());
+
+        if (Polyfills.IsMacOS())
+            return new UnixMemoryMappedFile(name, Cached.GetAllocationGranularity());
+
+        ThrowHelpers.ThrowPlatformNotSupportedException();
+        return null!;
 #pragma warning restore CA1416
     }
 

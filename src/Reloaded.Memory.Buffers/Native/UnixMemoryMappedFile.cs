@@ -1,76 +1,70 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using Reloaded.Memory.Buffers.Utilities;
-using Reloaded.Memory.Native.Unix;
-using static Reloaded.Memory.Buffers.Native.Posix;
-using static Reloaded.Memory.Native.Unix.Posix;
-#if NET5_0_OR_GREATER
+using System.IO.MemoryMappedFiles;
 using System.Runtime.Versioning;
-#endif
 
 namespace Reloaded.Memory.Buffers.Native;
 
 #if NET5_0_OR_GREATER
-[SupportedOSPlatform("linux")]
 [SupportedOSPlatform("macos")]
 #endif
 [SuppressMessage("ReSharper", "BuiltInTypeReferenceStyleForMemberAccess")]
 [SuppressMessage("ReSharper", "PartialTypeWithSinglePart")]
-internal partial class UnixMemoryMappedFile : IMemoryMappedFile
+internal class UnixMemoryMappedFile : IMemoryMappedFile
 {
-    private const int PROT_READ = 0x1; // Pages can be read.
-    private const int PROT_WRITE = 0x2; // Pages can be written.
-    private const int PROT_EXEC = 0x4; // Pages can be written.
-    private const int MAP_SHARED = 0x01; // Share changes.
+    public static string BaseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".reloaded/memory.buffers");
 
-    private const int O_CREAT_OSX = 0x200; // Create the file if it doesn't exist.
-    private const int O_CREAT = 0x40; // Create the file if it doesn't exist.
-    private const int O_RDWR = 0x2;    // Open for read and write.
-    private const int S_IRWXU = 0x1C0; // User has read, write, execute permission.
-
-    public int FileDescriptor { get; }
-    public bool AlreadyExisted { get; } = true;
-    public unsafe byte* Data { get; private set; }
+    public bool AlreadyExisted { get; }
+    public unsafe byte* Data { get; }
     public int Length { get; }
     public string FileName { get; }
 
+    private readonly MemoryMappedFile _memoryMappedFile;
+    private readonly MemoryMappedViewAccessor _view;
+    private readonly FileStream _stream;
+
     public unsafe UnixMemoryMappedFile(string name, int length)
     {
+        name = name.TrimStart('/');
+        AlreadyExisted = true;
         FileName = name;
         Length = length;
-        FileDescriptor = shm_open(FileName, O_RDWR, 0);
 
-        if (FileDescriptor == -1)
-        {
-            // If it doesn't exist, create a new shared memory.
-            var creat = Polyfills.IsMacOS() ? O_CREAT_OSX : O_CREAT;
-            FileDescriptor = shm_open(FileName, creat | O_RDWR, S_IRWXU);
-            ftruncate(FileDescriptor, Length);
-            AlreadyExisted = false;
-        }
+        // Override or create existing file.
+        var filePath = Path.Combine(BaseDir, name);
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+        AlreadyExisted = File.Exists(filePath);
 
-        Data = (byte*)mmap(0, (nuint)Length, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, FileDescriptor, 0);
-        AppDomain.CurrentDomain.ProcessExit += CleanupOnExit;
+        _stream = new FileStream(
+            filePath,
+            FileMode.OpenOrCreate,
+            FileAccess.ReadWrite,
+            FileShare.ReadWrite | FileShare.Delete,
+            length);
+
+        _memoryMappedFile = MemoryMappedFile.CreateFromFile(
+            _stream,
+            null,
+            0,
+            MemoryMappedFileAccess.ReadWriteExecute,
+            HandleInheritability.Inheritable,
+            true);
+
+        _view = _memoryMappedFile!.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWriteExecute);
+        Data = (byte*)_view.SafeMemoryMappedViewHandle.DangerousGetHandle();
     }
 
     ~UnixMemoryMappedFile() => Dispose();
 
     /// <inheritdoc />
-    public unsafe void Dispose()
+    public void Dispose()
     {
-        if (Data != null)
+        _memoryMappedFile.Dispose();
+        _view.Dispose();
+
+        if (!AlreadyExisted)
         {
-            munmap((nuint)Data, (nuint)Length);
-            if (!AlreadyExisted)
-                shm_unlink(FileName);
+            _stream.Dispose();
+            File.Delete(_stream.Name);
         }
-
-        Data = null!;
-    }
-
-    private void CleanupOnExit(object? sender, EventArgs e)
-    {
-        Dispose();
-        AppDomain.CurrentDomain.ProcessExit -= CleanupOnExit;
     }
 }
