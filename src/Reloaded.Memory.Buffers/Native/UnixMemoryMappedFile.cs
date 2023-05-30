@@ -41,10 +41,12 @@ internal class UnixMemoryMappedFile : IMemoryMappedFile
             FileShare.ReadWrite | FileShare.Delete,
             length);
 
+        _stream.SetLength(length);
+
         _memoryMappedFile = MemoryMappedFile.CreateFromFile(
             _stream,
             null,
-            0,
+            length,
             MemoryMappedFileAccess.ReadWriteExecute,
             HandleInheritability.Inheritable,
             true);
