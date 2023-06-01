@@ -42,6 +42,7 @@ public static partial class BufferAllocator
                     return item;
 
                 currentAddress = address + size;
+                address = currentAddress;
             }
         }
 
