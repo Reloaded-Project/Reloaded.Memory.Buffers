@@ -1,5 +1,4 @@
 using Reloaded.Memory.Buffers.Exceptions;
-using Reloaded.Memory.Buffers.Native.Linux;
 using Reloaded.Memory.Buffers.Structs;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
@@ -28,17 +27,18 @@ public static partial class BufferAllocator
 
         int flavor = VM_REGION_BASIC_INFO_64;
         uint infoCount = VM_REGION_BASIC_INFO_COUNT;
+        var selfTask = mach_task_self();
 
         for (int x = 0; x < settings.RetryCount; x++)
         {
             // Until we get all of the pages.
             while (currentAddress <= maxAddress)
             {
-                int kr = mach_vm_region(mach_task_self(), ref address, ref size, flavor, out var info, ref infoCount, out int objectName);
+                int kr = mach_vm_region(selfTask, ref address, ref size, flavor, out var info, ref infoCount, out _);
                 if (kr != 0)
                     break;
 
-                if (TryAllocateBuffer(ref info, address, size, settings, out var item))
+                if (TryAllocateBuffer(ref info, address, size, settings, selfTask, out var item))
                     return item;
 
                 currentAddress = address + size;
@@ -49,7 +49,8 @@ public static partial class BufferAllocator
         throw new MemoryBufferAllocationException(settings.MinAddress, settings.MaxAddress, (int)settings.Size);
     }
 
-    private static bool TryAllocateBuffer(ref vm_region_basic_info_64 pageInfo, nuint pageAddress, nuint pageSize, BufferAllocatorSettings settings, out LocatorItem result)
+    private static bool TryAllocateBuffer(ref vm_region_basic_info_64 pageInfo, nuint pageAddress, nuint pageSize,
+        BufferAllocatorSettings settings, int selfTask, out LocatorItem result)
     {
         result = default;
         if (pageInfo.protection != VM_PROT_NONE)
@@ -58,22 +59,12 @@ public static partial class BufferAllocator
         Span<nuint> results = stackalloc nuint[4];
         foreach (var addr in GetBufferPointersInPageRange(pageAddress, pageSize, (int)settings.Size, settings.MinAddress, settings.MaxAddress, results))
         {
-            // MAP_PRIVATE | MAP_ANON = 0x1002
-            // MAP_FIXED_NOREPLACE doesn't exist on OSX, map will fail if matches existing page.
-            // Note: MAP_ANON on OSX is 0x1000, not 0x20 like on Linux.
-            // ReSharper disable once RedundantCast
-            nuint allocated = (nuint)(nint)Posix.mmap(addr, settings.Size, (int)MemoryProtection.ReadWriteExecute, 0x101002, -1, 0);
-            if (allocated == MAP_FAILED)
+            int kr = mach_vm_allocate(selfTask, addr, settings.Size, 0);
+
+            if (kr != 0)
                 continue;
 
-            // If our hint failed and memory was mapped elsewhere, unmap and try again.
-            if (allocated != addr)
-            {
-                Posix.munmap(allocated, settings.Size);
-                continue;
-            }
-
-            result = new LocatorItem(allocated, settings.Size);
+            result = new LocatorItem(addr, settings.Size);
             return true;
         }
 

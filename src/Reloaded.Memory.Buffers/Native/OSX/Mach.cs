@@ -14,6 +14,14 @@ internal partial class Mach
 
 #if NET7_0_OR_GREATER
     [LibraryImport("/usr/lib/system/libsystem_kernel.dylib")]
+    public static partial int mach_vm_allocate(nint task, nuint address, nuint size, int anywhere);
+#else
+    [DllImport("/usr/lib/system/libsystem_kernel.dylib")]
+    public static extern int mach_vm_allocate(nint task, nuint address, nuint size, int anywhere);
+#endif
+
+#if NET7_0_OR_GREATER
+    [LibraryImport("/usr/lib/system/libsystem_kernel.dylib")]
     public static partial int mach_task_self();
 #else
     [DllImport("/usr/lib/system/libsystem_kernel.dylib")]
