@@ -15,6 +15,10 @@ public class BufferAllocatorTestsAllocation
     [Fact]
     public void CanAllocateIn2GiB()
     {
+        // Not supported on OSX.
+        if (Polyfills.IsMacOS())
+            return;
+
         // Arrange
         var settings = new BufferAllocatorSettings()
         {
