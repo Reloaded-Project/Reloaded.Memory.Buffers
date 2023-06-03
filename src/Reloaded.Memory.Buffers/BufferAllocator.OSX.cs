@@ -21,45 +21,66 @@ public static partial class BufferAllocator
         var maxAddress = Math.Min(Cached.GetMaxAddress(), settings.MaxAddress);
         nuint currentAddress = settings.MinAddress;
 
-        // Define the necessary variables for mach_vm_region
-        nuint address = currentAddress;
-        nuint size = 0;
-
-        int flavor = VM_REGION_BASIC_INFO_64;
-        uint infoCount = VM_REGION_BASIC_INFO_COUNT;
         var selfTask = mach_task_self();
-
         for (int x = 0; x < settings.RetryCount; x++)
         {
             // Until we get all of the pages.
-            while (currentAddress <= maxAddress)
+            // ReSharper disable once RedundantCast
+            foreach (var page in GetFreePages(currentAddress, (nuint)maxAddress, selfTask))
             {
-                int kr = mach_vm_region(selfTask, ref address, ref size, flavor, out var info, ref infoCount, out _);
-                if (kr != 0)
-                    break;
-
-                if (TryAllocateBuffer(ref info, address, size, settings, selfTask, out var item))
+                if (TryAllocateBuffer(page.addr, page.size, settings, selfTask, out var item))
                     return item;
-
-                currentAddress = address + size;
-                address = currentAddress;
             }
         }
 
         throw new MemoryBufferAllocationException(settings.MinAddress, settings.MaxAddress, (int)settings.Size);
     }
 
-    private static bool TryAllocateBuffer(ref vm_region_basic_info_64 pageInfo, nuint pageAddress, nuint pageSize,
-        BufferAllocatorSettings settings, int selfTask, out LocatorItem result)
+    internal static List<(nuint addr, nuint size)> GetFreePages(nuint minAddress, nuint maxAddress, nuint selfTask)
+    {
+        var result = new List<(nuint addr, nuint size)>();
+        uint infoCount = VM_REGION_BASIC_INFO_COUNT;
+        var currentAddress = minAddress;
+
+        // Until we get all of the pages.
+        while (currentAddress <= maxAddress)
+        {
+            var actualAddress = currentAddress;
+            nuint availableSize = 0;
+            int kr = mach_vm_region(selfTask, ref actualAddress, ref availableSize, VM_REGION_BASIC_INFO_64, out var info, ref infoCount, out _);
+
+            // KERN_INVALID_ADDRESS, i.e. no more regions.
+            if (kr == 1)
+            {
+                var padding = maxAddress - currentAddress;
+                if (padding > 0)
+                    result.Add((currentAddress, padding));
+
+                break;
+            }
+
+            // Any other error.
+            if (kr != 0)
+                break;
+
+            var freeBytes = actualAddress - currentAddress;
+            if (freeBytes > 0)
+                result.Add((currentAddress, freeBytes));
+
+            currentAddress = actualAddress + availableSize;
+        }
+
+        return result;
+    }
+
+    private static unsafe bool TryAllocateBuffer(nuint pageAddress, nuint pageSize,
+        BufferAllocatorSettings settings, nuint selfTask, out LocatorItem result)
     {
         result = default;
-        if (pageInfo.protection != VM_PROT_NONE)
-            return false;
-
         Span<nuint> results = stackalloc nuint[4];
         foreach (var addr in GetBufferPointersInPageRange(pageAddress, pageSize, (int)settings.Size, settings.MinAddress, settings.MaxAddress, results))
         {
-            int kr = mach_vm_allocate(selfTask, addr, settings.Size, 0);
+            int kr = mach_vm_allocate(selfTask, (nuint)(&addr), settings.Size, 0);
 
             if (kr != 0)
                 continue;
