@@ -36,7 +36,7 @@ public static partial class BufferAllocator
         throw new MemoryBufferAllocationException(settings.MinAddress, settings.MaxAddress, (int)settings.Size);
     }
 
-    internal static List<(nuint addr, nuint size)> GetFreePages(nuint minAddress, nuint maxAddress, nuint selfTask)
+    private static List<(nuint addr, nuint size)> GetFreePages(nuint minAddress, nuint maxAddress, nuint selfTask)
     {
         var result = new List<(nuint addr, nuint size)>();
         uint infoCount = VM_REGION_BASIC_INFO_COUNT;
@@ -47,7 +47,7 @@ public static partial class BufferAllocator
         {
             var actualAddress = currentAddress;
             nuint availableSize = 0;
-            int kr = mach_vm_region(selfTask, ref actualAddress, ref availableSize, VM_REGION_BASIC_INFO_64, out var info, ref infoCount, out _);
+            int kr = mach_vm_region(selfTask, ref actualAddress, ref availableSize, VM_REGION_BASIC_INFO_64, out vm_region_basic_info_64 _, ref infoCount, out _);
 
             // KERN_INVALID_ADDRESS, i.e. no more regions.
             if (kr == 1)
