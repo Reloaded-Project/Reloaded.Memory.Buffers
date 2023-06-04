@@ -1,5 +1,5 @@
-using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Reloaded.Memory.Buffers.Structs;
 using Reloaded.Memory.Buffers.Structs.Params;
@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Reloaded.Memory.Buffers.Tests.Tests;
 
+[SuppressMessage("ReSharper", "RedundantCast")]
 public class BufferAllocatorTestsAllocation
 {
     [Fact]
@@ -61,13 +62,13 @@ public class BufferAllocatorTestsAllocation
         if (Polyfills.IsWindows())
         {
             if (settings.TargetProcess.Id == Polyfills.GetProcessId())
-                Kernel32.VirtualFree(item.BaseAddress, (UIntPtr)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE);
+                Kernel32.VirtualFree(item.BaseAddress, (nuint)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE);
             else
-                Kernel32.VirtualFreeEx((IntPtr)settings.TargetProcess.Id, item.BaseAddress, (UIntPtr)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE);
+                Kernel32.VirtualFreeEx((nint)settings.TargetProcess.Id, item.BaseAddress, (nuint)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE);
         }
         else if (Polyfills.IsLinux() || Polyfills.IsMacOS())
         {
-            Posix.munmap(item.BaseAddress, (UIntPtr)item.Size);
+            Posix.munmap(item.BaseAddress, (nuint)item.Size);
         }
     }
 }

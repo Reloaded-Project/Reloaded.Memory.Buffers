@@ -2,8 +2,6 @@ using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Structs;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
-using Reloaded.Memory.Enums;
-using Reloaded.Memory.Native.Unix;
 using static Reloaded.Memory.Buffers.Native.OSX.Mach;
 
 namespace Reloaded.Memory.Buffers;

@@ -18,7 +18,7 @@ internal static class LinuxMapParser
     /// <param name="targetProcess">The process to get free regions from.</param>
     public static List<MemoryMapEntry> GetFreeRegions(Process targetProcess)
     {
-        using var regs = ParseMemoryMap(targetProcess);
+        using var regs = ParseMemoryMap(targetProcess.Id);
         return GetFreeRegions(regs.Span);
     }
 
@@ -62,12 +62,12 @@ internal static class LinuxMapParser
     /// <summary>
     /// Parses the contents of the /proc/{id}/maps file and returns an array of memory mapping entries.
     /// </summary>
-    /// <param name="process">The process to get mapping ranges for.</param>
+    /// <param name="processId">The process id to get mapping ranges for.</param>
     /// <returns>An array of memory mapping entries.</returns>
     /// <exception cref="FormatException">One of the lines in the memory map could not be correctly parsed.</exception>
-    public static ArrayRentalSlice<MemoryMapEntry> ParseMemoryMap(Process process)
+    public static ArrayRentalSlice<MemoryMapEntry> ParseMemoryMap(int processId)
     {
-        var mapsPath = $"/proc/{process.Id}/maps";
+        var mapsPath = $"/proc/{processId}/maps";
         return ParseMemoryMap(File.ReadAllLines(mapsPath));
     }
 

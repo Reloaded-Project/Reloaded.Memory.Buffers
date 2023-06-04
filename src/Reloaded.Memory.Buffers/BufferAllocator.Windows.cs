@@ -112,6 +112,13 @@ public static partial class BufferAllocator
             if (allocated == 0)
                 continue;
 
+            // Sanity test in case of '0' value input.
+            if (allocated != addr)
+            {
+                k32.VirtualFree(allocated, (nuint)settings.Size);
+                continue;
+            }
+
             result = new LocatorItem(allocated, settings.Size);
             return true;
         }
@@ -140,7 +147,8 @@ public static partial class BufferAllocator
     private interface IKernel32
     {
         unsafe nuint VirtualQuery(nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer);
-        unsafe nuint VirtualAlloc(UIntPtr lpAddress, UIntPtr dwSize);
+        nuint VirtualAlloc(UIntPtr lpAddress, UIntPtr dwSize);
+        bool VirtualFree(UIntPtr lpAddress, UIntPtr dwSize);
     }
 
     private struct LocalKernel32 : IKernel32
@@ -150,6 +158,9 @@ public static partial class BufferAllocator
 
         public nuint VirtualAlloc(UIntPtr lpAddress, UIntPtr dwSize) =>
             Reloaded.Memory.Native.Windows.Kernel32.VirtualAlloc(lpAddress, dwSize, MEM_ALLOCATION_TYPE.MEM_RESERVE | MEM_ALLOCATION_TYPE.MEM_COMMIT, MEM_PROTECTION.PAGE_EXECUTE_READWRITE);
+
+        public bool VirtualFree(UIntPtr lpAddress, UIntPtr dwSize) =>
+            Reloaded.Memory.Native.Windows.Kernel32.VirtualFree(lpAddress, dwSize, MEM_ALLOCATION_TYPE.MEM_RELEASE);
     }
 
     private readonly struct RemoteKernel32 : IKernel32
@@ -162,5 +173,8 @@ public static partial class BufferAllocator
 
         public nuint VirtualAlloc(UIntPtr lpAddress, UIntPtr dwSize) =>
             VirtualAllocEx(_handle, lpAddress, dwSize, MEM_ALLOCATION_TYPE.MEM_RESERVE | MEM_ALLOCATION_TYPE.MEM_COMMIT, MEM_PROTECTION.PAGE_EXECUTE_READWRITE);
+
+        public bool VirtualFree(UIntPtr lpAddress, UIntPtr dwSize) =>
+            Reloaded.Memory.Native.Windows.Kernel32.VirtualFreeEx(_handle, lpAddress, dwSize, MEM_ALLOCATION_TYPE.MEM_RELEASE);
     }
 }

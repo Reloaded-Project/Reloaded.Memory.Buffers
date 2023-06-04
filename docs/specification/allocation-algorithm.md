@@ -1,16 +1,16 @@
 # Allocation Algorithm
 
-!!! tip "This page provides sample source code to demonstrate how the library may be implemented."
+!!! info "Allocating within certain proximity on different platforms can be tricky."
 
-!!! tip "This is to help you implement compatible solutions."
+!!! info "This page provides snippets from the source to give guidance for other language ports, or for those implementing similar solutions."
 
 !!! tip "For a full implementation, look at this repo's code."
 
 Allocating buffers and locators generally follows the same algorithm; with minor platform specific differences.
 
-- [Enumerate Free Memory Pages](#finding-free-memory-pages)  
-- [Check if Page Satisfies Constraints](#checking-if-buffer-fits)  
-- [Allocating A Buffer](#allocating-a-buffer)  
+- [Enumerate Free Memory Pages](#finding-free-memory-pages)
+- [Allocating A Buffer](#allocating-a-buffer)
+    - [Check if Page Satisfies Constraints](#checking-if-buffer-fits)  
 
 ## Finding Free Memory Pages
 
@@ -268,8 +268,7 @@ We can extract the free regions in the following fashion:
     }
     ```
 
-Lastly, try allocating; on Linux, to allocate you should use `mmap`. 
-Here's remainder of the code that does the actual lookup and allocation.
+Lastly, try allocating based on the free regions, like this:  
 
 === "C#"
 
@@ -284,33 +283,6 @@ Here's remainder of the code that does the actual lookup and allocation.
         // Add the page and increment address iterator to go to next page.
         if (TryAllocateBuffer(region, settings, out var item))
             return item;
-    }
-
-    private static bool TryAllocateBuffer(MemoryMapEntry entry, BufferAllocatorSettings settings, out LocatorItem result)
-    {
-        result = default;
-    
-        Span<nuint> results = stackalloc nuint[4];
-        foreach (var addr in GetPossibleBufferAddresses(settings.MinAddress, settings.MaxAddress, entry.StartAddress, entry.EndAddress, settings.Size, Cached.GetAllocationGranularity(), results))
-        {
-            // ReSharper disable once RedundantCast
-            // MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE = 0x100022
-            nint allocated = Posix.mmap(addr, (nuint)settings.Size, (int)MemoryProtection.ReadWriteExecute, 0x100022, -1, 0);
-            if (allocated == -1)
-                continue;
-    
-            // Error handling for older kernels before 2018 that don't respect MAP_FIXED_NOREPLACE.
-            if ((nuint)allocated != addr)
-            {
-                Posix.munmap((nuint)allocated, settings.Size);
-                continue;
-            }
-    
-            result = new LocatorItem((nuint)allocated, settings.Size);
-            return true;
-        }
-    
-        return false;
     }
     ```
 
@@ -334,33 +306,138 @@ Here's remainder of the code that does the actual lookup and allocation.
         if (TryAllocateBuffer(region, settings, item))
             return item;
     }
-    
-    bool TryAllocateBuffer(const MemoryMapEntry& entry, const BufferAllocatorSettings& settings, LocatorItem& result)
+    ```
+
+### OSX
+
+!!! info "For OSX, you have to find all used pages via `mach_vm_region`, then use that information to find the free pages."
+
+!!! note "It seems OSX seems to impose a minimum address, in around where the `.text` segment would eventually get allocated. Usually getting memory in first 2GiB appears impossible."
+
+=== "C#"
+
+    ```
+    private static List<(nuint addr, nuint size)> GetFreePages(nuint minAddress, nuint maxAddress, nuint selfTask)
     {
-        result = LocatorItem(0, 0);
+        var result = new List<(nuint addr, nuint size)>();
+        uint infoCount = VM_REGION_BASIC_INFO_COUNT;
+        var currentAddress = minAddress;
     
-        std::array<uintptr_t, 4> resultArray;
-        std::span<uintptr_t> results(resultArray);
-        for (auto addr : GetPossibleBufferAddresses(settings.MinAddress, settings.MaxAddress, entry.StartAddress, entry.EndAddress, settings.Size, GetAllocationGranularity(), results))
+        // Until we get all of the pages.
+        while (currentAddress <= maxAddress)
         {
-            intptr_t allocated = mmap(reinterpret_cast<void*>(addr), settings.Size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-            if (allocated == reinterpret_cast<intptr_t>(MAP_FAILED))
-                continue;
+            var actualAddress = currentAddress;
+            nuint availableSize = 0;
+            int kr = mach_vm_region(selfTask, ref actualAddress, ref availableSize, VM_REGION_BASIC_INFO_64, out vm_region_basic_info_64 _, ref infoCount, out _);
     
-            // Error handling for older kernels before 2018 that don't respect MAP_FIXED_NOREPLACE.
-            if (static_cast<uintptr_t>(allocated) != addr)
+            // KERN_INVALID_ADDRESS, i.e. no more regions.
+            if (kr == 1)
             {
-                munmap(reinterpret_cast<void*>(allocated), settings.Size);
-                continue;
+                var padding = maxAddress - currentAddress;
+                if (padding > 0)
+                    result.Add((currentAddress, padding));
+    
+                break;
             }
     
-            result = LocatorItem(static_cast<uintptr_t>(allocated), settings.Size);
-            return true;
+            // Any other error.
+            if (kr != 0)
+                break;
+    
+            var freeBytes = actualAddress - currentAddress;
+            if (freeBytes > 0)
+                result.Add((currentAddress, freeBytes));
+    
+            currentAddress = actualAddress + availableSize;
         }
     
-        return false;
+        return result;
     }
     ```
+
+=== "C++"
+
+    ```
+    // Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.
+    // I also cannot guarantee this one compiles, I don't have a macOS compiler readily available.
+    #include <vector>
+    #include <mach/mach.h>
+    
+    struct PageRange {
+        mach_vm_address_t addr;
+        mach_vm_size_t size;
+    };
+    
+    std::vector<PageRange> GetFreePages(mach_vm_address_t minAddress, mach_vm_address_t maxAddress, mach_port_t selfTask) {
+        std::vector<PageRange> result;
+        mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+        mach_vm_address_t currentAddress = minAddress;
+    
+        // Until we get all of the pages.
+        while (currentAddress <= maxAddress) {
+            mach_vm_address_t actualAddress = currentAddress;
+            mach_vm_size_t availableSize = 0;
+            vm_region_basic_info_data_64_t info;
+            mach_msg_type_number_t infoCnt = VM_REGION_BASIC_INFO_COUNT_64;
+            mach_port_t object_name;
+            kern_return_t kr = mach_vm_region(selfTask, &actualAddress, &availableSize, VM_REGION_BASIC_INFO, reinterpret_cast<vm_region_info_t>(&info), &infoCnt, &object_name);
+    
+            // KERN_INVALID_ADDRESS, i.e. no more regions.
+            if (kr == KERN_INVALID_ADDRESS) {
+                mach_vm_size_t padding = maxAddress - currentAddress;
+                if (padding > 0)
+                    result.push_back({currentAddress, padding});
+    
+                break;
+            }
+    
+            // Any other error.
+            if (kr != KERN_SUCCESS)
+                break;
+    
+            mach_vm_size_t freeBytes = actualAddress - currentAddress;
+            if (freeBytes > 0)
+                result.push_back({currentAddress, freeBytes});
+    
+            currentAddress = actualAddress + availableSize;
+        }
+    
+        return result;
+    }
+    ```
+
+Now, try allocating in those free pages:  
+
+=== "C#"
+
+    ```csharp
+    // Until we get all of the pages.
+    foreach (var page in GetFreePages(currentAddress, (nuint)maxAddress, selfTask))
+    {
+        if (TryAllocateBuffer(page.addr, page.size, settings, selfTask, out var item))
+            return item;
+    }
+    ```
+
+=== "C++"
+
+    ```cpp
+    // results is replaced with a vector because stack allocated arrays are not commonly used in C++
+    std::vector<mach_vm_address_t> results(4);
+    for(auto addr : GetBufferPointersInPageRange(pageAddress, pageSize, static_cast<int>(settings.size), settings.minAddress, settings.maxAddress, results))
+    {
+        kern_return_t kr = mach_vm_allocate(selfTask, &addr, settings.size, 0);
+
+        if (kr != KERN_SUCCESS)
+            continue;
+
+        result = {addr, settings.size};
+        return true;
+    }
+    ```
+
+
+!!! note "It appears you can't use `mmap` for allocating on OSX in these scenarios, so make sure to use `mach_vm_allocate`."
 
 ## Allocating a Buffer
 
@@ -381,11 +458,17 @@ Here's remainder of the code that does the actual lookup and allocation.
         Span<nuint> results = stackalloc nuint[4];
         foreach (var addr in GetBufferPointersInPageRange(ref pageInfo, (int)settings.Size, settings.MinAddress, settings.MaxAddress, results))
         {
-            // ReSharper disable once RedundantCast
             nuint allocated = k32.VirtualAlloc(addr, (nuint)settings.Size);
             if (allocated == 0)
                 continue;
     
+            // Sanity test in case of '0' value input and random address allocated.
+            if (allocated != addr)
+            {
+                k32.VirtualFree(allocated, (nuint)settings.Size);
+                continue;
+            }
+
             result = new LocatorItem(allocated, settings.Size);
             return true;
         }
@@ -442,6 +525,13 @@ Here's remainder of the code that does the actual lookup and allocation.
             if (allocated == 0)
                 continue;
     
+            // Sanity test in case of '0' value input and random address allocated.
+            if (allocated != addr)
+            {
+                k32.VirtualFree(allocated, (nuint)settings.Size);
+                continue;
+            }
+
             result = LocatorItem(allocated, settings.Size);
             return true;
         }
@@ -450,7 +540,122 @@ Here's remainder of the code that does the actual lookup and allocation.
     }
     ```
 
-### Checking if Buffer Fits
+### Linux
+
+=== "C#"
+
+    ```csharp
+    private static bool TryAllocateBuffer(MemoryMapEntry entry, BufferAllocatorSettings settings, out LocatorItem result)
+    {
+        result = default;
+    
+        Span<nuint> results = stackalloc nuint[4];
+        foreach (var addr in GetPossibleBufferAddresses(settings.MinAddress, settings.MaxAddress, entry.StartAddress, entry.EndAddress, settings.Size, Cached.GetAllocationGranularity(), results))
+        {
+            // MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE = 0x100022
+            nint allocated = Posix.mmap(addr, (nuint)settings.Size, (int)MemoryProtection.ReadWriteExecute, 0x100022, -1, 0);
+            if (allocated == -1)
+                continue;
+    
+            // Error handling for older kernels before 2018 that don't respect MAP_FIXED_NOREPLACE.
+            if ((nuint)allocated != addr)
+            {
+                Posix.munmap((nuint)allocated, settings.Size);
+                continue;
+            }
+    
+            result = new LocatorItem((nuint)allocated, settings.Size);
+            return true;
+        }
+    
+        return false;
+    }
+    ```
+
+=== "C++"
+
+    ```cpp
+    // Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.
+    // Note: Uses C++20
+    #include <sys/mman.h>
+    #include <array>
+    
+    bool TryAllocateBuffer(const MemoryMapEntry& entry, const BufferAllocatorSettings& settings, LocatorItem& result)
+    {
+        result = LocatorItem(0, 0);
+    
+        std::array<uintptr_t, 4> resultArray;
+        std::span<uintptr_t> results(resultArray);
+        for (auto addr : GetPossibleBufferAddresses(settings.MinAddress, settings.MaxAddress, entry.StartAddress, entry.EndAddress, settings.Size, GetAllocationGranularity(), results))
+        {
+            intptr_t allocated = mmap(reinterpret_cast<void*>(addr), settings.Size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+            if (allocated == reinterpret_cast<intptr_t>(MAP_FAILED))
+                continue;
+    
+            // Error handling for older kernels before 2018 that don't respect MAP_FIXED_NOREPLACE.
+            if (static_cast<uintptr_t>(allocated) != addr)
+            {
+                munmap(reinterpret_cast<void*>(allocated), settings.Size);
+                continue;
+            }
+    
+            result = LocatorItem(static_cast<uintptr_t>(allocated), settings.Size);
+            return true;
+        }
+    
+        return false;
+    }
+    ```
+
+### OSX
+
+=== "C#"
+
+    ```csharp
+    private static unsafe bool TryAllocateBuffer(nuint pageAddress, nuint pageSize,
+        BufferAllocatorSettings settings, nuint selfTask, out LocatorItem result)
+    {
+        result = default;
+        Span<nuint> results = stackalloc nuint[4];
+        foreach (var addr in GetBufferPointersInPageRange(pageAddress, pageSize, (int)settings.Size, settings.MinAddress, settings.MaxAddress, results))
+        {
+            int kr = mach_vm_allocate(selfTask, (nuint)(&addr), settings.Size, 0);
+    
+            if (kr != 0)
+                continue;
+    
+            result = new LocatorItem(addr, settings.Size);
+            return true;
+        }
+    
+        return false;
+    }
+    ```
+
+=== "C++"
+
+    ```cpp
+    bool TryAllocateBuffer(mach_vm_address_t pageAddress, mach_vm_size_t pageSize, 
+        BufferAllocatorSettings settings, mach_port_t selfTask, LocatorItem& result)
+    {
+        // results is replaced with a vector because stack allocated arrays are not commonly used in C++
+        std::vector<mach_vm_address_t> results(4);
+        for(auto addr : GetBufferPointersInPageRange(pageAddress, pageSize, static_cast<int>(settings.size), settings.minAddress, settings.maxAddress, results))
+        {
+            kern_return_t kr = mach_vm_allocate(selfTask, &addr, settings.size, 0);
+    
+            if (kr != KERN_SUCCESS)
+                continue;
+    
+            result = {addr, settings.size};
+            return true;
+        }
+    
+        return false;
+    }
+    ```
+
+## Checking if Buffer Fits
 
 !!! info "For any memory page returned from the OS, we need to check if it satisfies our constraints."
 

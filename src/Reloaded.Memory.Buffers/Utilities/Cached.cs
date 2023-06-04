@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Native.Unix;
 using static Reloaded.Memory.Buffers.Native.Windows.Kernel32;
@@ -12,6 +13,7 @@ internal static class Cached
 {
     private static readonly nuint s_maxAddress;
     private static readonly int s_allocationGranularity;
+    private static readonly Process _thisProcess;
     private const int ScPagesizeLinux = 30;
     private const int ScPagesizeOsx = 29;
 
@@ -41,11 +43,14 @@ internal static class Cached
         {
             ThrowHelpers.ThrowPlatformNotSupportedException();
         }
-        #pragma warning restore CA1416 // Validate platform compatibility
 
+        _thisProcess = Process.GetCurrentProcess();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public static nuint GetMaxAddress() => s_maxAddress;
 
     public static int GetAllocationGranularity() => s_allocationGranularity;
+
+    public static Process GetThisProcess() => _thisProcess;
 }

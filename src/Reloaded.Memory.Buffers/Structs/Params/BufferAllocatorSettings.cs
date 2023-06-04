@@ -28,7 +28,7 @@ public struct BufferAllocatorSettings
     /// <summary>
     ///     Process to allocate memory in.
     /// </summary>
-    public required Process TargetProcess { get; init; }
+    public Process TargetProcess { get; init; } = Cached.GetThisProcess();
 
     /// <summary>
     ///     Amount of times library should retry after failing to allocate a region.
@@ -61,6 +61,10 @@ public struct BufferAllocatorSettings
     /// </summary>
     public void Sanitize()
     {
+        // On Windows, VirtualAlloc treats 0 as 'any address', we might aswell avoid this out the gate.
+        if (Polyfills.IsWindows() && MinAddress < (ulong)Cached.GetAllocationGranularity())
+            MinAddress = (nuint)Cached.GetAllocationGranularity();
+
         Size = (uint)Mathematics.RoundUp(Size, Cached.GetAllocationGranularity());
     }
 }

@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Reloaded.Memory.Buffers.Native;
 using Reloaded.Memory.Buffers.Utilities;
-using Reloaded.Memory.Native.Unix;
 using Posix = Reloaded.Memory.Buffers.Native.Posix;
 
 namespace Reloaded.Memory.Buffers;
@@ -9,7 +8,7 @@ namespace Reloaded.Memory.Buffers;
 /// <summary>
 ///     Class that locates the buffer locator.
 /// </summary>
-public static unsafe partial class BufferLocatorFinder
+public static partial class BufferLocatorFinder
 {
     private static void Cleanup()
     {

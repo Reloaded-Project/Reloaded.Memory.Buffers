@@ -1,4 +1,3 @@
-using System.Globalization;
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Structs;
 using Reloaded.Memory.Buffers.Structs.Params;
@@ -18,14 +17,21 @@ public static partial class BufferAllocator
     /// </summary>
     /// <param name="settings">Settings for the memory allocator.</param>
     /// <returns>Native address of the allocated region.</returns>
+    /// <exception cref="MemoryBufferAllocationException">Memory cannot be allocated within the needed constraints.</exception>
+    /// <exception cref="PlatformNotSupportedException">This operation is not supported on the current platform.</exception>
     public static LocatorItem Allocate(BufferAllocatorSettings settings)
     {
         settings.Sanitize();
         if (Polyfills.IsWindows())
             return AllocateWindows(settings);
-        else if (Polyfills.IsLinux())
+
+        if (settings.TargetProcess.Id != Polyfills.GetProcessId())
+            ThrowHelpers.ThrowExternalAllocationNotSupportedException();
+
+        if (Polyfills.IsLinux())
             return AllocateLinux(settings);
-        else if (Polyfills.IsMacOS())
+
+        if (Polyfills.IsMacOS())
             return AllocateOSX(settings);
 
         ThrowHelpers.ThrowPlatformNotSupportedException();

@@ -154,17 +154,17 @@ Code below shows basic use of `Memory Mapped Files`:
         allocationGranularity);
     ```
 
-=== "C++ (Linux & OSX)"
+=== "C++ (Linux)"
 
     ```cpp
+    // Note: Untested AI generated code (with manual correction), for reference only.
+    // Note: Missing error handling.
     #include <sys/mman.h>
     #include <sys/stat.h>
     #include <fcntl.h>
     #include <unistd.h>
     #include <iostream>
 
-    // Note: Untested AI generated code (with manual correction), for reference only.
-    // Note: Missing error handling.
     // Construct the name
     bool previouslyExisted = true;
     int pid = getpid(); // Get current process ID
@@ -184,16 +184,53 @@ Code below shows basic use of `Memory Mapped Files`:
     void* data = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ```
 
+=== "C++ (OSX)"
+
+    ```cpp
+    // Note: Untested AI generated code (with manual correction), for reference only.
+    // This is same as C++ (Linux), except backed by a real file.
+    #include <iostream>
+    #include <fstream>
+    #include <filesystem>
+    #include <sys/mman.h>
+    #include <fcntl.h>
+
+    // BaseDir = `$HOME/.reloaded/memory.buffers`
+    previouslyExisted = true;
+    int pid = getpid(); // Get current process ID
+    std::string name = "/Reloaded.Memory.Buffers.MemoryBuffer, PID " + std::to_string(pid);
+    std::string filePath = BaseDir + "/" + name;
+    std::filesystem::create_directories(std::filesystem::path(filePath).parent_path());
+    previouslyExisted = std::filesystem::exists(filePath);
+
+    fileDescriptor = open(filePath.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    if (fileDescriptor < 0)
+        throw std::runtime_error("Failed to open or create the file.");
+
+    lseek(fileDescriptor, length - 1, SEEK_SET);
+    write(fileDescriptor, "", 1);
+
+    Data = reinterpret_cast<uint8_t*>(mmap(nullptr, length, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, fileDescriptor, 0));
+    if (Data == MAP_FAILED)
+    {
+        close(fileDescriptor);
+        throw std::runtime_error("Failed to memory map the file.");
+    }
+    ```
+
 !!! tip "Memory Mapped Files on Windows respect `allocationGranularity` (usually 64KiB) which you can get from `GetSystemInfo`."
 
 !!! tip "Register the remainder of that (usually 64K) buffer after header as first [Items](#item) in the locator."
 
+!!! tip "On OSX we bind to real files; we use directory `$HOME/.reloaded/memory.buffers` for this, because there is no way to query open files to prevent memory leaks after crashes."
+
 For the users implementing from other languages, here are the raw OS APIs for reference:  
 
-| Platform    | APIs                                                                       |
-|-------------|----------------------------------------------------------------------------|
-| Windows     | `CreateFileMapping`, `OpenFileMapping`, `MapViewOfFile`, `UnmapViewOfFile` |
-| Linux & OSX | `shm_open`, `shm_unlink`, `mmap`, `munmap`                                 |
+| Platform | APIs                                                                       |
+|----------|----------------------------------------------------------------------------|
+| Windows  | `CreateFileMapping`, `OpenFileMapping`, `MapViewOfFile`, `UnmapViewOfFile` |
+| Linux    | `shm_open`, `shm_unlink`, `mmap`, `munmap`                                 |
+| OSX      | `open`, `close`, `mmap`, `munmap`                                          |
 
 Notice the presence of `previouslyExisted` bool.  
 This is used to determine if the locator structure needs to be kept alive.
@@ -218,6 +255,9 @@ Here's what to do depending on situation:
 !!! warning "Given expected use is in hooking frameworks where crashes are expected to be common on dev machines."
 
 In these scenarios, we cannot waste memory. For Linux, we can look through `/dev/shm` for any unused mapping, and unlink them.  
+
+For OSX we look through `$HOME/.reloaded/memory.buffers` for any unused mapping, and unlink them.  
+
 In the reference library, the following code is ran upon successful opening of existing memory mapped file (i.e. only ever once per library instance).  
 
 === "C#"
@@ -225,37 +265,50 @@ In the reference library, the following code is ran upon successful opening of e
     ```csharp
     private static void Cleanup()
     {
-        // Keep the view around forever for other mods/programs/etc. to use.
-
+        // Keep the view around forever for other modThjers/programs/etc. to use.
+    
         // Note: At runtime this is only ever executed once per library instance, so this should be okay.
         // On Linux we need to execute a runtime check to ensure that after a crash, no MMF was left over.
         // because the OS does not auto dispose them.
         if (Polyfills.IsLinux())
         {
             const string shmDirectoryPath = "/dev/shm";
-            const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
-
-            // Read all files in /dev/shm
-            var files = Directory.EnumerateFiles(shmDirectoryPath);
-
-            foreach (var file in files)
+            CleanupPosix(shmDirectoryPath, (path) => Posix.shm_unlink(path));
+        }
+        else if (Polyfills.IsMacOS())
+        {
+            CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
             {
-                var fileName = Path.GetFileName(file);
-                if (!fileName.StartsWith(memoryMappedFilePrefix))
-                    continue;
-
-                // Extract PID from the file name
-                var pidStr = fileName.Substring(memoryMappedFilePrefix.Length);
-                if (!int.TryParse(pidStr, out var pid))
-                    continue;
-
-                // Check if the process is still running
-                if (!IsProcessRunning(pid))
-                    Posix.shm_unlink(fileName);
-            }
+                try { File.Delete(path); }
+                catch (Exception) { /* Ignored */ }
+            });
         }
     }
-
+    
+    private static void CleanupPosix(string mmfDirectory, Action<string> deleteFile)
+    {
+        const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
+    
+        // Read all files in /dev/shm
+        var files = Directory.EnumerateFiles(mmfDirectory);
+    
+        foreach (var file in files)
+        {
+            var fileName = Path.GetFileName(file);
+            if (!fileName.StartsWith(memoryMappedFilePrefix))
+                continue;
+    
+            // Extract PID from the file name
+            var pidStr = fileName.Substring(memoryMappedFilePrefix.Length);
+            if (!int.TryParse(pidStr, out var pid))
+                continue;
+    
+            // Check if the process is still running
+            if (!IsProcessRunning(pid))
+                deleteFile(fileName);
+        }
+    }
+    
     private static bool IsProcessRunning(int pid)
     {
         try
@@ -277,45 +330,64 @@ In the reference library, the following code is ran upon successful opening of e
     // AI Generated.
     // Note: This is untested code, for reference only.
     // Note: This will only build on a Linux/OSX box due to included headers. You'll need to compile guard this.
-    #include <sys/stat.h>
     #include <dirent.h>
-    #include <fcntl.h>
-    #include <signal.h>
+    #include <sys/stat.h>
     #include <unistd.h>
-    #include <cstdlib>
-    #include <cstring>
     #include <iostream>
+    #include <cstring>
+    #include <cstdlib>
+    #include <pwd.h>
+    #include <signal.h>
     #include <sys/mman.h>
-
-    bool isProcessRunning(int pid) {
-        return kill(pid, 0) == 0;
-    }    
-
-    void cleanup() {
-        const char* shmDirectoryPath = "/dev/shm";
-        const char* memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
-        size_t prefixLength = strlen(memoryMappedFilePrefix);
     
-        DIR* dirp = opendir(shmDirectoryPath);
-        if (dirp == nullptr) {
-            perror("Could not open /dev/shm directory");
-            return;
-        }
+    void Cleanup();
+    void CleanupPosix(const std::string& mmfDirectory);
+    bool IsProcessRunning(pid_t pid);
     
-        struct dirent* dp;
-        while ((dp = readdir(dirp)) != nullptr) {
-            if (strncmp(dp->d_name, memoryMappedFilePrefix, prefixLength) == 0) {
-                char* pidStr = dp->d_name + prefixLength;
-                int pid = std::atoi(pidStr);
+    void Cleanup() {
+    #ifdef __linux__
+        CleanupPosix("/dev/shm");
+    #elif __APPLE__
+        const char* homeDir = getenv("HOME");
+        if (homeDir == nullptr) homeDir = getpwuid(getuid())->pw_dir;
+        CleanupPosix(std::string(homeDir) + "/.reloaded/memory.buffers");
+    #endif
+    }
     
-                if (!isProcessRunning(pid)) {
-                    std::string filePath = std::string(shmDirectoryPath) + "/" + dp->d_name;
+    void CleanupPosix(const std::string& mmfDirectory) {
+        const std::string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
+    
+        DIR *dir;
+        struct dirent *ent;
+        struct stat st;
+    
+        if ((dir = opendir(mmfDirectory.c_str())) != nullptr) {
+            while ((ent = readdir(dir)) != nullptr) {
+                std::string fileName = ent->d_name;
+    
+                if (fileName.find(memoryMappedFilePrefix) != 0)
+                    continue;
+    
+                std::string pidStr = fileName.substr(memoryMappedFilePrefix.length());
+                pid_t pid = std::stoi(pidStr);
+    
+                if (!IsProcessRunning(pid)) {
+                    std::string filePath = mmfDirectory + "/" + fileName;
+    #ifdef __linux__
                     shm_unlink(filePath.c_str());
+    #elif __APPLE__
+                    std::remove(filePath.c_str());
+    #endif
                 }
             }
+            closedir(dir);
+        } else {
+            perror("");
         }
+    }
     
-        closedir(dirp);
+    bool IsProcessRunning(pid_t pid) {
+        return kill(pid, 0) == 0;
     }
     ```
 

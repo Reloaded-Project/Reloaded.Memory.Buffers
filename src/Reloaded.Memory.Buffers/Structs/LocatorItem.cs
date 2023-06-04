@@ -14,7 +14,7 @@ public struct LocatorItem
     public nuint BaseAddress;
 
     /// <summary>
-    ///     True if he is allocated.
+    ///     True if the buffer is allocated.
     /// </summary>
     public bool IsAllocated => BaseAddress != 0;
 
@@ -113,6 +113,9 @@ public struct LocatorItem
     /// <returns>If this buffer can be used given the parameters.</returns>
     public bool CanUse(uint size, nuint minAddress, nuint maxAddress)
     {
+        if (!IsAllocated)
+            return false;
+
         // Calculate the start and end positions within the buffer
         var startAvailableAddress = BaseAddress + Position;
         var endAvailableAddress = startAvailableAddress + size;
@@ -124,5 +127,41 @@ public struct LocatorItem
         // [endAvailableAddress <= maxAddress] checks if in range.
         return endAvailableAddress <= MaxAddress && startAvailableAddress >= minAddress &&
                endAvailableAddress <= maxAddress;
+    }
+
+    /// <summary>
+    /// Appends the data to this buffer.
+    /// </summary>
+    /// <param name="data">The data to append to the item.</param>
+    /// <returns>Address of the written data.</returns>
+    /// <remarks>
+    ///     It is the caller's responsibility to ensure there is sufficient space in the buffer.<br/>
+    ///     When returning buffers from the library, the library will ensure there's at least the requested amount of space;
+    ///     so if the total size of your data falls under that space, you are good.
+    /// </remarks>
+    public unsafe nuint Append(Span<byte> data)
+    {
+        nuint address = BaseAddress + Position;
+        data.CopyTo(new Span<byte>((void*)address, data.Length));
+        Position += (uint)data.Length;
+        return address;
+    }
+
+    /// <summary>
+    /// Appends the blittable variable to this buffer.
+    /// </summary>
+    /// <typeparam name="T">Type of the item to write.</typeparam>
+    /// <param name="data">The item to append to the buffer.</param>
+    /// <returns>Address of the written data.</returns>
+    /// <remarks>
+    ///     It is the caller's responsibility to ensure there is sufficient space in the buffer.<br/>
+    ///     When returning buffers from the library, the library will ensure there's at least the requested amount of space;
+    ///     so if the total size of your data falls under that space, you are good.
+    /// </remarks>
+    public unsafe nuint Append<T>(in T data) where T : unmanaged
+    {
+        var address = (T*)(BaseAddress + Position);
+        *address = data;
+        return (nuint)address;
     }
 }

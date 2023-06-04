@@ -10,8 +10,8 @@ namespace Reloaded.Memory.Buffers;
 /// </summary>
 public static unsafe partial class BufferLocatorFinder
 {
-    private static LocatorHeader* _address;
-    private static IMemoryMappedFile? _mmf;
+    private static LocatorHeader* s_address;
+    private static IMemoryMappedFile? s_mmf;
 
     /// <summary>
     ///     Retrieves the address of the first locator.
@@ -24,12 +24,13 @@ public static unsafe partial class BufferLocatorFinder
     /// </summary>
     /// <param name="reason">The reason the element was found.</param>
     /// <returns>Address of the first locator.</returns>
+    /// <exception cref="PlatformNotSupportedException">This operation is not supported on the current platform.</exception>
     internal static LocatorHeader* Find(out FindReason reason)
     {
-        if (_address != (LocatorHeader*)0)
+        if (s_address != (LocatorHeader*)0)
         {
             reason = FindReason.Cached;
-            return _address;
+            return s_address;
         }
 
         // Create or open the memory-mapped file
@@ -39,18 +40,18 @@ public static unsafe partial class BufferLocatorFinder
         // our mapping.
         if (mmf.AlreadyExisted)
         {
-            _address = ((LocatorHeader*)mmf.Data)->ThisAddress;
+            s_address = ((LocatorHeader*)mmf.Data)->ThisAddress;
             reason = FindReason.PreviouslyExisted;
             mmf.Dispose();
-            return _address;
+            return s_address;
         }
 
         Cleanup();
-        _mmf = mmf;
-        _address = (LocatorHeader*)mmf.Data;
-        _address->Initialize(mmf.Length);
+        s_mmf = mmf;
+        s_address = (LocatorHeader*)mmf.Data;
+        s_address->Initialize(mmf.Length);
         reason = FindReason.Created;
-        return _address;
+        return s_address;
     }
 
     internal static IMemoryMappedFile OpenOrCreateMemoryMappedFile()
@@ -78,9 +79,9 @@ public static unsafe partial class BufferLocatorFinder
     /// </summary>
     internal static void Reset()
     {
-        _address = (LocatorHeader*)0;
-        _mmf?.Dispose();
-        _mmf = null;
+        s_address = (LocatorHeader*)0;
+        s_mmf?.Dispose();
+        s_mmf = null;
     }
 
     internal enum FindReason

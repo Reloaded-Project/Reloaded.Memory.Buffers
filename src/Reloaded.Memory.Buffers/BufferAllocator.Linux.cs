@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Native.Linux;
 using Reloaded.Memory.Buffers.Structs;

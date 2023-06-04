@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
+using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Structs;
 using Reloaded.Memory.Buffers.Tests.Attributes;
 using Reloaded.Memory.Buffers.Tests.Utilities;
+using Reloaded.Memory.Buffers.Utilities;
 using Xunit;
 
 namespace Reloaded.Memory.Buffers.Tests.Tests.Structs;
@@ -160,5 +162,84 @@ public class LocatorHeaderTests
 
         // Assert
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public unsafe void TryAllocateItem_ShouldAllocateItem_WhenHeaderIsNotFullAndWithinAddressLimits()
+    {
+        // Arrange
+        byte* buffer = stackalloc byte[LocatorHeader.Length];
+        var header = (LocatorHeader*)buffer;
+        header->Initialize(LocatorHeader.Length);
+
+        uint size = 100;
+        nuint minAddress = Cached.GetMaxAddress() / 2;
+        nuint maxAddress = Cached.GetMaxAddress();
+
+        // Act
+        bool result = header->TryAllocateItem(size, minAddress, maxAddress, out var item);
+
+        // Assert
+        result.Should().BeTrue();
+        item.Should().NotBeNull();
+        item.Value.Item->Size.Should().BeGreaterOrEqualTo(size);
+        Assert.True(item.Value.Item->BaseAddress >= minAddress);
+        Assert.True(item.Value.Item->BaseAddress <= maxAddress);
+        item.Value.Dispose();
+    }
+
+    [Fact]
+    public unsafe void TryAllocateItem_ShouldNotAllocateItem_WhenHeaderIsFull()
+    {
+        // Arrange
+        byte* buffer = stackalloc byte[LocatorHeader.Length];
+        var header = (LocatorHeader*)buffer;
+        header->Initialize(LocatorHeader.Length);
+        header->NumItems = (byte)LocatorHeader.MaxItemCount;
+
+        uint size = 100;
+        nuint minAddress = 0;
+        nuint maxAddress = uint.MaxValue;
+
+        // Act
+        bool result = header->TryAllocateItem(size, minAddress, maxAddress, out var item);
+
+        // Assert
+        result.Should().BeFalse();
+        item.Should().BeNull();
+    }
+
+    [Fact]
+    public unsafe void TryAllocateItem_ShouldNotAllocateItem_WhenOutsideAddressLimits()
+    {
+        // Arrange
+        byte* buffer = stackalloc byte[LocatorHeader.Length];
+        var header = (LocatorHeader*)buffer;
+        header->Initialize(LocatorHeader.Length);
+
+        uint size = 100;
+        nuint minAddress = 0;
+        nuint maxAddress = 10; // Set maxAddress to a small value to make allocation impossible
+
+        // Act
+        Assert.Throws<MemoryBufferAllocationException>(() => header->TryAllocateItem(size, minAddress, maxAddress, out SafeLocatorItem? _));
+    }
+
+    [Fact]
+    public unsafe void GetNextLocator_ShouldAllocate_WhenNewlyCreated()
+    {
+        // Arrange
+        byte* buffer = stackalloc byte[LocatorHeader.Length];
+        var header = (LocatorHeader*)buffer;
+        header->Initialize(LocatorHeader.Length);
+        header->NumItems = (byte)LocatorHeader.MaxItemCount;
+
+        // Act
+        var next = (nuint)header->GetNextLocator();
+        var nextCached = (nuint)header->GetNextLocator();
+
+        // Assert
+        nextCached.Should().Be(next);
+        next.Should().NotBe(0);
     }
 }

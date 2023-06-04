@@ -9,7 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferLocatorFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferLocatorFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorHeader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorHeader.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,11 +21,14 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/64b2ee7c93834f36b6f86a9249b3d53415a00/fa/508aeeca/SpanExtensions.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c4913f3244baa8c16e621afdef1be1d96fa1c835e1740d85646a5c4a8127e87/Span.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d81d50aa37afb114327ac8c4d01d3b613a33760a32bdc25f64bc5165e552e4/Int32.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e1f5d57d5299b498d1e9127689fa526648fe27cd0892713df58df67ccb43eeb/IntPtr.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/fd495755bc5b3363eba9fd4b7bbd653483c3b258d07289d887a6a83bb7e1071/TargetInvocationException.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4b76c3e709534801a173f34a1d6b3dfc522790/02/e2f44df6/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/159be8d190cfdf77c9e33529f2e856c5b46ba1f2c86243059845f7c61b5/Process.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/24bb4567e978ba6557a972f5cf4aa3f6fd8ba16c0f913b05ccb9fb6d2c92c69/UnmanagedMemoryAccessor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/275c91e8825d3a2b394ea2c03e30eebf62ed063dedd5d339c6ea4e6b9224053/BooleanAsserts.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/73441e6a7f3ccccf47132a199b7717aea94a6bc8257f63c550e2ad6c2f6c97/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/753d44b40e7dfcf2a0534343444ce1ebaac652db5adaf638d71f2ea97e562f/MethodInvoker.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/85448f861b1cb95910693f28a5ce3363967c79953b460b176d97298ae5ed0/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/906d7cfe7139647e7fcafb24c420abecae95b3e4e75b63dd63c4cf38d6e3/AssertionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reloaded.Memory.Buffers/obj/Debug/netstandard2.0/Reloaded.Memory.Buffers.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
@@ -41,28 +45,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;refactor-reloaded3-compliance&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "XThreadsFramesViewSplitterKey": "0.113274336",
+    "git-widget-placeholder": "refactor-reloaded3-compliance",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;/home/sewer/.config/JetBrains/Rider2023.1/resharper-host/DecompilerCache&quot;,
-      &quot;/home/sewer/.config/JetBrains/Rider2023.1/resharper-host/SourcesCache&quot;,
-      &quot;/home/sewer/.local/share/Symbols/src&quot;
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\sewer\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache",
+      "C:\\Users\\sewer\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache",
+      "C:\\Users\\sewer\\AppData\\Local\\Symbols\\src"
     ]
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -93,7 +98,12 @@
       <workItem from="1685329978254" duration="7845000" />
       <workItem from="1685387581041" duration="3621000" />
       <workItem from="1685404087415" duration="3623000" />
-      <workItem from="1685412996383" duration="4063000" />
+      <workItem from="1685412996383" duration="4507000" />
+      <workItem from="1685456611371" duration="1483000" />
+      <workItem from="1685458625481" duration="64000" />
+      <workItem from="1685603135939" duration="4349000" />
+      <workItem from="1685747033179" duration="116000" />
+      <workItem from="1685747167114" duration="3000" />
     </task>
     <servers />
   </component>
@@ -101,84 +111,50 @@
     <option name="version" value="3" />
   </component>
   <component name="UnitTestsCoverage.Settings">
-    <option name="coveragePercentColumnWidth" value="129" />
+    <option name="coveragePercentColumnWidth" value="81" />
     <option name="sortOrder" value="DESCENDING" />
     <option name="sortedColumn" value="1" />
-    <option name="symbolColumnWidth" value="466" />
+    <option name="symbolColumnWidth" value="335" />
     <coverage-tree-state>
       <expand>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Utilities 67% 26/78" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Structs 83% 26/150" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Structs 67% 35/105" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-        </path>
-        <path>
-          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Structs 67% 35/105" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Params 0% 20/20" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-        </path>
-        <path>
-          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Structs 67% 35/105" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Params 0% 20/20" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="BufferAllocatorSettings 0% 20/20" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-        </path>
-        <path>
-          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Native 50% 23/46" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-        </path>
-        <path>
-          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 60% 1766/4382" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 38% 1581/2567" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 169/365" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="BufferAllocator 23% 79/102" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Structs 83% 26/150" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="LocatorHeader 75% 21/85" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
       </expand>
       <select />
@@ -197,12 +173,6 @@
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorItem.cs</url>
-          <line>97</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers\Structs\LocatorItem.cs" initialLine="61" containingFunctionPresentation="Method 'Unlock'" />
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorItemTests.cs</url>
           <line>97</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorItemTests.cs" initialLine="97" containingFunctionPresentation="Method 'MinAddress_ShouldReturnBaseAddress_WhenCalled'" />
@@ -210,15 +180,9 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
-          <line>112</line>
+          <line>114</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="113" containingFunctionPresentation="Method 'GetFirstAvailableItemLocked_ShouldReturnExpectedResult'" />
           <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
-          <line>141</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="141" containingFunctionPresentation="Method 'GetFirstAvailableItemLocked_ShouldReturnNullIfNoAvailableItem'" />
-          <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Common.cs</url>
@@ -246,13 +210,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs</url>
-          <line>26</line>
+          <line>31</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" initialLine="26" containingFunctionPresentation="Method 'CanAllocateIn2GiB'">
             <startOffsets>
-              <option value="674" />
+              <option value="834" />
             </startOffsets>
             <endOffsets>
-              <option value="720" />
+              <option value="880" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="31" />
@@ -285,13 +249,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs</url>
-          <line>24</line>
+          <line>23</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs" initialLine="24" containingFunctionPresentation="Method 'AllocateLinux'">
             <startOffsets>
-              <option value="777" />
+              <option value="739" />
             </startOffsets>
             <endOffsets>
-              <option value="845" />
+              <option value="807" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="73" />
@@ -308,6 +272,58 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
+          <line>179</line>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="177" containingFunctionPresentation="Method 'TryAllocateItem_ShouldAllocateItem_WhenHeaderIsNotFullAndWithinAddressLimits'">
+            <startOffsets>
+              <option value="4823" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4905" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/SafeLocatorItemTests.cs</url>
+          <line>15</line>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\SafeLocatorItemTests.cs" initialLine="15" containingFunctionPresentation="Method 'AppendData_BufferShouldContainData'">
+            <startOffsets>
+              <option value="319" />
+            </startOffsets>
+            <endOffsets>
+              <option value="356" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/SafeLocatorItemTests.cs</url>
+          <line>34</line>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\SafeLocatorItemTests.cs" initialLine="34" containingFunctionPresentation="Method 'AppendBlittableData_ShouldBeAtCorrectAddress'">
+            <startOffsets>
+              <option value="908" />
+            </startOffsets>
+            <endOffsets>
+              <option value="945" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
+          <line>231</line>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="231" containingFunctionPresentation="Method 'GetNextLocator_ShouldAllocate_WhenNewlyCreated'">
+            <startOffsets>
+              <option value="6571" />
+            </startOffsets>
+            <endOffsets>
+              <option value="6624" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="89" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

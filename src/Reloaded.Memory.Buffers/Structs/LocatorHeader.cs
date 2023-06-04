@@ -1,5 +1,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Reloaded.Memory.Buffers.Exceptions;
+using Reloaded.Memory.Buffers.Structs.Params;
+using Reloaded.Memory.Buffers.Utilities;
 
 namespace Reloaded.Memory.Buffers.Structs;
 
@@ -158,18 +161,6 @@ public unsafe struct LocatorHeader
     public LocatorItem* GetItem(int index) => GetFirstItem() + index;
 
     /// <summary>
-    ///     Gets the item at a specific index, with lock.
-    /// </summary>
-    /// <param name="index">Index to get item at.</param>
-    /// <returns>Locked locator item. Make sure this is disposed with use of 'using' statement. Disposing will release lock.</returns>
-    public SafeLocatorItem GetItemLocked(int index)
-    {
-        LocatorItem* item = GetItem(index);
-        item->Lock();
-        return new SafeLocatorItem(item);
-    }
-
-    /// <summary>
     ///     Gets the first available, with lock.
     /// </summary>
     /// <param name="size">Required size of buffer.</param>
@@ -189,5 +180,78 @@ public unsafe struct LocatorHeader
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///     Tries to allocate an additional item in the header, if possible.
+    /// </summary>
+    /// <param name="size">Required size of buffer.</param>
+    /// <param name="minAddress">Minimum address for the allocation.</param>
+    /// <param name="maxAddress">Maximum address for the allocation.</param>
+    /// <param name="item">Receives the successfully allocated buffer (locked).</param>
+    /// <returns>True if an item could be allocated, else false.</returns>
+    /// <remarks>If an item can't be allocated, there are simply no slots left.</remarks>
+    /// <exception cref="MemoryBufferAllocationException">Memory cannot be allocated within the needed constraints.</exception>
+    public bool TryAllocateItem(uint size, nuint minAddress, nuint maxAddress, out SafeLocatorItem? item)
+    {
+        item = default;
+        if (IsFull)
+            return false;
+
+        // Note: We don't need to check if item was created while we were waiting for the lock,
+        // because the item in question will be locked by the one who created it.
+        // We only need to check if there's space.
+        Lock();
+        try
+        {
+            if (IsFull)
+                return false;
+
+            var result = BufferAllocator.Allocate(new BufferAllocatorSettings()
+            {
+                Size = size,
+                MinAddress = minAddress,
+                MaxAddress = maxAddress
+            });
+
+            result.Lock();
+            var target = GetItem(NumItems);
+            *target = result;
+            item = new SafeLocatorItem(target);
+            return true;
+        }
+        finally
+        {
+            Unlock();
+        }
+    }
+
+    /// <summary>
+    ///     Gets the next header in the chain, allocating it if necessary.
+    /// </summary>
+    /// <returns>Address of next header.</returns>
+    public LocatorHeader* GetNextLocator()
+    {
+        // No-op if already exists.
+        if (HasNextLocator)
+            return NextLocatorPtr;
+
+        Lock();
+        // Check again, in case it was created while we were waiting for the lock.
+        try
+        {
+            if (HasNextLocator)
+                return NextLocatorPtr;
+
+            var allocSize = Cached.GetAllocationGranularity();
+            var addr = Memory.Instance.Allocate((nuint)allocSize);
+            NextLocatorPtr = (LocatorHeader*)addr.Address;
+            NextLocatorPtr->Initialize((int)addr.Length);
+            return NextLocatorPtr;
+        }
+        finally
+        {
+            Unlock();
+        }
     }
 }
