@@ -92,4 +92,4 @@ static Reloaded.Memory.Buffers.Native.Windows.Kernel32.IsWow64Process(nint hProc
 static Reloaded.Memory.Buffers.Native.Windows.Kernel32.VirtualQuery(nuint lpAddress, Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength) -> nuint
 static Reloaded.Memory.Buffers.Native.Windows.Kernel32.VirtualQueryEx(nint hProcess, nuint lpAddress, Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength) -> nuint
 static Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings
-static Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings
+static Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings

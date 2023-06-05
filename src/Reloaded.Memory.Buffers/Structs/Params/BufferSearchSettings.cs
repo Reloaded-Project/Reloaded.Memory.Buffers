@@ -36,7 +36,7 @@ public struct BufferSearchSettings
     /// <param name="target">Target address.</param>
     /// <param name="size">Size required in the settings.</param>
     /// <returns>Settings that would satisfy this search.</returns>
-    public static BufferAllocatorSettings FromProximity(nuint proximity, nuint target, nuint size) => new()
+    public static BufferSearchSettings FromProximity(nuint proximity, nuint target, nuint size) => new()
     {
         MaxAddress = Mathematics.AddWithOverflowCap(target, proximity),
         MinAddress = Mathematics.SubtractWithUnderflowCap(target, proximity),

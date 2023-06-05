@@ -92,4 +92,4 @@ static extern Reloaded.Memory.Buffers.Native.Windows.Kernel32.VirtualQueryEx(Sys
 static Reloaded.Memory.Buffers.Buffers.AllocatePrivateMemory(Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings settings) -> Reloaded.Memory.Buffers.Structs.PrivateAllocation!
 static Reloaded.Memory.Buffers.Buffers.GetBuffer(Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings settings) -> Reloaded.Memory.Buffers.Structs.SafeLocatorItem
 static Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings
-static Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings
+static Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings

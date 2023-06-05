@@ -45,57 +45,67 @@ With the following properties:
 
 ## Usage
 
-!!! info "The library is available as a NuGet package."
+!!! info "The library provides a simple high level API to use."
 
+### Get A Buffer
 
-## Common Utilities
+!!! info "Gets a buffer where you can allocate 4096 bytes in first 2GiB of address space."
 
-!!! info "Common Classes within this Package Include"
+```csharp
+var settings = new BufferSearchSettings()
+{
+    MinAddress = 0,
+    MaxAddress = int.MaxValue,
+    Size = 4096
+};
 
-**Memory Manipulation:  **
+// Make sure to dispose, so lock gets released.
+using var item = Buffers.GetBuffer(settings);
 
-| Action                              | Description                                                                         |
-|-------------------------------------|-------------------------------------------------------------------------------------|
-| [Memory](./About-Memory.md)         | Allows you to Read, Write, Allocate & Change Memory Protection for Current Process. |
-| [ExternalMemory](./About-Memory.md) | Read, Write, Allocate & Change Memory Protection but for Another Process.           |
+// Write some data, get pointer back.
+var ptr = item->Append(data); 
+```
 
-**Streams Management:  **
+### Get A Buffer (With Proximity)
 
-| Action                                                                                                                        | Description                                     |
-|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| BigEndian([Reader](./Streams/EndianReaders/BigEndianReader.md)/[Writer](./Streams/EndianReaders/BigEndianWriter.md))          | Read/write raw data in memory as Big Endian.    |
-| LittleEndian([Reader](./Streams/EndianReaders/LittleEndianReader.md)/[Writer](./Streams/EndianReaders/LittleEndianWriter.md)) | Read/write raw data in memory as Little Endian. |
-| [BufferedStreamReader](./Streams/BufferedStreamReader.md)                                                                     | High performance alternative to `BinaryReader`. |
+!!! info "Gets a buffer where 4096 bytes written will be within 2GiB of 0x140000000."
 
-**Extensions:  **
+```csharp
+var settings = BufferSearchSettings.FromProximity(int.MaxValue, (nuint)0x140000000, 4096);
 
-| Action                                                                                      | Description                                                                       |
-|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| ([Array](./Extensions/ArrayExtensions.md)/[Span](./Extensions/SpanExtensions.md))Extensions | Unsafe slicing, references without bounds checks and SIMD accelerated extensions. |
-| [StreamExtensions](./Extensions/StreamExtensions.md)                                        | Extensions for reading and writing from/to generics.                              |
-| [StringExtensions](./Extensions/StringExtensions.md)                                        | Custom Hash Function(s) and unsafe character references.                          |
+// Make sure to dispose, so lock gets released.
+using var item = Buffers.GetBuffer(settings);
 
-**Utilities:  **
+// Write some data, get pointer back.
+var ptr = item->Append(data); 
+```
 
-| Action                                                       | Description                                                                            |
-|--------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| [ArrayRental & ArrayRentalSlice](./Utilities/ArrayRental.md) | Safe wrapper around `ArrayPool<T>` rentals.                                            |
-| [Box<T>](./Utilities/Box.md)                                 | Represents a boxed value type, providing build-time validation and automatic unboxing. |
-| [CircularBuffer](./Utilities/CircularBuffer.md)              | Basic high-performance circular buffer.                                                |
-| [Pinnable<T>](./Utilities/Pinnable.md)                       | Utility for pinning C# objects for access from native code.                            |
+### Allocate Memory
 
-**Base building blocks:  **
+!!! info "Allows you to temporarily allocate memory within a specific address range and size constraints."
 
-| Action                                                                                   | Description                                     |
-|------------------------------------------------------------------------------------------|-------------------------------------------------|
-| [Ptr&lt;T&gt; / MarshalledPtr&lt;T&gt;](./Pointers/Ptr.md)                               | Abstraction over a pointer to arbitrary source. |
-| [FixedArrayPtr&lt;T&gt; & MarshalledFixedArrayPtr&lt;T&gt;](./Pointers/FixedArrayPtr.md) | Abstraction over a pointer with known length.   |
+```csharp
+// Arrange
+var settings = new BufferAllocatorSettings()
+{
+    MinAddress = 0,
+    MaxAddress = int.MaxValue,
+    Size = 4096
+};
 
-(This list is not exhaustive, please see the API Documentation for complete API)
+using var item = Buffers.AllocatePrivateMemory(settings);
+
+// You have allocated memory in first 2GiB of address space.
+// Disposing this memory (via `using` statement) will free it.
+item.BaseAddress.Should().NotBeNull();
+item.Size.Should().BeGreaterOrEqualTo(settings.Size);
+```
+
+!!! note "You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows."
 
 ## Community Feedback
 
-If you have questions/bug reports/etc. feel free to [Open an Issue](https://github.com/Reloaded-Project/Reloaded.Memory/issues/new).
+If you have questions/bug reports/etc. feel free to [Open an Issue](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/new).
 
 Contributions are welcome and encouraged. Feel free to implement new features, make bug fixes or suggestions so long as
 they meet the quality standards set by the existing code in the repository.

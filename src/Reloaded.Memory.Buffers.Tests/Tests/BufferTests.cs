@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using FluentAssertions;
 using Reloaded.Memory.Buffers.Internal;
@@ -63,5 +64,21 @@ public class BufferTests
         using var item = Buffers.GetBuffer(settings);
         ((nuint)item.Item).Should().NotBeNull();
         item.Item->Size.Should().BeGreaterOrEqualTo(settings.Size);
+    }
+
+    [Fact]
+    public unsafe void GetBuffer_WithProximity()
+    {
+        const int size = 4096;
+        ulong baseAddress = Cached.GetMaxAddress() - int.MaxValue;
+
+        // In case left over uninitialized by previous test.
+        LocatorHeaderFinder.Reset();
+        using var item = Buffers.GetBuffer(BufferSearchSettings.FromProximity(int.MaxValue, (nuint)baseAddress, size));
+        ((nuint)item.Item).Should().NotBeNull();
+        item.Item->Size.Should().BeGreaterOrEqualTo(size);
+
+        var offset = Math.Abs((long)(item.Item->BaseAddress - baseAddress));
+        offset.Should().BeLessThan(int.MaxValue);
     }
 }
