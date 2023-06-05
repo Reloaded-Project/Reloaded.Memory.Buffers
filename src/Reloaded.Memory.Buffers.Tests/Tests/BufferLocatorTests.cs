@@ -7,7 +7,6 @@ using Xunit;
 
 namespace Reloaded.Memory.Buffers.Tests.Tests;
 
-[Collection("NonParallel")]
 public unsafe class BufferLocatorTests
 {
     // Reset the state between tests.
@@ -17,7 +16,7 @@ public unsafe class BufferLocatorTests
     public void Find_ShouldReturnAddress_WhenPreviouslyExists()
     {
         // Arrange
-        LocatorHeaderFinder.OpenOrCreateMemoryMappedFile();
+        using var map = LocatorHeaderFinder.OpenOrCreateMemoryMappedFile();
 
         // Act
         LocatorHeader* address = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason reason);

@@ -21,10 +21,10 @@ public class PrivateAllocation : IDisposable
     /// <summary>
     ///     Exact size of allocated data.
     /// </summary>
-    public nuint Size { get; }
+    public uint Size { get; }
 
-    private readonly Action _free;
     private bool _isDisposed;
+    private readonly Action _free;
 
     /// <summary>
     ///     Creates a private allocation returned to user upon allocating a region of memory.

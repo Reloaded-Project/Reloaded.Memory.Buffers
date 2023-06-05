@@ -78,7 +78,7 @@ Reloaded.Memory.Buffers.Structs.PrivateAllocation
 Reloaded.Memory.Buffers.Structs.PrivateAllocation.BaseAddress.get -> nuint
 Reloaded.Memory.Buffers.Structs.PrivateAllocation.Dispose() -> void
 Reloaded.Memory.Buffers.Structs.PrivateAllocation.PrivateAllocation(nuint baseAddress, nuint size, System.Diagnostics.Process! process) -> void
-Reloaded.Memory.Buffers.Structs.PrivateAllocation.Size.get -> nuint
+Reloaded.Memory.Buffers.Structs.PrivateAllocation.Size.get -> uint
 Reloaded.Memory.Buffers.Structs.PrivateAllocation.~PrivateAllocation() -> void
 Reloaded.Memory.Buffers.Structs.SafeLocatorItem
 Reloaded.Memory.Buffers.Structs.SafeLocatorItem.Append(System.Span<byte> data) -> nuint
