@@ -114,12 +114,12 @@ internal struct LocatorItem
     /// <returns>If this buffer can be used given the parameters.</returns>
     public bool CanUse(uint size, nuint minAddress, nuint maxAddress)
     {
-        if (!IsAllocated)
+        if (!IsAllocated || BytesLeft < size)
             return false;
 
         // Calculate the start and end positions within the buffer
         var startAvailableAddress = BaseAddress + Position;
-        var endAvailableAddress = Mathematics.AddWithOverflowCap(startAvailableAddress, size);
+        var endAvailableAddress = Mathematics.AddWithOverflowCap(BaseAddress, Size);
 
         // Check if the requested memory lies within the remaining buffer and within the specified address range
         // If any of the checks fail, the buffer can't be used

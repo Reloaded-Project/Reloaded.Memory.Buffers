@@ -140,7 +140,7 @@ public class LocatorHeaderTests
     }
 
     [Fact]
-    public unsafe void GetFirstAvailableItemLocked_ShouldReturnNullIfNoAvailableItem()
+    public unsafe void GetFirstAvailableItemLocked_ShouldReturnNullIfNoAvailableItem_BecauseSizeIsInsufficient()
     {
         // Arrange
         byte* buffer = stackalloc byte[LocatorHeader.Length];
@@ -161,6 +161,33 @@ public class LocatorHeaderTests
 
         // Act
         using var result = header->GetFirstAvailableItemLocked(25, 100, 300);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public unsafe void GetFirstAvailableItemLocked_ShouldReturnNullIfNoAvailableItem_BecauseNoBufferFitsRange()
+    {
+        // Arrange
+        byte* buffer = stackalloc byte[LocatorHeader.Length];
+        var header = (LocatorHeader*)buffer;
+
+        header->ThisAddress = header;
+        header->NumItems = 2;
+
+        LocatorItem* firstItem = header->GetFirstItem();
+        firstItem->BaseAddress = 100;
+        firstItem->Size = 50;
+        firstItem->Position = 0;
+
+        LocatorItem* secondItem = header->GetItem(1);
+        secondItem->BaseAddress = 200;
+        secondItem->Size = 50;
+        secondItem->Position = 0;
+
+        // Act
+        using var result = header->GetFirstAvailableItemLocked(25, 0, 100);
 
         // Assert
         result.Should().BeNull();
