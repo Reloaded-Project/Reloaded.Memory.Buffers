@@ -1,23 +1,23 @@
+#if NET5_0_OR_GREATER
+#endif
 using System.Diagnostics;
 using Reloaded.Memory.Buffers.Exceptions;
-#if NET5_0_OR_GREATER
-using System.Runtime.Versioning;
-#endif
 using Reloaded.Memory.Buffers.Native.Windows;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
 using static Reloaded.Memory.Buffers.Native.Windows.Kernel32;
 using static Reloaded.Memory.Buffers.Utilities.Mathematics;
 using static Reloaded.Memory.Native.Windows.Kernel32;
+// ReSharper disable RedundantCast
 
-namespace Reloaded.Memory.Buffers;
+namespace Reloaded.Memory.Buffers.Internal;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 /// <summary>
 /// Windows specific buffer allocator.
 /// </summary>
-public static partial class BufferAllocator
+internal static partial class BufferAllocator
 {
     // Devirtualized based on target.
     private static LocatorItem AllocateWindows(BufferAllocatorSettings settings) =>

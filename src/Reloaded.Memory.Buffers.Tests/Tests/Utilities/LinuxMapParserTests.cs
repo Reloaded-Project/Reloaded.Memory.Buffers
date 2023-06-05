@@ -3,6 +3,7 @@ using FluentAssertions;
 using Reloaded.Memory.Buffers.Native.Linux;
 using Reloaded.Memory.Buffers.Utilities;
 using Xunit;
+// ReSharper disable RedundantCast
 
 namespace Reloaded.Memory.Buffers.Tests.Tests.Utilities;
 

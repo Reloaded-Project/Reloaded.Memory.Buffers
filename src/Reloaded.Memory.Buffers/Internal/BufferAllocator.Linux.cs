@@ -1,19 +1,19 @@
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Native.Linux;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
 using Reloaded.Memory.Enums;
 using Reloaded.Memory.Native.Unix;
 
-namespace Reloaded.Memory.Buffers;
+namespace Reloaded.Memory.Buffers.Internal;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
 /// <summary>
 /// Windows specific buffer allocator.
 /// </summary>
-public static partial class BufferAllocator
+internal static partial class BufferAllocator
 {
     // Devirtualized based on target.
     private static LocatorItem AllocateLinux(BufferAllocatorSettings settings)

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace Reloaded.Memory.Buffers.Native;
 

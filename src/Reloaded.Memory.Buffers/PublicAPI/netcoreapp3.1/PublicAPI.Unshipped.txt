@@ -1,1 +1,95 @@
-#nullable enable
+Reloaded.Memory.Buffers.Buffers
+Reloaded.Memory.Buffers.Exceptions.MemoryBufferAllocationException
+Reloaded.Memory.Buffers.Exceptions.MemoryBufferAllocationException.MemoryBufferAllocationException() -> void
+Reloaded.Memory.Buffers.Exceptions.MemoryBufferAllocationException.MemoryBufferAllocationException(nuint start, nuint end, int size) -> void
+Reloaded.Memory.Buffers.Exceptions.MemoryBufferAllocationException.MemoryBufferAllocationException(string! message) -> void
+Reloaded.Memory.Buffers.Exceptions.MemoryBufferAllocationException.MemoryBufferAllocationException(string! message, System.Exception! innerException) -> void
+Reloaded.Memory.Buffers.Native.Windows.Kernel32
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.AllocationBase -> nuint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.AllocationProtect -> Reloaded.Memory.Native.Windows.Kernel32.MEM_PROTECTION
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.BaseAddress -> nuint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.MEMORY_BASIC_INFORMATION() -> void
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.Protect -> uint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.RegionSize -> nuint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.State -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION.Type -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE.COMMIT = 4096 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE.FREE = 65536 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE.RESERVE = 8192 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_STATE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE.IMAGE = 16777216 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE.MAPPED = 262144 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE.PRIVATE = 131072 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEM_TYPE
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ALPHA = 2 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ALPHA64 = 7 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_AMD64 = 9 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ARM = 5 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64 = 13 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ARM64 = 12 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_IA32_ON_WIN64 = 10 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_IA64 = 6 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_INTEL = 0 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_MIPS = 1 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_MSIL = 8 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_NEUTRAL = 11 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_PPC = 3 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_SHX = 4 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture.PROCESSOR_ARCHITECTURE_UNKNOWN = 65535 -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.dwActiveProcessorMask -> nuint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.dwAllocationGranularity -> uint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.dwNumberOfProcessors -> uint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.dwPageSize -> uint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.dwProcessorType -> uint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.lpMaximumApplicationAddress -> nuint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.lpMinimumApplicationAddress -> nuint
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.SYSTEM_INFO() -> void
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.wProcessorArchitecture -> Reloaded.Memory.Buffers.Native.Windows.Kernel32.ProcessorArchitecture
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.wProcessorLevel -> ushort
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.wProcessorRevision -> ushort
+Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO.wReserved -> ushort
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.BruteForce.get -> bool
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.BruteForce.set -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.BufferAllocatorSettings() -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.MaxAddress.get -> nuint
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.MaxAddress.set -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.MinAddress.get -> nuint
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.MinAddress.set -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.RetryCount.get -> int
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.RetryCount.set -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.Sanitize() -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.Size.get -> uint
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.Size.set -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.TargetProcess.get -> System.Diagnostics.Process!
+Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.TargetProcess.init -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.BufferSearchSettings() -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.MaxAddress.get -> nuint
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.MaxAddress.init -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.MinAddress.get -> nuint
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.MinAddress.init -> void
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.Size.get -> uint
+Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.Size.init -> void
+Reloaded.Memory.Buffers.Structs.PrivateAllocation
+Reloaded.Memory.Buffers.Structs.PrivateAllocation.BaseAddress.get -> nuint
+Reloaded.Memory.Buffers.Structs.PrivateAllocation.Dispose() -> void
+Reloaded.Memory.Buffers.Structs.PrivateAllocation.PrivateAllocation(nuint baseAddress, nuint size, System.Diagnostics.Process! process) -> void
+Reloaded.Memory.Buffers.Structs.PrivateAllocation.Size.get -> nuint
+Reloaded.Memory.Buffers.Structs.PrivateAllocation.~PrivateAllocation() -> void
+Reloaded.Memory.Buffers.Structs.SafeLocatorItem
+Reloaded.Memory.Buffers.Structs.SafeLocatorItem.Append(System.Span<byte> data) -> nuint
+Reloaded.Memory.Buffers.Structs.SafeLocatorItem.Append<T>(in T data) -> nuint
+Reloaded.Memory.Buffers.Structs.SafeLocatorItem.Dispose() -> void
+Reloaded.Memory.Buffers.Structs.SafeLocatorItem.SafeLocatorItem() -> void
+static extern Reloaded.Memory.Buffers.Native.Windows.Kernel32.GetSystemInfo(out Reloaded.Memory.Buffers.Native.Windows.Kernel32.SYSTEM_INFO lpSystemInfo) -> void
+static extern Reloaded.Memory.Buffers.Native.Windows.Kernel32.IsWow64Process(System.IntPtr hProcess, out bool Wow64Process) -> bool
+static extern Reloaded.Memory.Buffers.Native.Windows.Kernel32.VirtualQuery(nuint lpAddress, Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength) -> nuint
+static extern Reloaded.Memory.Buffers.Native.Windows.Kernel32.VirtualQueryEx(System.IntPtr hProcess, nuint lpAddress, Reloaded.Memory.Buffers.Native.Windows.Kernel32.MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength) -> nuint
+static Reloaded.Memory.Buffers.Buffers.AllocatePrivateMemory(Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings settings) -> Reloaded.Memory.Buffers.Structs.PrivateAllocation!
+static Reloaded.Memory.Buffers.Buffers.GetBuffer(Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings settings) -> Reloaded.Memory.Buffers.Structs.SafeLocatorItem
+static Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings
+static Reloaded.Memory.Buffers.Structs.Params.BufferSearchSettings.FromProximity(nuint proximity, nuint target, nuint size) -> Reloaded.Memory.Buffers.Structs.Params.BufferAllocatorSettings

@@ -13,7 +13,7 @@ internal static class Cached
 {
     private static readonly nuint s_maxAddress;
     private static readonly int s_allocationGranularity;
-    private static readonly Process _thisProcess;
+    private static readonly Process s_thisProcess;
     private const int ScPagesizeLinux = 30;
     private const int ScPagesizeOsx = 29;
 
@@ -44,7 +44,7 @@ internal static class Cached
             ThrowHelpers.ThrowPlatformNotSupportedException();
         }
 
-        _thisProcess = Process.GetCurrentProcess();
+        s_thisProcess = Process.GetCurrentProcess();
 #pragma warning restore CA1416 // Validate platform compatibility
     }
 
@@ -52,5 +52,5 @@ internal static class Cached
 
     public static int GetAllocationGranularity() => s_allocationGranularity;
 
-    public static Process GetThisProcess() => _thisProcess;
+    public static Process GetThisProcess() => s_thisProcess;
 }

@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Internal;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
 using Reloaded.Memory.Native.Unix;
@@ -57,8 +58,10 @@ public class BufferAllocatorTestsAllocation
     ///     For testing use only.
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="settings"></param>
     internal static void Free(LocatorItem item, BufferAllocatorSettings settings)
     {
+#pragma warning disable CA1416 // Validate platform compatibility
         if (Polyfills.IsWindows())
         {
             if (settings.TargetProcess.Id == Polyfills.GetProcessId())
@@ -70,5 +73,6 @@ public class BufferAllocatorTestsAllocation
         {
             Posix.munmap(item.BaseAddress, (nuint)item.Size);
         }
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 }

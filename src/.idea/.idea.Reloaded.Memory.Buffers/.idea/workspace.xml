@@ -8,9 +8,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../docs/specification/usage.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/Params/BufferSearchSettings.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/PrivateAllocation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/specification/buffer-locator.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/specification/buffer-locator.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/specification/overview.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/specification/overview.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Assets/hello-world-linux-arm64.elf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Assets/hello-world-linux-x64.elf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Assets/phys.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Attributes/AutoLocatorHeader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Attributes/AutoLocatorHeader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Common.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Common.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorHeader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorHeader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorItemTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorItemTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/SafeLocatorItemTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/SafeLocatorItemTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.Linux.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.OSX.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.OSX.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Windows.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.Windows.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferLocatorFinder.Posix.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.Posix.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferLocatorFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Buffers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Buffers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/Windows/Kernel32.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/Windows/Kernel32.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net48/PublicAPI.Shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net48/PublicAPI.Shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net48/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net48/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net5.0/PublicAPI.Shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net5.0/PublicAPI.Shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net5.0/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net5.0/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net6.0/PublicAPI.Shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net6.0/PublicAPI.Shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net6.0/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net6.0/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net7.0/PublicAPI.Shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net7.0/PublicAPI.Shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net7.0/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/net7.0/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netcoreapp3.1/PublicAPI.Shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netcoreapp3.1/PublicAPI.Shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netcoreapp3.1/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netcoreapp3.1/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netstandard2.0/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netstandard2.0/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netstandard2.1/PublicAPI.Shipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netstandard2.1/PublicAPI.Shipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netstandard2.1/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/PublicAPI/netstandard2.1/PublicAPI.Unshipped.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorHeader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/Internal/LocatorHeader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/LocatorItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/Internal/LocatorItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/Params/BufferAllocatorSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/Params/BufferAllocatorSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/SafeLocatorItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Structs/SafeLocatorItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Utilities/Cached.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Utilities/Cached.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Project.Configurations" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Project.Configurations" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Project.Configurations/FixUndeclaredAPIs.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Project.Configurations/FixUndeclaredAPIs.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +71,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/753d44b40e7dfcf2a0534343444ce1ebaac652db5adaf638d71f2ea97e562f/MethodInvoker.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/85448f861b1cb95910693f28a5ce3363967c79953b460b176d97298ae5ed0/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/906d7cfe7139647e7fcafb24c420abecae95b3e4e75b63dd63c4cf38d6e3/AssertionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/da212f05885d76c98f09053e4797422b69e4a8/ExternalMemory_srcgen.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dd56f65861984286baf6e9eb53082f579da442d/Memory_srcgen.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reloaded.Memory.Buffers/obj/Debug/netstandard2.0/Reloaded.Memory.Buffers.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
@@ -37,6 +81,7 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="SWEA" />
   </component>
@@ -50,7 +95,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "XThreadsFramesViewSplitterKey": "0.113274336",
+    "XThreadsFramesViewSplitterKey": "0.025663717",
     "git-widget-placeholder": "refactor-reloaded3-compliance",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -104,6 +149,8 @@
       <workItem from="1685603135939" duration="4349000" />
       <workItem from="1685747033179" duration="116000" />
       <workItem from="1685747167114" duration="3000" />
+      <workItem from="1685855560771" duration="2146000" />
+      <workItem from="1685906587743" duration="10591000" />
     </task>
     <servers />
   </component>
@@ -111,55 +158,39 @@
     <option name="version" value="3" />
   </component>
   <component name="UnitTestsCoverage.Settings">
-    <option name="coveragePercentColumnWidth" value="81" />
+    <option name="coveragePercentColumnWidth" value="34" />
     <option name="sortOrder" value="DESCENDING" />
     <option name="sortedColumn" value="1" />
-    <option name="symbolColumnWidth" value="335" />
+    <option name="symbolColumnWidth" value="109" />
     <coverage-tree-state>
       <expand>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 58% 3126/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 58% 3126/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 41% 2891/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 58% 3126/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 41% 2891/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(3.0.0.0, net7.0) 57% 300/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
         <path>
           <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-        </path>
-        <path>
-          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Structs 83% 26/150" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-        </path>
-        <path>
-          <item name="rootNode" type="c53c71d1:RiderDotCoverCoverageTreeModel$RootNode" />
-          <item name="Total 57% 3256/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 39% 2971/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="(3.0.0.0, net7.0) 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Reloaded.Memory.Buffers 54% 316/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="Structs 83% 26/150" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
-          <item name="LocatorHeader 75% 21/85" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Total 58% 3126/7528" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 41% 2891/4863" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="(3.0.0.0, net7.0) 57% 300/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
+          <item name="Reloaded.Memory.Buffers 57% 300/693" type="8b8fad3a:RiderDotCoverCoverageTreeNode" />
         </path>
       </expand>
       <select />
     </coverage-tree-state>
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
@@ -180,7 +211,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
-          <line>114</line>
+          <line>115</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="113" containingFunctionPresentation="Method 'GetFirstAvailableItemLocked_ShouldReturnExpectedResult'" />
           <option name="timeStamp" value="15" />
         </line-breakpoint>
@@ -210,26 +241,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs</url>
-          <line>31</line>
+          <line>32</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" initialLine="26" containingFunctionPresentation="Method 'CanAllocateIn2GiB'">
             <startOffsets>
-              <option value="834" />
+              <option value="883" />
             </startOffsets>
             <endOffsets>
-              <option value="880" />
+              <option value="929" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs</url>
-          <line>18</line>
+          <line>19</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs" initialLine="18" containingFunctionPresentation="Method 'Find_ShouldReturnAddress_WhenPreviouslyExists'">
             <startOffsets>
-              <option value="460" />
+              <option value="509" />
             </startOffsets>
             <endOffsets>
-              <option value="511" />
+              <option value="560" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="33" />
@@ -248,79 +279,79 @@
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs</url>
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.Linux.cs</url>
           <line>23</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/BufferAllocator.Linux.cs" initialLine="24" containingFunctionPresentation="Method 'AllocateLinux'">
             <startOffsets>
-              <option value="739" />
+              <option value="759" />
             </startOffsets>
             <endOffsets>
-              <option value="807" />
+              <option value="827" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="73" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs</url>
-          <line>32</line>
+          <line>33</line>
           <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs" initialLine="32" containingFunctionPresentation="Method 'Find_ShouldReturnAddress_WhenCreated'">
             <startOffsets>
-              <option value="876" />
+              <option value="925" />
             </startOffsets>
             <endOffsets>
-              <option value="969" />
+              <option value="1018" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="75" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
-          <line>179</line>
+          <line>180</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="177" containingFunctionPresentation="Method 'TryAllocateItem_ShouldAllocateItem_WhenHeaderIsNotFullAndWithinAddressLimits'">
             <startOffsets>
-              <option value="4823" />
+              <option value="4873" />
             </startOffsets>
             <endOffsets>
-              <option value="4905" />
+              <option value="4955" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="85" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/SafeLocatorItemTests.cs</url>
-          <line>15</line>
+          <line>16</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\SafeLocatorItemTests.cs" initialLine="15" containingFunctionPresentation="Method 'AppendData_BufferShouldContainData'">
             <startOffsets>
-              <option value="319" />
+              <option value="367" />
             </startOffsets>
             <endOffsets>
-              <option value="356" />
+              <option value="404" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/SafeLocatorItemTests.cs</url>
-          <line>34</line>
+          <line>35</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\SafeLocatorItemTests.cs" initialLine="34" containingFunctionPresentation="Method 'AppendBlittableData_ShouldBeAtCorrectAddress'">
             <startOffsets>
-              <option value="908" />
+              <option value="956" />
             </startOffsets>
             <endOffsets>
-              <option value="945" />
+              <option value="993" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
-          <line>231</line>
+          <line>232</line>
           <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="231" containingFunctionPresentation="Method 'GetNextLocator_ShouldAllocate_WhenNewlyCreated'">
             <startOffsets>
-              <option value="6571" />
+              <option value="6622" />
             </startOffsets>
             <endOffsets>
-              <option value="6624" />
+              <option value="6675" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="89" />

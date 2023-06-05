@@ -34,7 +34,7 @@ internal class WindowsMemoryMappedFile : IMemoryMappedFile
             AlreadyExisted = false;
         }
 
-        _view = _memoryMappedFile!.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWriteExecute);
+        _view = _memoryMappedFile.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWriteExecute);
         Data = (byte*)_view.SafeMemoryMappedViewHandle.DangerousGetHandle();
     }
 

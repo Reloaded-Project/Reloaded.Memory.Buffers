@@ -46,19 +46,23 @@ All packed fields are `little-endian`; and written out when total number of bits
 
 ```mermaid
 flowchart TB
-  User["User"] --> GetOrAllocateBuffer
-  GetOrAllocateBuffer --> BufferLocatorFind["BufferLocator.Find"]
-  BufferLocatorFind --> BufferMatch{Buffer Match Found?}
-  BufferMatch -- Yes --> ReturnBufferToUser["Return Buffer to User"]
-  BufferMatch -- "No (Make New Buffer)" --> BufferAllocator["BufferAllocator.Allocate"]
-  BufferAllocator -- Register New Buffer --> BufferLocatorRegister["BufferLocator.Register"]
+  User["User"] --> GetOrAllocateBuffer(["Buffers.GetBuffer"])
+  GetOrAllocateBuffer --> BufferLocatorFind(["LocatorHeaderFinder.Find"])
+  BufferLocatorFind -- "(Via Memory Mapped Files)" --> GetAvailableItem(["LocatorHeader.GetFirstAvailableItem(locator)"])
+  GetAvailableItem --> BufferMatch{Buffer Match Found?}
+  BufferMatch -- Yes --> ReturnBufferToUser["Lock & Return Buffer to User"]
+  BufferMatch -- "No (Make New Buffer)" --> CanRegisterBuffer{Locator Has Space for New Entry?}
+  CanRegisterBuffer -- "No (Alloc New Locator, Link via Pointer & Try Again)" --> GetAvailableItem
+  CanRegisterBuffer -- "Yes (Allocate Memory and Register)" --> BufferAllocator(["BufferAllocator.Allocate"])
+  BufferAllocator -- "Lock & Register Returned Buffer" --> BufferLocatorRegister(["LocatorHeader.Register"])
   BufferLocatorRegister --> ReturnNewBufferToUser["Return New Buffer to User"]
 ```
 
-In the flowchart above, the user calls `GetOrAllocateBuffer`, which in turn calls `BufferLocator.Find` to check if 
-any matching buffer exists. 
+In the flowchart above, the user calls `GetBuffer`, which in turn calls `LocatorHeaderFinder.Find` to get address of the
+[locator structure](buffer-locator.md#structure).
 
-If a match is found (Yes path), the buffer is returned to the user. 
+If a match is found (Yes path), the buffer is locked and then returned to the user. 
 
-If no match is found (No path), `BufferAllocator.Allocate` is called, which then calls `BufferLocator.Register` to register the 
-new buffer, and then the new buffer is returned to the user.
+If no match is found (No path), a new buffer is allocated, and locked. If this buffer can fit into the current
+locator, it is appended. Otherwise a new locator is allocated (linked via pointer), and the buffer is registered into
+the new locator. Buffer is then returned to the user.

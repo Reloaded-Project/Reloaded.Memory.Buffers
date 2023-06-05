@@ -1,6 +1,7 @@
 using System;
 using FluentAssertions;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Internal;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Utilities;
 using Xunit;
 
@@ -10,38 +11,38 @@ namespace Reloaded.Memory.Buffers.Tests.Tests;
 public unsafe class BufferLocatorTests
 {
     // Reset the state between tests.
-    public BufferLocatorTests() => BufferLocatorFinder.Reset();
+    public BufferLocatorTests() => LocatorHeaderFinder.Reset();
 
     [Fact]
     public void Find_ShouldReturnAddress_WhenPreviouslyExists()
     {
         // Arrange
-        BufferLocatorFinder.OpenOrCreateMemoryMappedFile();
+        LocatorHeaderFinder.OpenOrCreateMemoryMappedFile();
 
         // Act
-        LocatorHeader* address = BufferLocatorFinder.Find(out BufferLocatorFinder.FindReason reason);
+        LocatorHeader* address = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason reason);
 
         // Assert
         ((nuint)address).Should().NotBeNull();
-        reason.Should().Be(BufferLocatorFinder.FindReason.PreviouslyExisted);
+        reason.Should().Be(LocatorHeaderFinder.FindReason.PreviouslyExisted);
     }
 
     [Fact]
     public void Find_ShouldReturnAddress_WhenCreated()
     {
         // Act
-        LocatorHeader* address = BufferLocatorFinder.Find(out BufferLocatorFinder.FindReason reason);
+        LocatorHeader* address = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason reason);
 
         // Assert
         ((nuint)address).Should().NotBeNull();
-        reason.Should().Be(BufferLocatorFinder.FindReason.Created);
+        reason.Should().Be(LocatorHeaderFinder.FindReason.Created);
     }
 
     [Fact]
     public void Find_ShouldInitializeCorrectly_WhenCreated()
     {
         // Act
-        LocatorHeader* address = BufferLocatorFinder.Find(out BufferLocatorFinder.FindReason _);
+        LocatorHeader* address = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason _);
 
         // Assert
         var expected = Math.Round((Cached.GetAllocationGranularity() - sizeof(LocatorHeader)) / (float) LocatorHeader.LengthOfPreallocatedChunks);
@@ -60,15 +61,15 @@ public unsafe class BufferLocatorTests
     public void Find_ShouldReturnCachedAddress_WhenCalledTwice()
     {
         // Act
-        LocatorHeader* firstAddress = BufferLocatorFinder.Find(out BufferLocatorFinder.FindReason firstReason);
-        LocatorHeader* secondAddress = BufferLocatorFinder.Find(out BufferLocatorFinder.FindReason secondReason);
+        LocatorHeader* firstAddress = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason firstReason);
+        LocatorHeader* secondAddress = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason secondReason);
 
         // Assert
         ((nuint)firstAddress).Should().NotBeNull();
-        firstReason.Should().Be(BufferLocatorFinder.FindReason.Created);
+        firstReason.Should().Be(LocatorHeaderFinder.FindReason.Created);
 
         ((nuint)secondAddress).Should().NotBeNull();
-        secondReason.Should().Be(BufferLocatorFinder.FindReason.Cached);
+        secondReason.Should().Be(LocatorHeaderFinder.FindReason.Cached);
 
         ((nuint)firstAddress).Should().Be((nuint)secondAddress);
     }

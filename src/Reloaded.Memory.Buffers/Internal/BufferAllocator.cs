@@ -1,16 +1,16 @@
 using Reloaded.Memory.Buffers.Exceptions;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
 using Reloaded.Memory.Extensions;
 using static Reloaded.Memory.Buffers.Utilities.Mathematics;
 
-namespace Reloaded.Memory.Buffers;
+namespace Reloaded.Memory.Buffers.Internal;
 
 /// <summary>
 ///     Class for allocating buffers between given memory ranges inside the current process.
 /// </summary>
-public static partial class BufferAllocator
+internal static partial class BufferAllocator
 {
     /// <summary>
     ///     Allocates a region of memory that satisfies the given parameters.
@@ -19,7 +19,7 @@ public static partial class BufferAllocator
     /// <returns>Native address of the allocated region.</returns>
     /// <exception cref="MemoryBufferAllocationException">Memory cannot be allocated within the needed constraints.</exception>
     /// <exception cref="PlatformNotSupportedException">This operation is not supported on the current platform.</exception>
-    public static LocatorItem Allocate(BufferAllocatorSettings settings)
+    internal static LocatorItem Allocate(BufferAllocatorSettings settings)
     {
         settings.Sanitize();
         if (Polyfills.IsWindows())

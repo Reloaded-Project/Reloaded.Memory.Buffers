@@ -1,16 +1,18 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Reloaded.Memory.Buffers.Exceptions;
+using Reloaded.Memory.Buffers.Internal;
 using Reloaded.Memory.Buffers.Structs.Params;
 using Reloaded.Memory.Buffers.Utilities;
 
-namespace Reloaded.Memory.Buffers.Structs;
+namespace Reloaded.Memory.Buffers.Structs.Internal;
 
 /// <summary>
 ///     Represents the header of an individual memory locator.
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public unsafe struct LocatorHeader
+internal unsafe struct LocatorHeader
 {
     /// <summary>
     ///     Static length of this locator.
@@ -192,7 +194,7 @@ public unsafe struct LocatorHeader
     /// <returns>True if an item could be allocated, else false.</returns>
     /// <remarks>If an item can't be allocated, there are simply no slots left.</remarks>
     /// <exception cref="MemoryBufferAllocationException">Memory cannot be allocated within the needed constraints.</exception>
-    public bool TryAllocateItem(uint size, nuint minAddress, nuint maxAddress, out SafeLocatorItem? item)
+    public bool TryAllocateItem(uint size, nuint minAddress, nuint maxAddress, [NotNullWhen(true)] out SafeLocatorItem? item)
     {
         item = default;
         if (IsFull)

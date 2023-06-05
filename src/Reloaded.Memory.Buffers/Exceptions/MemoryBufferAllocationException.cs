@@ -1,8 +1,13 @@
+// ReSharper disable InterpolatedStringExpressionIsNotIFormattable
+
+using JetBrains.Annotations;
+
 namespace Reloaded.Memory.Buffers.Exceptions;
 
 /// <summary>
 /// This is an exception thrown when memory allocation of a specified number of bytes in a specified address range fails.
 /// </summary>
+[PublicAPI]
 public class MemoryBufferAllocationException : Exception
 {
     /// <summary>
@@ -15,7 +20,7 @@ public class MemoryBufferAllocationException : Exception
         : base($"Failed to allocate {size} bytes in address range {start:X8} - {end:X8}.") { }
 
     /// <inheritdoc />
-    public MemoryBufferAllocationException() : base() { }
+    public MemoryBufferAllocationException() { }
 
     /// <inheritdoc />
     public MemoryBufferAllocationException(string message) : base(message) { }

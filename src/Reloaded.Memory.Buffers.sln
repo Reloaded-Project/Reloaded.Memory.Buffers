@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solutionItems", ".solution
 		..\mkdocs.yml = ..\mkdocs.yml
 		..\README.md = ..\README.md
 		..\LICENSE = ..\LICENSE
+		Reloaded.Project.Configurations\FixUndeclaredAPIs.ps1 = Reloaded.Project.Configurations\FixUndeclaredAPIs.ps1
 	EndProjectSection
 EndProject
 Global

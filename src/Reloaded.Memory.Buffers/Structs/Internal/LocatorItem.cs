@@ -1,12 +1,13 @@
 using System.Runtime.InteropServices;
+using Reloaded.Memory.Buffers.Utilities;
 
-namespace Reloaded.Memory.Buffers.Structs;
+namespace Reloaded.Memory.Buffers.Structs.Internal;
 
 /// <summary>
 ///     Individual item in the locator.
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct LocatorItem
+internal struct LocatorItem
 {
     /// <summary>
     ///     Address of the buffer in memory.
@@ -118,15 +119,13 @@ public struct LocatorItem
 
         // Calculate the start and end positions within the buffer
         var startAvailableAddress = BaseAddress + Position;
-        var endAvailableAddress = startAvailableAddress + size;
+        var endAvailableAddress = Mathematics.AddWithOverflowCap(startAvailableAddress, size);
 
         // Check if the requested memory lies within the remaining buffer and within the specified address range
         // If any of the checks fail, the buffer can't be used
-        // [endAvailableAddress <= MaxAddress] checks if the data can fit.
         // [startAvailableAddress >= minAddress] checks if in range.
         // [endAvailableAddress <= maxAddress] checks if in range.
-        return endAvailableAddress <= MaxAddress && startAvailableAddress >= minAddress &&
-               endAvailableAddress <= maxAddress;
+        return startAvailableAddress >= minAddress && endAvailableAddress <= maxAddress;
     }
 
     /// <summary>

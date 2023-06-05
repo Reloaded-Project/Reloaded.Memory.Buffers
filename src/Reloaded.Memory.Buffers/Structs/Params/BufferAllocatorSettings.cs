@@ -18,7 +18,7 @@ public struct BufferAllocatorSettings
     /// <summary>
     ///     Maximum address of the allocation.
     /// </summary>
-    public required nuint MaxAddress { get; set; } = uint.MaxValue;
+    public required nuint MaxAddress { get; set; } = Cached.GetMaxAddress();
 
     /// <summary>
     ///     Required size of the data.
@@ -37,7 +37,7 @@ public struct BufferAllocatorSettings
     ///     This is useful when there's high memory pressure, meaning pages become unavailable between the time
     ///     they are found and the time we try to allocate them.
     /// </remarks>
-    public int RetryCount = 8;
+    public int RetryCount { get; set; } = 8;
 
     /// <summary>
     ///     Whether to use brute force to find a suitable address.
@@ -45,11 +45,10 @@ public struct BufferAllocatorSettings
     /// <remarks>
     ///     This for some reason only ever was needed in FFXIV under Wine; and was contributed in the original library
     ///     (prior to rewrite) by the Dalamud folks. In Wine and on FFXIV *only*; the regular procedure of trying to allocate
-    ///     returned pages doesn't always work. This is a last ditch workaround for that.<br/>
-    ///
+    ///     returned pages doesn't always work. This is a last ditch workaround for that.<br />
     ///     This setting is only used on Windows targets today.
     /// </remarks>
-    public bool BruteForce = true;
+    public bool BruteForce { get; set; } = true;
 
     /// <summary>
     ///     Initializes the buffer allocator with default settings.
@@ -57,7 +56,24 @@ public struct BufferAllocatorSettings
     public BufferAllocatorSettings() { }
 
     /// <summary>
-    /// Sanitizes the input values.
+    ///     Creates settings such that the returned buffer will always be within <paramref name="proximity"/> bytes of <paramref name="target"/>.
+    /// </summary>
+    /// <param name="proximity">Max proximity (number of bytes) to target.</param>
+    /// <param name="target">Target address.</param>
+    /// <param name="size">Size required in the settings.</param>
+    /// <returns>Settings that would satisfy this search.</returns>
+    public static BufferAllocatorSettings FromProximity(nuint proximity, nuint target, nuint size)
+    {
+        return new BufferAllocatorSettings()
+        {
+            MaxAddress = Mathematics.AddWithOverflowCap(target, proximity),
+            MinAddress = Mathematics.SubtractWithUnderflowCap(target, proximity),
+            Size = (uint)size
+        };
+    }
+
+    /// <summary>
+    ///     Sanitizes the input values.
     /// </summary>
     public void Sanitize()
     {

@@ -4,7 +4,7 @@ using AutoFixture.Dsl;
 using AutoFixture.Kernel;
 using AutoFixture.Xunit2;
 using JetBrains.Annotations;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 
 namespace Reloaded.Memory.Buffers.Tests.Attributes;
 

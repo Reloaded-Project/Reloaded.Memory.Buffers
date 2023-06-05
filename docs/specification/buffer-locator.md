@@ -248,6 +248,71 @@ Here's what to do depending on situation:
     - Unmap the memory mapped file.  
     - Use address from static field (address of first memory map) in this and further accesses.  
 
+The code for this might look something like the following:
+
+=== "C#"
+
+    ```csharp
+    /// <summary>
+    ///     Retrieves the address of the first locator.
+    /// </summary>
+    /// <returns>Address of the first locator.</returns>
+    /// <exception cref="PlatformNotSupportedException">This operation is not supported on the current platform.</exception>
+    internal static LocatorHeader* Find()
+    {
+        if (s_locatorHeaderAddress != (LocatorHeader*)0)
+            return s_locatorHeaderAddress;
+    
+        // Create or open the memory-mapped file
+        IMemoryMappedFile mmf = OpenOrCreateMemoryMappedFile();
+    
+        // If the MMF previously existed, we need to read the real address from the header, then close
+        // our mapping.
+        if (mmf.AlreadyExisted)
+        {
+            s_locatorHeaderAddress = ((LocatorHeader*)mmf.Data)->ThisAddress;
+            mmf.Dispose();
+            return s_locatorHeaderAddress;
+        }
+    
+        Cleanup();
+        s_mmf = mmf;
+        s_locatorHeaderAddress = (LocatorHeader*)mmf.Data;
+        s_locatorHeaderAddress->Initialize(mmf.Length);
+        return s_locatorHeaderAddress;
+    }
+    ```
+
+=== "C++"
+
+    ```cpp
+    // Note: Untested AI generated code (with manual correction), for reference only.
+    // See original source in repo for implementation of OpenOrCreateMemoryMappedFile for different platforms.
+    LocatorHeader* Find()
+    {
+        if (s_locatorHeaderAddress != nullptr)
+            return s_locatorHeaderAddress;
+    
+        // Create or open the memory-mapped file
+        MemoryMappedFile* mmf = OpenOrCreateMemoryMappedFile();
+    
+        // If the MMF previously existed, we need to read the real address from the header, then close
+        // our mapping.
+        if (mmf->AlreadyExisted)
+        {
+            s_locatorHeaderAddress = reinterpret_cast<LocatorHeader*>(mmf->Data)->ThisAddress;
+            delete mmf;
+            return s_locatorHeaderAddress;
+        }
+    
+        Cleanup();
+        s_mmf = mmf;
+        s_locatorHeaderAddress = reinterpret_cast<LocatorHeader*>(mmf->Data);
+        s_locatorHeaderAddress->Initialize(mmf->Length);
+        return s_locatorHeaderAddress;
+    }
+    ```
+
 ### Cleaning Up
 
 !!! warning "On Linux & OSX, Shared Memory Objects are *NOT* automatically destroyed when all processes close."
@@ -413,7 +478,7 @@ When the buffer is acquired, a the [IsTaken](#item) field is set to `1` using `c
 item->IsTaken = Interlocked.CompareExchange(ref item->IsTaken, 1, 0);
 ```
 
-When the buffer is released, the `IsTaken` field is set to `0` using `cmpxchg`.  
+When the buffer is released, the `IsTaken` field is set to `0`.  
 
 ```csharp
 item->IsTaken = 0;
@@ -422,6 +487,8 @@ item->IsTaken = 0;
 ## Allocating Buffers
 
 !!! tip "[Allocation algorithm is documented here](./allocation-algorithm.md)"
+
+!!! tip "Use C# high level API (detailed in [usage](../usage.md)) for additional reference."
 
 If an additional buffer requires to be allocated, the following steps are taken:
 

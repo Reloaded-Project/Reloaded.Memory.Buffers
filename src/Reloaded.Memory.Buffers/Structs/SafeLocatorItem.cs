@@ -1,3 +1,5 @@
+using Reloaded.Memory.Buffers.Structs.Internal;
+
 namespace Reloaded.Memory.Buffers.Structs;
 
 /// <summary>
@@ -8,7 +10,11 @@ public unsafe struct SafeLocatorItem : IDisposable
     /// <summary>
     /// The item behind this struct.
     /// </summary>
-    public LocatorItem* Item;
+    /// <remarks>
+    ///     Use at your own risk.
+    ///     Unsafe.
+    /// </remarks>
+    internal LocatorItem* Item;
 
     /// <summary>
     /// Creates a disposable locator item.
@@ -17,7 +23,7 @@ public unsafe struct SafeLocatorItem : IDisposable
     /// <remarks>
     ///     Item used with this constructor must be locked.
     /// </remarks>
-    public SafeLocatorItem(LocatorItem* item) => Item = item;
+    internal SafeLocatorItem(LocatorItem* item) => Item = item;
 
     /// <summary>
     /// Appends the data to this buffer.

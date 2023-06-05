@@ -1,3 +1,4 @@
+// ReSharper disable InterpolatedStringExpressionIsNotIFormattable
 namespace Reloaded.Memory.Buffers.Native.Linux;
 
 /// <summary>

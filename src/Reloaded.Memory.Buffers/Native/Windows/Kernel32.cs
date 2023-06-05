@@ -1,9 +1,11 @@
 ﻿using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using System.Security;
 using JetBrains.Annotations;
-// ReSharper disable FieldCanBeMadeReadOnly.Global
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 
+// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable InconsistentNaming
 
 namespace Reloaded.Memory.Buffers.Native.Windows;
@@ -65,7 +67,7 @@ public static partial class Kernel32
     public static partial void GetSystemInfo(out SYSTEM_INFO lpSystemInfo);
 #else
     [DllImport("kernel32.dll")]
-    public static extern void GetSystemInfo(out Kernel32.SYSTEM_INFO lpSystemInfo);
+    public static extern void GetSystemInfo(out SYSTEM_INFO lpSystemInfo);
 #endif
 
     /// <summary>
@@ -85,7 +87,7 @@ public static partial class Kernel32
     public static unsafe partial nuint VirtualQueryEx(nint hProcess, nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength);
 #else
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static unsafe extern nuint VirtualQueryEx(IntPtr hProcess, nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength);
+    public static extern unsafe nuint VirtualQueryEx(IntPtr hProcess, nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength);
 #endif
 
     /// <summary>
@@ -104,7 +106,7 @@ public static partial class Kernel32
     public static unsafe partial nuint VirtualQuery(nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength);
 #else
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static unsafe extern nuint VirtualQuery(nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength);
+    public static extern unsafe nuint VirtualQuery(nuint lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, nuint dwLength);
 #endif
 
     /// <summary>

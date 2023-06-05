@@ -3,10 +3,12 @@ using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Tests.Attributes;
 using Reloaded.Memory.Buffers.Tests.Utilities;
 using Reloaded.Memory.Buffers.Utilities;
 using Xunit;
+// ReSharper disable RedundantCast
 
 namespace Reloaded.Memory.Buffers.Tests.Tests.Structs;
 
@@ -85,7 +87,7 @@ public class LocatorHeaderTests
 
     [Theory]
     [AutoLocatorHeader(true)]
-    public void VersionShouldBe3Bits(LocatorHeader header) => PackingTestHelpers.AssertSizeBits(
+    internal void VersionShouldBe3Bits(LocatorHeader header) => PackingTestHelpers.AssertSizeBits(
         ref header,
         (ref LocatorHeader instance, long value) => instance.Version = (byte)value,
         (ref LocatorHeader instance) => instance.Version,
@@ -182,7 +184,7 @@ public class LocatorHeaderTests
         // Assert
         result.Should().BeTrue();
         item.Should().NotBeNull();
-        item.Value.Item->Size.Should().BeGreaterOrEqualTo(size);
+        item!.Value.Item->Size.Should().BeGreaterOrEqualTo(size);
         Assert.True(item.Value.Item->BaseAddress >= minAddress);
         Assert.True(item.Value.Item->BaseAddress <= maxAddress);
         item.Value.Dispose();

@@ -1,6 +1,7 @@
 using System;
 using FluentAssertions;
 using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Xunit;
 
 namespace Reloaded.Memory.Buffers.Tests.Tests.Structs;

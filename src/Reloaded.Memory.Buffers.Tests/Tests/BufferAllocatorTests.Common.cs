@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Reloaded.Memory.Buffers.Utilities;
 using Xunit;
-using static Reloaded.Memory.Buffers.BufferAllocator;
+using static Reloaded.Memory.Buffers.Internal.BufferAllocator;
 
 namespace Reloaded.Memory.Buffers.Tests.Tests;
 

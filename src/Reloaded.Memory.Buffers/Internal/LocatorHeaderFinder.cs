@@ -1,16 +1,16 @@
 using Reloaded.Memory.Buffers.Exceptions;
 using Reloaded.Memory.Buffers.Native;
-using Reloaded.Memory.Buffers.Structs;
+using Reloaded.Memory.Buffers.Structs.Internal;
 using Reloaded.Memory.Buffers.Utilities;
 
-namespace Reloaded.Memory.Buffers;
+namespace Reloaded.Memory.Buffers.Internal;
 
 /// <summary>
 ///     Class that locates the buffer locator.
 /// </summary>
-public static unsafe partial class BufferLocatorFinder
+internal static unsafe partial class LocatorHeaderFinder
 {
-    private static LocatorHeader* s_address;
+    private static LocatorHeader* s_locatorHeaderAddress;
     private static IMemoryMappedFile? s_mmf;
 
     /// <summary>
@@ -27,10 +27,10 @@ public static unsafe partial class BufferLocatorFinder
     /// <exception cref="PlatformNotSupportedException">This operation is not supported on the current platform.</exception>
     internal static LocatorHeader* Find(out FindReason reason)
     {
-        if (s_address != (LocatorHeader*)0)
+        if (s_locatorHeaderAddress != (LocatorHeader*)0)
         {
             reason = FindReason.Cached;
-            return s_address;
+            return s_locatorHeaderAddress;
         }
 
         // Create or open the memory-mapped file
@@ -40,18 +40,18 @@ public static unsafe partial class BufferLocatorFinder
         // our mapping.
         if (mmf.AlreadyExisted)
         {
-            s_address = ((LocatorHeader*)mmf.Data)->ThisAddress;
+            s_locatorHeaderAddress = ((LocatorHeader*)mmf.Data)->ThisAddress;
             reason = FindReason.PreviouslyExisted;
             mmf.Dispose();
-            return s_address;
+            return s_locatorHeaderAddress;
         }
 
         Cleanup();
         s_mmf = mmf;
-        s_address = (LocatorHeader*)mmf.Data;
-        s_address->Initialize(mmf.Length);
+        s_locatorHeaderAddress = (LocatorHeader*)mmf.Data;
+        s_locatorHeaderAddress->Initialize(mmf.Length);
         reason = FindReason.Created;
-        return s_address;
+        return s_locatorHeaderAddress;
     }
 
     internal static IMemoryMappedFile OpenOrCreateMemoryMappedFile()
@@ -79,7 +79,7 @@ public static unsafe partial class BufferLocatorFinder
     /// </summary>
     internal static void Reset()
     {
-        s_address = (LocatorHeader*)0;
+        s_locatorHeaderAddress = (LocatorHeader*)0;
         s_mmf?.Dispose();
         s_mmf = null;
     }

@@ -3,12 +3,12 @@ using Reloaded.Memory.Buffers.Native;
 using Reloaded.Memory.Buffers.Utilities;
 using Posix = Reloaded.Memory.Buffers.Native.Posix;
 
-namespace Reloaded.Memory.Buffers;
+namespace Reloaded.Memory.Buffers.Internal;
 
 /// <summary>
 ///     Class that locates the buffer locator.
 /// </summary>
-public static partial class BufferLocatorFinder
+internal static partial class LocatorHeaderFinder
 {
     private static void Cleanup()
     {

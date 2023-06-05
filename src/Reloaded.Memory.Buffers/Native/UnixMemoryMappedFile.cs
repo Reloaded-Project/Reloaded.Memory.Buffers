@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO.MemoryMappedFiles;
+#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
+#endif
 
 namespace Reloaded.Memory.Buffers.Native;
 
@@ -51,7 +53,7 @@ internal class UnixMemoryMappedFile : IMemoryMappedFile
             HandleInheritability.Inheritable,
             true);
 
-        _view = _memoryMappedFile!.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWriteExecute);
+        _view = _memoryMappedFile.CreateViewAccessor(0, Length, MemoryMappedFileAccess.ReadWriteExecute);
         Data = (byte*)_view.SafeMemoryMappedViewHandle.DangerousGetHandle();
     }
 
