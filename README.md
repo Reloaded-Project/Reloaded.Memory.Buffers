@@ -1,8 +1,8 @@
 <div align="center">
-	<h1>Project Reloaded: Buffers Library</h1>
-	<img src="https://i.imgur.com/BjPn7rU.png" width="150" align="center" />
+	<h1>The Reloaded Buffers Library</h1>
+	<img src="https://camo.githubusercontent.com/8f75011947bdd0d14630a789dd4edc11edcbcd9f51bc94511c0f45ec71a0d06b/68747470733a2f2f692e696d6775722e636f6d2f426a506e3772552e706e67" width="150" align="center" />
 	<br/> <br/>
-	<strong><i>Allocate Memory... & Knuckles</i></strong>
+	<strong><i>Allocate Memory, & Knuckles</i></strong>
 	<br/> <br/>
 	<!-- Coverage -->
 	<a href="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers">
@@ -14,50 +14,102 @@
 	</a>
 	<!-- Build Status -->
 	<a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/actions/workflows/build-and-publish.yml">
-		<img src="https://img.shields.io/github/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/Build%20and%20Publish" alt="Build Status" />
+		<img src="https://img.shields.io/github/actions/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/build-and-publish.yml" alt="Build Status" />
 	</a>
 </div>
 
-# Introduction
-Reloaded.Memory.Buffers is a library designed with a rather simple purpose:
-*Allocate and provide access to memory between a given minimum and maximum memory address.*
+## About
 
-The library provides an implementation of efficient, shared, concurrent and permanent storage of many small objects in memory in static, non-changing locations that last the lifetime of the process.
+`Reloaded.Memory.Buffers` is a library for allocating memory between a given minimum and maximum memory address.
 
-The goal is to allow multiple applications to access and write to shared contiguous memory regions *(in user defined min - max memory regions)* without wasting memory or time because due to memory micro allocations.
+With the following properties:
 
-## Features
-Below is a list of ideas as to what you can do/should expect from this library:
+- ***Memory Efficient***: No wasted memory.  
+- ***Shared***: Can be found and read/written to by multiple users.  
+- ***Static***: Allocated data never moves, or is overwritten.  
+- ***Permanent***: Allocated data lasts the lifetime of the process.  
+- ***Concurrent***: Multiple users can access at the same time.  
+- ***Large Address Aware:*** On Windows, the library can correctly leverage all 4GB in 32-bit processes.  
+- ***Cross Platform***: Supports Windows, OSX and Linux.  
 
-+ General purpose memory storage shared between different threads, processes and modules in same process.
-+ Support for creating and using buffers (`MemoryBuffers`) in both current and external processes.
-+ Reasonable performance in both the internal (current process) and external implementations.
-+ Easy to use method for finding existing `MemoryBuffers` in both current and external processes.
-+ The ability to allocate `MemoryBuffers` in user specified memory address range.
+## Wiki & Documentation
 
-If you don't like sharing memory with others or want to store data not lasting the lifetime of the process that you can later dispose (free), `PrivateMemoryBuffers` are also now available.
+[For full documentation, please see the Wiki](https://reloaded-project.github.io/Reloaded.Memory.Buffers/).  
 
-## Non-Features
-Below is a list of ideas as to what you should NOT expect from this library:
-+ The straight up fastest, most performant solution. (Not possible without limiting functionality)
-+ Storage of disposable memory. (Everything written is stored for the lifetime of the program)
-+ Relocatable & resizable memory. (Usage of written bytes is unpredictable. Cannot fulfill.)
+## Example Use Cases
 
-For more details please see [what this library is not](Docs/What-this-library-is-not.md).
+These are just examples:  
 
-## Documentation
+- ***Hooks***: Hooking libraries like [Reloaded.Hooks](https://github.com/Reloaded-Project/Reloaded.Hooks) can reduce amount of bytes stolen from functions.
+- ***Libraries***: Libraries like [Reloaded.Assembler](https://github.com/Reloaded-Project/Reloaded.Assembler) require memory be allocated in first 2GB for x64 FASM.
 
-The following below are links aimed to help you get started with the library, they cover the basics of use:
+## Usage
 
-+ [Getting Started](Docs/Getting-Started.md)
-+ [Why this library was made](Docs/Why-was-this-made.md)
-+ [What this library is not](Docs/What-this-library-is-not.md)
+!!! info "The library provides a simple high level API to use."
 
-For extra ideas of how to use the library, you may always take a look at `Reloaded.Memory.Buffers.Tests`, the test suite for the library.
+### Get A Buffer
 
-## Contributions
-As with the standard for all of the `Reloaded-Project`, repositories; contributions are very welcome and encouraged.
+Gets a buffer where you can allocate 4096 bytes in first 2GiB of address space.
 
-Feel free to implement new features, make bug fixes or suggestions so long as they are accompanied by an issue with a clear description of the pull request.
+```csharp
+var settings = new BufferSearchSettings()
+{
+    MinAddress = 0,
+    MaxAddress = int.MaxValue,
+    Size = 4096
+};
 
-If you are implementing new features, please do provide the appropriate unit tests to cover the new features you have implemented; try to keep the coverage near 100%.
+// Make sure to dispose, so lock gets released.
+using var item = Buffers.GetBuffer(settings);
+
+// Write some data, get pointer back.
+var ptr = item->Append(data); 
+```
+
+### Get A Buffer (With Proximity)
+
+Gets a buffer where 4096 bytes written will be within 2GiB of 0x140000000.
+
+```csharp
+var settings = BufferSearchSettings.FromProximity(int.MaxValue, (nuint)0x140000000, 4096);
+
+// Make sure to dispose, so lock gets released.
+using var item = Buffers.GetBuffer(settings);
+
+// Write some data, get pointer back.
+var ptr = item->Append(data); 
+```
+
+### Allocate Memory
+
+Allows you to temporarily allocate memory within a specific address range and size constraints.
+
+```csharp
+// Arrange
+var settings = new BufferAllocatorSettings()
+{
+    MinAddress = 0,
+    MaxAddress = int.MaxValue,
+    Size = 4096
+};
+
+using var item = Buffers.AllocatePrivateMemory(settings);
+
+// You have allocated memory in first 2GiB of address space.
+// Disposing this memory (via `using` statement) will free it.
+item.BaseAddress.Should().NotBeNull();
+item.Size.Should().BeGreaterOrEqualTo(settings.Size);
+```
+
+You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows.
+
+## Community Feedback
+
+If you have questions/bug reports/etc. feel free to [Open an Issue](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/new).
+
+Contributions are welcome and encouraged. Feel free to implement new features, make bug fixes or suggestions so long as
+they meet the quality standards set by the existing code in the repository.
+
+For an idea as to how things are set up, [see Reloaded Project Configurations.](https://github.com/Reloaded-Project/Reloaded.Project.Configurations)
+
+Happy Hacking 💜

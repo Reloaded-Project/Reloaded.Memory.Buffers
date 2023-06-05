@@ -30,11 +30,12 @@ hide:
 With the following properties:
 
 - ***Memory Efficient***: No wasted memory.  
-- ***Shared***: Can be found and read/written to by multiple processes.  
+- ***Shared***: Can be found and read/written to by multiple users.  
 - ***Static***: Allocated data never moves, or is overwritten.  
 - ***Permanent***: Allocated data lasts the lifetime of the process.  
 - ***Concurrent***: Multiple users can access at the same time.  
-- **Large Address Aware:** On Windows, the library can correctly leverage all 4GB in 32-bit processes.  
+- ***Large Address Aware:*** On Windows, the library can correctly leverage all 4GB in 32-bit processes.  
+- ***Cross Platform***: Supports Windows, OSX and Linux.  
 
 ## Example Use Cases
 
