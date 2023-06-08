@@ -81,6 +81,6 @@ public struct BufferAllocatorSettings
         if (Polyfills.IsWindows() && MinAddress < (ulong)Cached.GetAllocationGranularity())
             MinAddress = (nuint)Cached.GetAllocationGranularity();
 
-        Size = (uint)Mathematics.RoundUp(Size, Cached.GetAllocationGranularity());
+        Size = (uint)Mathematics.RoundUp(Math.Max(Size, 1), Cached.GetAllocationGranularity());
     }
 }
