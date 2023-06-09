@@ -58,6 +58,8 @@ internal unsafe struct LocatorHeader
     public bool IsLocked => _isLocked == 1;
 
     private byte _flags;
+    private readonly byte _pad1;
+    private readonly byte _pad2;
 
     /// <summary>
     ///     Version represented by the first 3 bits of _flags.

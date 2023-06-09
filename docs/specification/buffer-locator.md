@@ -6,21 +6,25 @@
 
 !!! info "Size: `4096 bytes`, to match OS page size."  
 
-- [Header](#header) (14/22 bytes)  
+- [Header](#header) (16/24 bytes)  
 - [Items[]](#item) (fill until end of buffer)  
+
+!!! note "Atomic access on some platforms requires word alignment, thus this header must be such that items after are aligned."
 
 ### Header
 
 !!! note "Size of this header is version dependent. Implementation should not use versions it doesn't recognise."
 
-Size: `14/22 bytes` (Version 0).
+Size: `16/24 bytes` (Version 0).
 
 - `u32/u64` [This Header Address](#this-header-address)  
 - `u32/u64` [Next Locator Ptr](#next-locator-ptr)  
 - `u32` [IsLocked](#is-locked)  
 - `u3` [Version](#version)  
 - `u5` Reserved  
-- `u8` [NumItems](#item)  
+- `u8` [NumItems](#item)
+- `u8` Reserved
+- `u8` Reserved
 
 !!! note "Locks are `u32` because older .NET versions don't support `u8` atomic operations (emitting `cmpxchg` for 1 byte)."
 

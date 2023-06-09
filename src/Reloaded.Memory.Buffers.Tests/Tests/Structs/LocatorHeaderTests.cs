@@ -18,7 +18,7 @@ public class LocatorHeaderTests
     [Fact]
     public unsafe void IsCorrectSize()
     {
-        var expected = IntPtr.Size == 4 ? 14 : 22;
+        var expected = IntPtr.Size == 4 ? 16 : 24;
         sizeof(LocatorHeader).Should().Be(expected);
     }
 
