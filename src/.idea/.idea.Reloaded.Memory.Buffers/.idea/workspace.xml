@@ -8,16 +8,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../docs/specification/allocation-algorithm.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/specification/allocation-algorithm.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/structs/safe_locator_item.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/structs/safe_locator_item.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/projectSettingsUpdater.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/linux_map_parser.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/linux_map_parser.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.Windows.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/BufferAllocator.Windows.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +125,7 @@
       <workItem from="1686275303296" duration="4227000" />
       <workItem from="1686380815146" duration="12374000" />
       <workItem from="1686457056356" duration="737000" />
-      <workItem from="1686509348317" duration="347000" />
+      <workItem from="1686509348317" duration="982000" />
     </task>
     <servers />
   </component>
