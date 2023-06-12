@@ -25,7 +25,7 @@ hide:
 
 ## About
 
-!!! info "`Reloaded.Memory.Buffers` is a library for allocating memory between a given minimum and maximum memory address"
+!!! info "`Reloaded.Memory.Buffers` is a library for allocating memory between a given minimum and maximum memory address, for C# and Rust"
 
 With the following properties:
 
@@ -47,6 +47,8 @@ With the following properties:
 ## Usage
 
 !!! info "The library provides a simple high level API to use."
+
+!!! note "Both C# and Rust ports expose the same APIs."
 
 ### Get A Buffer
 

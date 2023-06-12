@@ -465,7 +465,7 @@ Now, try allocating in those free pages:
             // Sanity test in case of '0' value input and random address allocated.
             if (allocated != addr)
             {
-                k32.VirtualFree(allocated, (nuint)settings.Size);
+                k32.VirtualFree(allocated, 0);
                 continue;
             }
 
@@ -528,7 +528,7 @@ Now, try allocating in those free pages:
             // Sanity test in case of '0' value input and random address allocated.
             if (allocated != addr)
             {
-                k32.VirtualFree(allocated, (nuint)settings.Size);
+                k32.VirtualFree(allocated, 0);
                 continue;
             }
 
