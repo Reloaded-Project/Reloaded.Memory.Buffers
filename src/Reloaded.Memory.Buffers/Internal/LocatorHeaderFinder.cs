@@ -62,10 +62,7 @@ internal static unsafe partial class LocatorHeaderFinder
         if (Polyfills.IsWindows())
             return new WindowsMemoryMappedFile(name, Cached.GetAllocationGranularity());
 
-        if (Polyfills.IsLinux())
-            return new LinuxMemoryMappedFile(name, Cached.GetAllocationGranularity());
-
-        if (Polyfills.IsMacOS())
+        if (Polyfills.IsMacOS() || Polyfills.IsLinux())
             return new UnixMemoryMappedFile(name, Cached.GetAllocationGranularity());
 
         ThrowHelpers.ThrowPlatformNotSupportedException();

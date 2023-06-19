@@ -56,7 +56,7 @@ impl Kernel32 for RemoteKernel32 {
 }
 
 // Abstractions for Process //
-pub struct ProcessHandle {
+pub(crate) struct ProcessHandle {
     handle: HANDLE,
 }
 
@@ -115,7 +115,7 @@ fn get_max_windows_address(process_id: u32, handle: HANDLE) -> usize {
 }
 
 // Implementation //
-pub fn allocate_windows(settings: BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
+pub fn allocate_windows(settings: &BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
     unsafe {
         let process_handle = ProcessHandle::open_process(settings.target_process_id);
 
@@ -123,7 +123,7 @@ pub fn allocate_windows(settings: BufferAllocatorSettings) -> Result<LocatorItem
             return Err("Failed to open process");
         }
         
-        let handle =  process_handle.unwrap().handle;
+        let handle =  process_handle.unwrap_unchecked().handle;
         let max_address = get_max_windows_address(settings.target_process_id, handle);
         return if CACHED.get_this_process_id() == settings.target_process_id {
             allocate_fast(&LocalKernel32 {}, max_address, &settings)

@@ -3,12 +3,12 @@ use crate::internal::buffer_allocator::get_possible_buffer_addresses;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
-use crate::utilities::linux_map_parser::MemoryMapEntry;
+use crate::utilities::linux_map_parser::{get_free_regions_from_process_id, MemoryMapEntry};
 
 // Implementation //
-pub fn allocate_linux(settings: BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
+pub fn allocate_linux(settings: &BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
     for _ in 0..settings.retry_count {
-        let regions = crate::utilities::linux_map_parser::get_free_regions_from_process_id(settings.target_process_id as i32);
+        let regions = get_free_regions_from_process_id(settings.target_process_id as i32);
         for region in regions {
             if region.start_address > settings.max_address {
                 break;

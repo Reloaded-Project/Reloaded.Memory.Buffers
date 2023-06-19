@@ -44,6 +44,7 @@ pub fn round_down<T: Into<usize>>(number: usize, multiple: T) -> usize {
 ///
 /// * `a` - First value.
 /// * `b` - Second value.
+#[allow(dead_code)]
 pub fn min(a: usize, b: usize) -> usize {
     a.min(b)
 }

@@ -1,11 +1,16 @@
-﻿use std::mem::size_of;
+﻿use std::alloc::{alloc, Layout};
+use std::cmp::min;
+use std::mem::size_of;
 use std::sync::atomic::{AtomicI32, Ordering};
+use crate::internal::buffer_allocator::allocate;
 use crate::structs::internal::LocatorItem;
+use crate::structs::params::BufferAllocatorSettings;
 use crate::structs::SafeLocatorItem;
+use crate::utilities::cached::CACHED;
 use crate::utilities::wrappers::Unaligned;
 
 /// Static length of this locator.
-const LENGTH: usize = 4096;
+pub(crate) const LENGTH: usize = 4096;
 
 /// Length of buffers preallocated in this locator.
 ///
@@ -17,25 +22,26 @@ const LENGTH: usize = 4096;
 /// Our locator is a 4096 byte structure which means that it would be a waste to not
 /// do anything with the remaining data. So we chunk the remaining data by this amount
 /// and pre-register them as buffers.
-const LENGTH_OF_PREALLOCATED_CHUNKS: u32 = 16384;
+pub(crate) const LENGTH_OF_PREALLOCATED_CHUNKS: u32 = 16384;
 
 /// Returns the maximum possible amount of items in this locator.
-const MAX_ITEM_COUNT: u32 =
+pub(crate) const MAX_ITEM_COUNT: u32 =
     ((LENGTH - size_of::<LocatorHeader>()) / size_of::<LocatorItem>()) as u32;
 
 /// Represents the header of an individual memory locator.
 #[repr(C, align(1))]
 pub struct LocatorHeader {
-    this_address: Unaligned<*mut LocatorHeader>,
-    next_locator_ptr: Unaligned<*mut LocatorHeader>,
-    is_locked: AtomicI32,
-    flags: u8,
-    num_items: u8,
+    pub(crate) this_address: Unaligned<*mut LocatorHeader>,
+    pub(crate) next_locator_ptr: Unaligned<*mut LocatorHeader>,
+    pub(crate) is_locked: AtomicI32,
+    pub(crate) flags: u8,
+    pub(crate) num_items: u8,
     padding: [u8; 2]
 }
 
 impl LocatorHeader {
     /// Creates a new LocatorHeader instance.
+    #[cfg(test)]
     pub fn new() -> Self {
         LocatorHeader {
             this_address: Unaligned(std::ptr::null_mut()),
@@ -46,13 +52,43 @@ impl LocatorHeader {
             padding: [0; 2]
         }
     }
+    
+    /// Initializes the locator header values at a specific address.
+    /// # Arguments
+    ///
+    /// * `length` - Number of bytes available.
+    pub(crate) fn initialize(&mut self, length: usize) {
+        self.this_address = Unaligned(self as *mut LocatorHeader);
+        self.next_locator_ptr = Unaligned(std::ptr::null_mut());
+        self.is_locked = AtomicI32::new(0);
+        self.flags = 0;
+
+        let mut num_items = 0u8;
+        let mut remaining_bytes = (length - LENGTH) as u32;
+        unsafe {
+            let buffer_address = (self.this_address.0 as *mut u8).add(LENGTH);
+            let mut current_item = self.get_first_item();
+
+            while remaining_bytes > 0 {
+                let this_length = min(LENGTH_OF_PREALLOCATED_CHUNKS, remaining_bytes);
+                *current_item = LocatorItem::new(buffer_address as usize, this_length);
+                current_item = current_item.offset(1);
+                remaining_bytes -= this_length;
+                num_items += 1;
+            }
+        }
+        
+        self.num_items = num_items;
+    }
 
     /// Returns the version represented by the first 3 bits of `flags`.
+    #[allow(dead_code)]
     pub fn version(&self) -> u8 {
         self.flags & 0x07
     }
 
     /// Sets the version represented by the first 3 bits of `flags`.
+    #[allow(dead_code)]
     pub fn set_version(&mut self, value: u8) {
         self.flags = (self.flags & 0xF8) | (value & 0x07);
     }
@@ -142,15 +178,121 @@ impl LocatorHeader {
 
         None
     }
+
+    /// Tries to allocate an additional item in the header, if possible.
+    ///
+    /// # Arguments
+    ///
+    /// * `size` - Required size of buffer.
+    /// * `min_address` - Minimum address for the allocation.
+    /// * `max_address` - Maximum address for the allocation.
+    ///
+    /// # Returns
+    ///
+    /// Returns the successfully allocated buffer (locked) wrapped in an Option.
+    ///
+    /// # Remarks
+    ///
+    /// If an item can't be allocated, there are simply no slots left.
+    ///
+    /// # Errors
+    ///
+    /// If the memory cannot be allocated within the needed constraints, this function will return `Err(MemoryBufferAllocationException)`.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it requires the caller to ensure that calls are properly synchronized. 
+    /// Concurrent access without synchronization can lead to undefined behavior.
+    pub fn try_allocate_item(&mut self, size: u32, min_address: usize, max_address: usize) -> Result<SafeLocatorItem, &'static str> {
+        
+        if self.is_full() {
+            return Err("No more space in locator header");
+        }
+
+        // Note: We don't need to check if an item was created while we were waiting for the lock,
+        // because the item in question will be locked by the one who created it.
+        // We only need to (re)check if there's space.
+        self.lock();
+        
+        if self.is_full() {
+            self.unlock();
+            return Err("No more space in locator header");
+        }
+        
+        let mut settings = BufferAllocatorSettings::new();
+        settings.min_address = min_address;
+        settings.max_address = max_address;
+        settings.size = size;
+        let result = allocate(&mut settings);
+        
+        match result {
+            Ok(mut allocated_memory) => {
+                allocated_memory.lock();
+                
+                unsafe {
+                    let target = self.get_item(self.num_items as usize);
+                    *target = LocatorItem::new(allocated_memory.base_address.0, size);
+                    let item = SafeLocatorItem::new(target);
+
+                    self.unlock();
+                    Ok(item)
+                }
+            }
+            Err(_) => {
+                self.unlock();
+                Err("Could not allocate memory")
+            }
+        }
+    }
+
+    /// Gets the next header in the chain, allocating it if necessary.
+    ///
+    /// # Returns
+    ///
+    /// Address of next header.
+    ///
+    pub fn get_next_locator(&mut self) -> *mut LocatorHeader {
+        
+        // No-op if already exists.
+        if self.has_next_locator() {
+            return self.next_locator_ptr.0
+        }
+
+        self.lock();
+        
+        // Check again, in case it was created while we were waiting for the lock.
+        if self.has_next_locator() {
+            self.unlock();
+            return self.next_locator_ptr.0;
+        }
+        
+        // Allocate the next locator.
+        let alloc_size = CACHED.get_allocation_granularity();
+        unsafe {
+            let addr = alloc(Layout::from_size_align(alloc_size as usize, CACHED.page_size as usize).unwrap());
+            if addr == 0 as *mut u8 {
+                self.unlock();
+                panic!("Failed to allocate memory for LocatorHeader. Is this process out of memory?");
+            }
+            
+            self.next_locator_ptr.0 = addr as *mut LocatorHeader;
+            (*self.next_locator_ptr.0).initialize(alloc_size as usize);
+            self.unlock();
+            
+            self.next_locator_ptr.0
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::alloc::{alloc, Layout};
     use memoffset::offset_of;
-    use std::mem::size_of;
+    use std::mem::{align_of, size_of};
     use std::sync::atomic::Ordering;
     use crate::structs::internal::locator_header::{LENGTH, MAX_ITEM_COUNT, Unaligned};
     use crate::structs::internal::LocatorHeader;
+    use crate::utilities::cached::CACHED;
 
     // Ternary Operator
     macro_rules! expected_offset {
@@ -347,5 +489,85 @@ mod tests {
             // Assert
             assert!(result.is_none());
         }
+    }
+
+    #[test]
+    fn try_allocate_item_should_allocate_item_when_header_is_not_full_and_within_address_limits() {
+
+        // Arrange
+        let ptr = unsafe { alloc(Layout::from_size_align(LENGTH, align_of::<LocatorHeader>()).unwrap()) };
+        let header_ptr = ptr as *mut LocatorHeader;
+        let header = unsafe { &mut *header_ptr };
+        header.initialize(LENGTH);
+        
+        let size = 100;
+        let min_address = CACHED.max_address / 2;
+        let max_address = CACHED.max_address;
+
+        // Act
+        let result = header.try_allocate_item(size, min_address, max_address);
+
+        // Assert
+        assert!(result.is_ok());
+        let item = result.unwrap();
+        unsafe {
+            let address = (*item.item.get()).base_address.0;
+            assert!(address >= min_address);
+            assert!(address <= max_address);
+        }
+    }
+
+    #[test]
+    fn try_allocate_item_should_not_allocate_item_when_header_is_full() {
+        // Arrange
+        let ptr = unsafe { alloc(Layout::from_size_align(LENGTH, align_of::<LocatorHeader>()).unwrap()) };
+        let header_ptr = ptr as *mut LocatorHeader;
+        let header = unsafe { &mut *header_ptr };
+        header.initialize(LENGTH);
+        header.num_items = MAX_ITEM_COUNT as u8;
+
+        let size = 100;
+        let min_address = CACHED.max_address / 2;
+        let max_address = CACHED.max_address;
+
+        // Act
+        let result = header.try_allocate_item(size, min_address, max_address);
+
+        // Assert
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn try_allocate_item_should_not_allocate_item_when_outside_address_limits() {
+        // Arrange
+        let ptr = unsafe { alloc(Layout::from_size_align(LENGTH, align_of::<LocatorHeader>()).unwrap()) };
+        let header_ptr = ptr as *mut LocatorHeader;
+        let header = unsafe { &mut *header_ptr };
+        header.initialize(LENGTH);
+        
+        let size = 100;
+        let min_address = 0;
+        let max_address = 10; // Set maxAddress to a small value to make allocation impossible
+
+        // Act
+        assert!(header.try_allocate_item(size, min_address, max_address).is_err());
+    }
+
+    #[test]
+    fn get_next_locator_should_allocate_when_newly_created() {
+        // Arrange
+        let ptr = unsafe { alloc(Layout::from_size_align(LENGTH, align_of::<LocatorHeader>()).unwrap()) };
+        let header_ptr = ptr as *mut LocatorHeader;
+        let header = unsafe { &mut *header_ptr };
+        header.initialize(LENGTH);
+        header.num_items = MAX_ITEM_COUNT as u8;
+
+        // Act
+        let next = header.get_next_locator();
+        let next_cached = header.get_next_locator();
+
+        // Assert
+        assert_eq!(next as usize, next_cached as usize);
+        assert_ne!(next as usize, 0);
     }
 }

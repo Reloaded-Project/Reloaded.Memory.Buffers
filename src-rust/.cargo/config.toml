@@ -4,3 +4,7 @@
 #target = 'x86_64-unknown-linux-gnu' # don't commit, IntelliJ only.
 #target = 'x86_64-pc-windows-msvc' # don't commit, IntelliJ only.
 #target = 'x86_64-apple-darwin' # don't commit, IntelliJ only.
+
+# This is needed for Memory Mapped File based Tests.
+[env]
+RUST_TEST_THREADS = "1"

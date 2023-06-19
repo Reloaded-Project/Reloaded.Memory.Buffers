@@ -3,7 +3,7 @@ use crate::structs::params::{BufferAllocatorSettings};
 use crate::utilities::address_range::AddressRange;
 use crate::utilities::mathematics::{add_with_overflow_cap, round_down, round_up, subtract_with_underflow_cap};
 
-pub fn allocate(mut settings: BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
+pub fn allocate(settings: &mut BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
     settings.sanitize();
     
     #[cfg(target_os = "windows")]
@@ -231,7 +231,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "macos"))]
     fn can_allocate_in_2gib() {
-        let settings = BufferAllocatorSettings {
+        let mut settings = BufferAllocatorSettings {
             min_address: 0,
             max_address: i32::MAX as usize,
             size: 4096,
@@ -240,17 +240,17 @@ mod tests {
             brute_force: false,
         };
 
-        let item = allocate(settings).unwrap();
+        let item = allocate(&mut settings).unwrap();
         let base_addr = item.base_address.0;
         assert_ne!(base_addr, 0);
         assert!(item.size >= settings.size);
-        free(item, settings);
+        free(item);
     }
 
     #[test]
     fn can_allocate_up_to_max_address() {
 
-        let settings = BufferAllocatorSettings {
+        let mut settings = BufferAllocatorSettings {
             min_address: CACHED.max_address / 2,
             max_address: CACHED.max_address,
             size: 4096,
@@ -259,21 +259,21 @@ mod tests {
             brute_force: false,
         };
 
-        let item = allocate(settings).unwrap();
+        let item = allocate(&mut settings).unwrap();
         let base_addr = item.base_address.0;
         assert_ne!(base_addr, 0);
         assert!(item.size >= settings.size);
-        free(item, settings);
+        free(item);
     }
 
     // For testing use only.
-    fn free(item: LocatorItem, _settings: BufferAllocatorSettings) {
+    fn free(item: LocatorItem) {
 
         #[cfg(target_os = "windows")]
         free_windows(item);
 
         #[cfg(any(target_os = "linux", target_os = "macos"))]
-        free_libc(item, _settings);
+        free_libc(item);
     }
 
     // For testing use only.
@@ -285,7 +285,7 @@ mod tests {
     }
     
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    fn free_libc(item: LocatorItem, settings: BufferAllocatorSettings) {
+    fn free_libc(item: LocatorItem) {
         unsafe {
             libc::munmap(item.base_address.0 as *mut c_void, item.size as usize);
         }

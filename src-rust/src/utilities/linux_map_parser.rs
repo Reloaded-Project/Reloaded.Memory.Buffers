@@ -1,4 +1,5 @@
-﻿use std::error::Error;
+﻿use std::fs::read_to_string;
+use std::io;
 use crate::utilities;
 
 #[derive(Debug)]
@@ -30,16 +31,16 @@ impl MemoryMapEntry {
 ///
 /// * a vector of memory mapping entries if the function succeeds,
 /// * an error if the function fails.
-fn parse_memory_map_from_process_id(process_id: i32) -> Result<Vec<MemoryMapEntry>, Box<dyn std::error::Error>> {
+fn parse_memory_map_from_process_id(process_id: i32) -> io::Result<Vec<MemoryMapEntry>> {
     // Construct the path to the maps file for the given process ID.
     let maps_path = format!("/proc/{}/maps", process_id);
 
     // Read all the lines from the file into a single string.
-    let all_lines = std::fs::read_to_string(&maps_path)?;
+    let all_lines = read_to_string(&maps_path)?;
 
     // Split the string into lines.
     let lines: Vec<&str> = all_lines.split('\n').collect();
-    parse_memory_map_from_lines(lines)
+    Ok(parse_memory_map_from_lines(lines))
 }
 
 /// Parses the contents of the /proc/{id}/maps file and returns a vector of memory mapping entries.
@@ -54,7 +55,7 @@ fn parse_memory_map_from_process_id(process_id: i32) -> Result<Vec<MemoryMapEntr
 ///
 /// * a vector of memory mapping entries if the function succeeds,
 /// * an error if the function fails.
-fn parse_memory_map_from_lines(lines: Vec<&str>) -> Result<Vec<MemoryMapEntry>, Box<dyn std::error::Error>> {
+fn parse_memory_map_from_lines(lines: Vec<&str>) -> Vec<MemoryMapEntry> {
     let mut entries = Vec::new();
 
     for line in lines {
@@ -65,7 +66,7 @@ fn parse_memory_map_from_lines(lines: Vec<&str>) -> Result<Vec<MemoryMapEntry>, 
         }
     }
 
-    Ok(entries)
+    entries
 }
 
 /// Parses a line from the /proc/self/maps file (or equivalent) and returns a memory mapping entry.
@@ -213,7 +214,7 @@ mod tests {
             "7f9c89991000-7f9c89993000 r--p 00000000 08:01 3932177                    /path/to/file",
             "7f9c89994000-7f9c89995000 r--p 00000000 08:01 3932178                    /path/to/file"
         ];
-        let result = parse_memory_map_from_lines(lines).unwrap();
+        let result = parse_memory_map_from_lines(lines);
         assert_eq!(result.len(), 2);
         assert_eq!(result[0].start_address, 0x7f9c89991000);
         assert_eq!(result[0].end_address, 0x7f9c89993000);
@@ -228,7 +229,7 @@ mod tests {
             "9c89900-9c89C00 r--p 00000000 08:01 3932177                    /path/to/file",
             "9c89C00-9c89E00 r--p 00000000 08:01 3932178                    /path/to/file"
         ];
-        let result = parse_memory_map_from_lines(lines).unwrap();
+        let result = parse_memory_map_from_lines(lines);
         assert_eq!(result.len(), 2);
         assert_eq!(result[0].start_address, 0x9c89900);
         assert_eq!(result[0].end_address, 0x9c89C00);

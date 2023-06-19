@@ -8,8 +8,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../docs/specification/buffer-locator.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/specification/buffer-locator.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/.cargo/config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/.cargo/config.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_linux.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_linux.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_osx.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_osx.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_windows.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_windows.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/structs/internal/locator_header.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/structs/internal/locator_header.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/cached.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/cached.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/linux_map_parser.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/linux_map_parser.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/wrappers.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/wrappers.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.Posix.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.Posix.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/IMemoryMappedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/IMemoryMappedFile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/LinuxMemoryMappedFile.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/OSX/Mach.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/OSX/Mach.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/UnixMemoryMappedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/UnixMemoryMappedFile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/WindowsMemoryMappedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/WindowsMemoryMappedFile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +49,9 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/73441e6a7f3ccccf47132a199b7717aea94a6bc8257f63c550e2ad6c2f6c97/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/753d44b40e7dfcf2a0534343444ce1ebaac652db5adaf638d71f2ea97e562f/MethodInvoker.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/85448f861b1cb95910693f28a5ce3363967c79953b460b176d97298ae5ed0/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8c16b4fb43da5719d1882d3e2ff69cb363a64fd4975f9d317b1b8af6a7232/SafeHandle.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/906d7cfe7139647e7fcafb24c420abecae95b3e4e75b63dd63c4cf38d6e3/AssertionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9a209f68f4ce1c95d56e8b81418cbd83292f43a099c856e312373bf7eed9e7/MemoryMappedFile.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/da212f05885d76c98f09053e4797422b69e4a8/ExternalMemory_srcgen.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dd56f65861984286baf6e9eb53082f579da442d/Memory_srcgen.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reloaded.Memory.Buffers/obj/Debug/netstandard2.0/Reloaded.Memory.Buffers.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
@@ -42,7 +64,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="Toolset" />
   </component>
   <component name="ProjectId" id="2P6ACdvuhnMRzpQa1sDnsSm5oE5" />
   <component name="ProjectViewState">
@@ -60,7 +82,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -126,6 +148,12 @@
       <workItem from="1686380815146" duration="12374000" />
       <workItem from="1686457056356" duration="737000" />
       <workItem from="1686509348317" duration="982000" />
+      <workItem from="1686613556559" duration="7767000" />
+      <workItem from="1686956230734" duration="44000" />
+      <workItem from="1686956334608" duration="174000" />
+      <workItem from="1686960851949" duration="513000" />
+      <workItem from="1687022292708" duration="2542000" />
+      <workItem from="1687033533654" duration="14123000" />
     </task>
     <servers />
   </component>
@@ -216,28 +244,40 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs</url>
           <line>36</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\BufferAllocatorTests.Allocation.cs" initialLine="35" containingFunctionPresentation="Method 'CanAllocateIn2GiB'">
-            <startOffsets>
-              <option value="1061" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1082" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\BufferAllocatorTests.Allocation.cs" initialLine="35" containingFunctionPresentation="Method 'CanAllocateIn2GiB'" />
           <option name="timeStamp" value="74" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferAllocatorTests.Allocation.cs</url>
           <line>33</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\BufferAllocatorTests.Allocation.cs" initialLine="32" containingFunctionPresentation="Method 'CanAllocateIn2GiB'">
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\BufferAllocatorTests.Allocation.cs" initialLine="32" containingFunctionPresentation="Method 'CanAllocateIn2GiB'" />
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs</url>
+          <line>18</line>
+          <properties documentPath="$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/BufferLocatorTests.cs" initialLine="18" containingFunctionPresentation="Method 'Find_ShouldReturnAddress_WhenPreviouslyExists'">
             <startOffsets>
-              <option value="897" />
+              <option value="481" />
             </startOffsets>
             <endOffsets>
-              <option value="943" />
+              <option value="548" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="75" />
+          <option name="timeStamp" value="77" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
+          <line>208</line>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="208" containingFunctionPresentation="Method 'TryAllocateItem_ShouldAllocateItem_WhenHeaderIsNotFullAndWithinAddressLimits'">
+            <startOffsets>
+              <option value="5728" />
+            </startOffsets>
+            <endOffsets>
+              <option value="5810" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="78" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

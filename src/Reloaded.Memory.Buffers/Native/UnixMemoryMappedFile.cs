@@ -13,7 +13,16 @@ namespace Reloaded.Memory.Buffers.Native;
 [SuppressMessage("ReSharper", "PartialTypeWithSinglePart")]
 internal class UnixMemoryMappedFile : IMemoryMappedFile
 {
-    public static string BaseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".reloaded/memory.buffers");
+    public static readonly string BaseDir;
+
+    static UnixMemoryMappedFile()
+    {
+        var user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (user is "/" or "")
+            user = Path.GetTempPath();
+
+        BaseDir = Path.Combine(user, ".reloaded/memory.buffers");
+    }
 
     public bool AlreadyExisted { get; }
     public unsafe byte* Data { get; }
