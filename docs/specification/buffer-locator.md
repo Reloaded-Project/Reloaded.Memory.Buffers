@@ -437,7 +437,7 @@ item->IsTaken = 0;
 
 !!! tip "[Allocation algorithm is documented here](./allocation-algorithm.md)"
 
-!!! tip "Use C# high level API (detailed in [usage](../usage.md)) for additional reference."
+!!! tip "Use C# high level API (detailed in [usage](../index.md#usage)) for additional reference."
 
 If an additional buffer requires to be allocated, the following steps are taken:
 
