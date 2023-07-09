@@ -35,7 +35,7 @@ pub struct UnixMemoryMappedFile {
 impl UnixMemoryMappedFile {
     pub fn new(name: &str, length: usize) -> UnixMemoryMappedFile {
         let mut new_name = String::with_capacity(BASE_DIR.len() + name.len());
-        new_name.push_str(&*BASE_DIR);
+        new_name.push_str(&BASE_DIR);
         new_name.push_str(name);
 
         let file_name = CString::new(new_name.to_string()).expect("CString::new failed");
@@ -67,7 +67,7 @@ impl UnixMemoryMappedFile {
 
         let data = unsafe {
             mmap(
-                0 as *mut c_void,
+                std::ptr::null_mut::<c_void>(),
                 length,
                 PROT_READ | PROT_WRITE | PROT_EXEC,
                 MAP_SHARED,
@@ -139,12 +139,12 @@ mod tests {
         let file_length = CACHED.get_allocation_granularity() as usize;
         let mmf = UnixMemoryMappedFile::new(&file_name, file_length);
 
-        assert_eq!(mmf.already_existed, false);
+        assert!(!mmf.already_existed);
         assert_eq!(mmf.length, file_length);
 
         // Assert the file can be opened again (i.e., it exists)
         let mmf_existing = UnixMemoryMappedFile::new(&file_name, file_length);
-        assert_eq!(mmf_existing.already_existed, true);
+        assert!(mmf_existing.already_existed);
     }
 
     #[test]
@@ -161,7 +161,7 @@ mod tests {
         // Let's test we can read and write to the data.
         unsafe {
             let data_ptr = mmf.data();
-            assert_ne!(data_ptr, 0 as *mut u8);
+            assert_ne!(data_ptr, std::ptr::null_mut::<u8>());
             println!("data_ptr: {:?}", data_ptr);
 
             // Write a value

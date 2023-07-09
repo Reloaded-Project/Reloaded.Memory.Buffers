@@ -127,7 +127,7 @@ impl LocatorItem {
     /// There is no error thrown if size is insufficient.
     pub unsafe fn append_bytes(&mut self, data: &[u8]) -> usize {
         let address = self.base_address.0 + self.position as usize;
-        let data_len = data.len() as usize;
+        let data_len = data.len();
 
         std::ptr::copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
         self.position += data_len as u32;
@@ -272,7 +272,7 @@ mod tests {
         for (position, base_address, max_address, size, expected) in &test_cases {
             // Arrange
             let locator_item = LocatorItem {
-                base_address: Unaligned(*base_address as usize),
+                base_address: Unaligned(*base_address),
                 position: *position as u32,
                 size: (max_address - base_address) as u32,
                 is_taken: AtomicI32::new(0),

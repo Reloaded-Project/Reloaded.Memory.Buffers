@@ -85,6 +85,12 @@ impl BufferAllocatorSettings {
     }
 }
 
+impl Default for BufferAllocatorSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
 

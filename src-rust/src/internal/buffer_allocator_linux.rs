@@ -20,7 +20,7 @@ pub fn allocate_linux(
             }
 
             unsafe {
-                match try_allocate_buffer(&region, &settings) {
+                match try_allocate_buffer(&region, settings) {
                     Ok(item) => return Ok(item),
                     Err(_) => continue,
                 }

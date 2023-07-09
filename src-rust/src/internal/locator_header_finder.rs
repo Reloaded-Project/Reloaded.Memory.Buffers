@@ -104,7 +104,7 @@ impl LocatorHeaderFinder {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn cleanup() {
         LocatorHeaderFinder::cleanup_posix(BASE_DIR.as_str(), |path| {
-            if let Err(err) = fs::remove_file(&path) {
+            if let Err(err) = fs::remove_file(path) {
                 eprintln!("Failed to delete file {}: {}", path.display(), err);
             }
         });
@@ -143,9 +143,7 @@ impl LocatorHeaderFinder {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn is_process_running(pid: i32) -> bool {
-        unsafe {
-            return kill(pid, 0) != 0;
-        }
+        unsafe { kill(pid, 0) != 0 }
     }
 }
 

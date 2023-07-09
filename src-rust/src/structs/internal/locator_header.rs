@@ -45,7 +45,7 @@ impl LocatorHeader {
     pub fn new() -> Self {
         LocatorHeader {
             this_address: Unaligned(std::ptr::null_mut()),
-            next_locator_ptr: Unaligned(0 as *mut LocatorHeader),
+            next_locator_ptr: Unaligned(std::ptr::null_mut::<LocatorHeader>()),
             is_locked: AtomicI32::new(0),
             flags: 0,
             num_items: 0,
@@ -95,7 +95,7 @@ impl LocatorHeader {
 
     /// Returns true if next locator is present.
     pub fn has_next_locator(&self) -> bool {
-        self.next_locator_ptr.0 != 0 as *mut LocatorHeader
+        !self.next_locator_ptr.0.is_null()
     }
 
     /// Returns true if this buffer is full.
@@ -279,7 +279,7 @@ impl LocatorHeader {
             let addr = alloc(
                 Layout::from_size_align(alloc_size as usize, CACHED.page_size as usize).unwrap(),
             );
-            if addr == 0 as *mut u8 {
+            if addr.is_null() {
                 self.unlock();
                 panic!(
                     "Failed to allocate memory for LocatorHeader. Is this process out of memory?"
