@@ -1,4 +1,5 @@
 use crate::internal::buffer_allocator::get_possible_buffer_addresses;
+use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
@@ -21,10 +22,10 @@ pub fn allocate_osx(
     unsafe {
         let self_task = mach_task_self();
         for _ in 0..settings.retry_count {
-            let pages = get_free_pages(current_address, max_address, self_task)?;
+            let pages = get_free_pages(current_address, max_address, self_task);
             for page in pages {
                 let mut result_addr: usize = 0;
-                if try_allocate_buffer(page.0, page.1, &settings, self_task, &mut result_addr) {
+                if try_allocate_buffer(page.0, page.1, settings, self_task, &mut result_addr) {
                     return Ok(LocatorItem {
                         base_address: Unaligned(result_addr),
                         size: settings.size,
@@ -46,7 +47,7 @@ fn get_free_pages(
     min_address: usize,
     max_addr: usize,
     self_task: mach_port_t,
-) -> Result<Vec<(usize, usize)>, &'static str> {
+) -> Vec<(usize, usize)> {
     let mut result: Vec<(usize, usize)> = Vec::new();
     let mut count = mem::size_of::<vm_region_basic_info_data_64_t>() as mach_msg_type_number_t;
     let mut object_name: mach_port_t = 0;
@@ -57,14 +58,14 @@ fn get_free_pages(
     while current_address <= max_address {
         let mut actual_address = current_address;
         let mut available_size: u64 = 0;
-        let mut region_info = vm_region_basic_info_data_64_t::default();
+        let region_info = vm_region_basic_info_data_64_t::default();
         let kr = unsafe {
             mach_vm_region(
                 self_task,
                 &mut actual_address,
                 &mut available_size,
                 vm_region::VM_REGION_BASIC_INFO_64,
-                mem::transmute(&mut region_info),
+                &region_info as *const mach::vm_region::vm_region_basic_info_64 as *mut i32,
                 &mut count,
                 &mut object_name,
             )
@@ -90,7 +91,7 @@ fn get_free_pages(
         current_address = actual_address + available_size;
     }
 
-    Ok(result)
+    result
 }
 
 fn try_allocate_buffer(
@@ -129,7 +130,7 @@ fn try_allocate_buffer(
         return true;
     }
 
-    return false;
+    false
 }
 
 fn get_buffer_pointers_in_page_range(
