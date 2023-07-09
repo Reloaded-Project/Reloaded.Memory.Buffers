@@ -85,7 +85,7 @@ With the following properties:
 
 	// Append some data.
 	unsafe {
-		item?.append_bytes(data);
+		item.append_bytes(data);
 	}
 	```
 

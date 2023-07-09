@@ -53,14 +53,16 @@ impl Buffers {
     ///
     /// Returns an error if the memory cannot be allocated within the needed constraints when there
     /// is no existing suitable buffer.
-    pub fn get_buffer(settings: &BufferSearchSettings) -> Result<SafeLocatorItem, &'static str> {
+    pub fn get_buffer(
+        settings: &BufferSearchSettings,
+    ) -> Result<SafeLocatorItem, BufferAllocationError> {
         unsafe { Self::get_buffer_recursive(settings, LocatorHeaderFinder::find()) }
     }
 
     unsafe fn get_buffer_recursive(
         settings: &BufferSearchSettings,
         locator: *mut LocatorHeader,
-    ) -> Result<SafeLocatorItem, &'static str> {
+    ) -> Result<SafeLocatorItem, BufferAllocationError> {
         let item = (*locator).get_first_available_item_locked(
             settings.size,
             settings.min_address,
@@ -81,5 +83,30 @@ impl Buffers {
 
         // If we can't allocate a new one
         Self::get_buffer_recursive(settings, unsafe { (*locator).get_next_locator() })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Buffers;
+    use crate::structs::params::BufferSearchSettings;
+
+    /// Baseline test to ensure that the buffer get logic is ok.
+    #[test]
+    fn test_get_buffer() {
+        let settings = BufferSearchSettings {
+            min_address: 0_usize,
+            max_address: i32::MAX as usize,
+            size: 4096,
+        };
+
+        // Automatically dropped.
+        let item = Buffers::get_buffer(&settings).unwrap();
+
+        // Append some data.
+        let data = [0x0; 4096];
+        unsafe {
+            item.append_bytes(&data);
+        }
     }
 }
