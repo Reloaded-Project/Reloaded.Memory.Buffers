@@ -5,6 +5,7 @@ use crate::structs::SafeLocatorItem;
 use crate::utilities::cached::CACHED;
 use crate::utilities::wrappers::Unaligned;
 use std::alloc::{alloc, Layout};
+use std::cell::Cell;
 use std::cmp::min;
 use std::mem::size_of;
 use std::sync::atomic::{AtomicI32, Ordering};
@@ -174,7 +175,12 @@ impl LocatorHeader {
         while current_item < final_item {
             let item_ref = &mut *current_item;
             if item_ref.can_use(size, min_address, max_address) && item_ref.try_lock() {
-                return Some(SafeLocatorItem::new(item_ref));
+                return Some({
+                    let item: *mut LocatorItem = item_ref;
+                    SafeLocatorItem {
+                        item: Cell::new(item),
+                    }
+                });
             }
 
             current_item = current_item.offset(1);
@@ -240,7 +246,12 @@ impl LocatorHeader {
                 unsafe {
                     let target = self.get_item(self.num_items as usize);
                     *target = LocatorItem::new(allocated_memory.base_address.0, size);
-                    let item = SafeLocatorItem::new(target);
+                    let item = {
+                        let item = target;
+                        SafeLocatorItem {
+                            item: Cell::new(item),
+                        }
+                    };
 
                     self.unlock();
                     Ok(item)

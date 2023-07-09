@@ -12,21 +12,16 @@ pub struct SafeLocatorItem {
 }
 
 impl SafeLocatorItem {
-    /// Creates a disposable locator item.
-    ///
-    /// The item used with this constructor must be locked.
-    pub unsafe fn new(item: *mut LocatorItem) -> Self {
-        Self {
-            item: Cell::new(item),
-        }
-    }
-
     /// Appends the data to this buffer.
     ///
     /// It is the caller's responsibility to ensure there is sufficient space in the buffer.
     /// When returning buffers from the library, the library will ensure there's at least
     /// the requested amount of space; so if the total size of your data falls under that
     /// space, you are good.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because it writes to raw (untracked by Rust) memory.
     pub unsafe fn append_bytes(&self, data: &[u8]) -> usize {
         (*self.item.get()).append_bytes(data)
     }
@@ -41,6 +36,10 @@ impl SafeLocatorItem {
     /// When returning buffers from the library, the library will ensure there's at least
     /// the requested amount of space; so if the total size of your data falls under that
     /// space, you are good.
+    /// 
+    /// # Safety
+    /// 
+    /// This function is unsafe because it writes to raw (untracked by Rust) memory.
     pub unsafe fn append_copy<T>(&self, data: &T) -> usize
     where
         T: Copy,

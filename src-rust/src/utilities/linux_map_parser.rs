@@ -36,7 +36,7 @@ fn parse_memory_map_from_process_id(process_id: i32) -> io::Result<Vec<MemoryMap
     let maps_path = format!("/proc/{}/maps", process_id);
 
     // Read all the lines from the file into a single string.
-    let all_lines = read_to_string(&maps_path)?;
+    let all_lines = read_to_string(maps_path)?;
 
     // Split the string into lines.
     let lines: Vec<&str> = all_lines.split('\n').collect();
@@ -59,10 +59,8 @@ fn parse_memory_map_from_lines(lines: Vec<&str>) -> Vec<MemoryMapEntry> {
     let mut entries = Vec::new();
 
     for line in lines {
-        let result = parse_memory_map_entry(&line);
-        match result {
-            Ok(entry) => entries.push(entry),
-            Err(_) => {}
+        if let Ok(entry) = parse_memory_map_entry(line) {
+            entries.push(entry)
         }
     }
 
@@ -84,7 +82,7 @@ fn parse_memory_map_from_lines(lines: Vec<&str>) -> Vec<MemoryMapEntry> {
 fn parse_memory_map_entry(line: &str) -> Result<MemoryMapEntry, Box<dyn std::error::Error>> {
     let parts: Vec<&str> = line.split_ascii_whitespace().collect();
 
-    if let Some(address_range) = parts.get(0) {
+    if let Some(address_range) = parts.first() {
         let addresses: Vec<&str> = address_range.split('-').collect();
         if addresses.len() == 2 {
             let start_address = usize::from_str_radix(addresses[0], 16)?;
@@ -135,7 +133,7 @@ pub fn get_free_regions(regions: &[MemoryMapEntry]) -> Vec<MemoryMapEntry> {
 /// * `process_id` - ID of the process to get regions for.
 pub fn get_free_regions_from_process_id(process_id: i32) -> Vec<MemoryMapEntry> {
     let regions = parse_memory_map_from_process_id(process_id).unwrap();
-    return get_free_regions(&regions);
+    get_free_regions(&regions)
 }
 
 #[cfg(test)]

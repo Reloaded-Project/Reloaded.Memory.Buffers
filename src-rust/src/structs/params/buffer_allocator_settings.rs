@@ -104,7 +104,7 @@ mod tests {
         assert_eq!(settings.size, 4096);
         assert_eq!(settings.target_process_id, CACHED.this_process_id);
         assert_eq!(settings.retry_count, 8);
-        assert_eq!(settings.brute_force, true);
+        assert!(settings.brute_force);
     }
 
     #[test]
@@ -125,8 +125,8 @@ mod tests {
         assert_eq!(settings.size, size as u32);
         assert_eq!(settings.target_process_id, CACHED.this_process_id);
         assert_eq!(settings.retry_count, 8);
-        assert_eq!(settings.brute_force, true);
-    }
+        assert!(settings.brute_force);
+    }   
 
     #[test]
     fn test_sanitize() {

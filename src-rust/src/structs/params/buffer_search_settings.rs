@@ -43,6 +43,12 @@ impl BufferSearchSettings {
     }
 }
 
+impl Default for BufferSearchSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

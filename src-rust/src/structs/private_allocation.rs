@@ -133,10 +133,7 @@ impl PrivateAllocation {
     pub(crate) fn drop_linux(&mut self) {
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
-                let result = libc::munmap(
-                    self.base_address.as_ptr() as *mut c_void,
-                    self.size as usize,
-                );
+                let result = libc::munmap(self.base_address.as_ptr() as *mut c_void, self.size);
                 if result != 0 {
                     // Failed to free memory on Linux
                 }
