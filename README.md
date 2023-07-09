@@ -47,6 +47,8 @@ These are just examples:
 
 !!! info "The library provides a simple high level API to use."
 
+!!! info "See [Wiki](https://reloaded-project.github.io/Reloaded.Memory.Buffers/) for Rust usage"
+
 ### Get A Buffer
 
 Gets a buffer where you can allocate 4096 bytes in first 2GiB of address space.

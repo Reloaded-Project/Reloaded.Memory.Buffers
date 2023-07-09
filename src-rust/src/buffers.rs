@@ -1,6 +1,7 @@
 ﻿use std::ptr::{NonNull};
 use crate::internal::buffer_allocator;
 use crate::internal::locator_header_finder::LocatorHeaderFinder;
+use crate::structs::errors::BufferAllocationError;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
 use crate::structs::internal::LocatorHeader;
@@ -23,7 +24,7 @@ impl Buffers {
     /// # Remarks
     ///
     /// Allocating inside another process is only supported on Windows.
-    pub fn allocate_private_memory(settings: &mut BufferAllocatorSettings) -> Result<PrivateAllocation, &'static str> {
+    pub fn allocate_private_memory(settings: &mut BufferAllocatorSettings) -> Result<PrivateAllocation, BufferAllocationError> {
         let alloc = buffer_allocator::allocate(settings)?;
         Ok(PrivateAllocation::new(NonNull::new(alloc.base_address.0 as *mut u8).unwrap(), alloc.size as usize, settings.target_process_id))
     }

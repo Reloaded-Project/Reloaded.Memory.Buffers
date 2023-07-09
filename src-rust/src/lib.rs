@@ -7,6 +7,11 @@ pub mod structs {
         pub mod buffer_search_settings;
         pub use buffer_search_settings::BufferSearchSettings;
     }
+
+    pub mod errors {
+        pub mod buffer_allocation_error;
+        pub use buffer_allocation_error::BufferAllocationError;
+    }
     
     pub mod safe_locator_item;
     pub use safe_locator_item::SafeLocatorItem;

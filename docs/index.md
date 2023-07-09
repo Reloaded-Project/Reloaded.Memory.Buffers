@@ -54,55 +54,110 @@ With the following properties:
 
 !!! info "Gets a buffer where you can allocate 4096 bytes in first 2GiB of address space."
 
-```csharp
-var settings = new BufferSearchSettings()
-{
-    MinAddress = 0,
-    MaxAddress = int.MaxValue,
-    Size = 4096
-};
+=== "C#"
 
-// Make sure to dispose, so lock gets released.
-using var item = Buffers.GetBuffer(settings);
+	```csharp
+	var settings = new BufferSearchSettings()
+	{
+		MinAddress = 0,
+		MaxAddress = int.MaxValue,
+		Size = 4096
+	};
 
-// Write some data, get pointer back.
-var ptr = item->Append(data); 
-```
+	// Make sure to dispose, so lock gets released.
+	using var item = Buffers.GetBuffer(settings);
+
+	// Write some data, get pointer back.
+	var ptr = item->Append(data); 
+	```
+
+=== "Rust"
+
+	```rust
+	let settings = BufferSearchSettings {
+		min_address: 0 as usize,
+		max_address: i32::MAX as usize,
+		size: 4096,
+	};
+
+	// Automatically dropped.
+	let item = Buffers::get_buffer(&settings)?;
+
+	// Append some data.
+	unsafe {
+		item?.append_bytes(data);
+	}
+	```
 
 ### Get A Buffer (With Proximity)
 
 !!! info "Gets a buffer where 4096 bytes written will be within 2GiB of 0x140000000."
 
-```csharp
-var settings = BufferSearchSettings.FromProximity(int.MaxValue, (nuint)0x140000000, 4096);
+=== "C#"
 
-// Make sure to dispose, so lock gets released.
-using var item = Buffers.GetBuffer(settings);
+	```csharp
+	var settings = BufferSearchSettings.FromProximity(int.MaxValue, (nuint)0x140000000, 4096);
 
-// Write some data, get pointer back.
-var ptr = item->Append(data); 
-```
+	// Make sure to dispose, so lock gets released.
+	using var item = Buffers.GetBuffer(settings);
+
+	// Write some data, get pointer back.
+	var ptr = item->Append(data); 
+	```
+
+=== "Rust"
+
+	```rust
+	let settings = BufferAllocatorSettings::from_proximity(i32::MAX, 0x140000000 as usize, 4096);
+	
+	// Automatically dropped.
+	let item = Buffers::get_buffer(settings)?;
+
+	// Append some data.
+	unsafe {
+		item?.append_bytes(data);
+	}
+	```
 
 ### Allocate Memory
 
 !!! info "Allows you to temporarily allocate memory within a specific address range and size constraints."
 
-```csharp
-// Arrange
-var settings = new BufferAllocatorSettings()
-{
-    MinAddress = 0,
-    MaxAddress = int.MaxValue,
-    Size = 4096
-};
 
-using var item = Buffers.AllocatePrivateMemory(settings);
+=== "C#"
 
-// You have allocated memory in first 2GiB of address space.
-// Disposing this memory (via `using` statement) will free it.
-item.BaseAddress.Should().NotBeNull();
-item.Size.Should().BeGreaterOrEqualTo(settings.Size);
-```
+	```csharp
+	// Arrange
+	var settings = new BufferAllocatorSettings()
+	{
+		MinAddress = 0,
+		MaxAddress = int.MaxValue,
+		Size = 4096
+	};
+
+	using var item = Buffers.AllocatePrivateMemory(settings);
+
+	// You have allocated memory in first 2GiB of address space.
+	// Disposing this memory (via `using` statement) will free it.
+	item.BaseAddress.Should().NotBeNull();
+	item.Size.Should().BeGreaterOrEqualTo(settings.Size);
+	```
+
+=== "Rust"
+
+	```rust
+	let mut settings = BufferAllocatorSettings::new();
+	settings.min_address = 0;
+	settings.max_address = i32::MAX as usize;
+	settings.size = 4096;
+
+	let item = Buffers::allocate_private_memory(&mut settings).unwrap();
+
+	// You have allocated memory in first 2GiB of address space.
+	// Disposing this memory (via `using` statement) will free it.
+	assert!(item.base_address.as_ptr() != std::ptr::null_mut());
+	assert!(item.size >= settings.size as usize);
+	```
 
 !!! note "You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows."
 

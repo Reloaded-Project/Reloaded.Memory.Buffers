@@ -1,9 +1,10 @@
-﻿use crate::structs::internal::LocatorItem;
+﻿use crate::structs::errors::BufferAllocationError;
+use crate::structs::internal::LocatorItem;
 use crate::structs::params::{BufferAllocatorSettings};
 use crate::utilities::address_range::AddressRange;
 use crate::utilities::mathematics::{add_with_overflow_cap, round_down, round_up, subtract_with_underflow_cap};
 
-pub fn allocate(settings: &mut BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
+pub fn allocate(settings: &mut BufferAllocatorSettings) -> Result<LocatorItem, BufferAllocationError> {
     settings.sanitize();
     
     #[cfg(target_os = "windows")]
@@ -11,7 +12,7 @@ pub fn allocate(settings: &mut BufferAllocatorSettings) -> Result<LocatorItem, &
     
     #[cfg(target_os = "linux")]
     return crate::internal::buffer_allocator_linux::allocate_linux(settings);
-    
+
     #[cfg(target_os = "macos")]
     return crate::internal::buffer_allocator_osx::allocate_osx(settings);
 }

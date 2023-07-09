@@ -3,7 +3,7 @@ use crate::utilities::mathematics;
 use crate::utilities::cached::CACHED;
 
 /// Settings to pass to the buffer allocator.
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct BufferAllocatorSettings {
     /// Minimum address of the allocation.
     pub min_address: usize,
@@ -84,6 +84,7 @@ impl BufferAllocatorSettings {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]

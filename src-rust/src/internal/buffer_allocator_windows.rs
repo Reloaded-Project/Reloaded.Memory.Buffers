@@ -8,6 +8,7 @@ use windows::Win32::System::SystemInformation::{GetSystemInfo, SYSTEM_INFO};
 use windows::Win32::System::Threading;
 use windows::Win32::System::Threading::{OpenProcess, PROCESS_ALL_ACCESS};
 use crate::internal::buffer_allocator::get_possible_buffer_addresses;
+use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
@@ -115,12 +116,12 @@ fn get_max_windows_address(process_id: u32, handle: HANDLE) -> usize {
 }
 
 // Implementation //
-pub fn allocate_windows(settings: &BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
+pub fn allocate_windows(settings: &BufferAllocatorSettings) -> Result<LocatorItem, BufferAllocationError> {
     unsafe {
         let process_handle = ProcessHandle::open_process(settings.target_process_id);
 
         if process_handle.is_err() {
-            return Err("Failed to open process");
+            return Err(BufferAllocationError::new(*settings, "Failed to open process"));
         }
         
         let handle =  process_handle.unwrap_unchecked().handle;
@@ -137,7 +138,7 @@ fn allocate_fast<T: Kernel32>(
     k32: &T,
     mut max_address: usize,
     settings: &BufferAllocatorSettings,
-) -> Result<LocatorItem, &'static str> {
+) -> Result<LocatorItem, BufferAllocationError> {
     max_address = min(max_address, settings.max_address as usize);
 
     for _ in 0..settings.retry_count {
@@ -189,7 +190,7 @@ fn allocate_fast<T: Kernel32>(
         }
     }
 
-    Err("Failed to allocate buffer")
+    Err(BufferAllocationError::new(*settings, "Failed to allocate buffer on Windows"))
 }
 
 fn try_allocate_buffer<T: Kernel32>(

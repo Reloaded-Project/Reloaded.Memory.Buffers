@@ -12,7 +12,7 @@ use crate::utilities::cached::{CACHED};
 use crate::utilities::wrappers::Unaligned;
 
 // Implementation //
-pub fn allocate_osx(settings: &BufferAllocatorSettings) -> Result<LocatorItem, &'static str> {
+pub fn allocate_osx(settings: &BufferAllocatorSettings) -> Result<LocatorItem, BufferAllocationError> {
     let max_address = min(CACHED.max_address, settings.max_address);
     let current_address = settings.min_address;
 
@@ -33,7 +33,7 @@ pub fn allocate_osx(settings: &BufferAllocatorSettings) -> Result<LocatorItem, &
             }
         }
 
-        Err("Failed to allocate memory buffer")
+        Err(BufferAllocationError::new(*settings, "Failed to allocate buffer on OSX"))
     }
 }
 
