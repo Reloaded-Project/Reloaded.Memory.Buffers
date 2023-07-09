@@ -1,5 +1,5 @@
-﻿use crate::utilities::mathematics;
 use crate::utilities::cached::CACHED;
+use crate::utilities::mathematics;
 
 /// Settings to pass to buffer search mechanisms.
 pub struct BufferSearchSettings {
@@ -62,8 +62,14 @@ mod tests {
         let size: usize = 3000;
         let settings = BufferSearchSettings::from_proximity(proximity, target, size);
 
-        assert_eq!(settings.max_address, mathematics::add_with_overflow_cap(target, proximity));
-        assert_eq!(settings.min_address, mathematics::subtract_with_underflow_cap(target, proximity));
+        assert_eq!(
+            settings.max_address,
+            mathematics::add_with_overflow_cap(target, proximity)
+        );
+        assert_eq!(
+            settings.min_address,
+            mathematics::subtract_with_underflow_cap(target, proximity)
+        );
         assert_eq!(settings.size, size as u32);
     }
 }

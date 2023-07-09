@@ -1,6 +1,6 @@
-﻿use std::fs::read_to_string;
-use std::io;
 use crate::utilities;
+use std::fs::read_to_string;
+use std::io;
 
 #[derive(Debug)]
 pub struct MemoryMapEntry {
@@ -8,7 +8,7 @@ pub struct MemoryMapEntry {
     pub(crate) end_address: usize,
 }
 
-/// This struct represents an entry in the memory map, 
+/// This struct represents an entry in the memory map,
 /// which is a region in the process's virtual memory space.
 impl MemoryMapEntry {
     fn new(start_address: usize, end_address: usize) -> MemoryMapEntry {
@@ -134,7 +134,6 @@ pub fn get_free_regions(regions: &[MemoryMapEntry]) -> Vec<MemoryMapEntry> {
 ///
 /// * `process_id` - ID of the process to get regions for.
 pub fn get_free_regions_from_process_id(process_id: i32) -> Vec<MemoryMapEntry> {
-    
     let regions = parse_memory_map_from_process_id(process_id).unwrap();
     return get_free_regions(&regions);
 }
@@ -227,7 +226,7 @@ mod tests {
     fn parse_memory_map_valid_lines_32() {
         let lines = vec![
             "9c89900-9c89C00 r--p 00000000 08:01 3932177                    /path/to/file",
-            "9c89C00-9c89E00 r--p 00000000 08:01 3932178                    /path/to/file"
+            "9c89C00-9c89E00 r--p 00000000 08:01 3932178                    /path/to/file",
         ];
         let result = parse_memory_map_from_lines(lines);
         assert_eq!(result.len(), 2);

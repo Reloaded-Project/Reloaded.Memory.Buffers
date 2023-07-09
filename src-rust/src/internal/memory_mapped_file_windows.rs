@@ -1,9 +1,12 @@
-﻿use std::ffi::CString;
+use crate::internal::memory_mapped_file::MemoryMappedFile;
+use std::ffi::CString;
 use windows::core::PCSTR;
 use windows::imp::CloseHandle;
 use windows::Win32::Foundation::{HANDLE, INVALID_HANDLE_VALUE};
-use windows::Win32::System::Memory::{CreateFileMappingA, FILE_MAP_ALL_ACCESS, MapViewOfFile, MEMORYMAPPEDVIEW_HANDLE, OpenFileMappingA, PAGE_EXECUTE_READWRITE, UnmapViewOfFile};
-use crate::internal::memory_mapped_file::MemoryMappedFile;
+use windows::Win32::System::Memory::{
+    CreateFileMappingA, MapViewOfFile, OpenFileMappingA, UnmapViewOfFile, FILE_MAP_ALL_ACCESS,
+    MEMORYMAPPEDVIEW_HANDLE, PAGE_EXECUTE_READWRITE,
+};
 
 pub struct WindowsMemoryMappedFile {
     already_existed: bool,
@@ -14,7 +17,6 @@ pub struct WindowsMemoryMappedFile {
 
 impl WindowsMemoryMappedFile {
     pub fn new(name: &str, length: usize) -> WindowsMemoryMappedFile {
-        
         let file_name = CString::new(name).unwrap();
         let mut already_existed = true;
 
@@ -22,8 +24,9 @@ impl WindowsMemoryMappedFile {
             let mut map_handle = OpenFileMappingA(
                 FILE_MAP_ALL_ACCESS.0,
                 false,
-                PCSTR(file_name.as_ptr() as *const u8));
-            
+                PCSTR(file_name.as_ptr() as *const u8),
+            );
+
             // No file existed, as open failed. Try create a new one.
             if map_handle.is_err() {
                 map_handle = CreateFileMappingA(
@@ -44,13 +47,15 @@ impl WindowsMemoryMappedFile {
                 0,
                 0,
                 length,
-            ).unwrap().0 as *mut u8;
+            )
+            .unwrap()
+            .0 as *mut u8;
 
             WindowsMemoryMappedFile {
                 already_existed,
                 data,
                 length,
-                map_handle: map_handle.unwrap()
+                map_handle: map_handle.unwrap(),
             }
         }
     }
@@ -66,9 +71,15 @@ impl Drop for WindowsMemoryMappedFile {
 }
 
 impl MemoryMappedFile for WindowsMemoryMappedFile {
-    fn already_existed(&self) -> bool { self.already_existed }
-    unsafe fn data(&self) -> *mut u8 { self.data }
-    fn length(&self) -> usize { self.length }
+    fn already_existed(&self) -> bool {
+        self.already_existed
+    }
+    unsafe fn data(&self) -> *mut u8 {
+        self.data
+    }
+    fn length(&self) -> usize {
+        self.length
+    }
 }
 
 #[cfg(test)]
@@ -79,7 +90,10 @@ mod tests {
     #[test]
     fn test_windows_memory_mapped_file_creation() {
         // Let's create a memory mapped file with a specific size.
-        let file_name = format!("/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}", CACHED.this_process_id);
+        let file_name = format!(
+            "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
+            CACHED.this_process_id
+        );
         let file_length = CACHED.get_allocation_granularity() as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
 
@@ -93,7 +107,10 @@ mod tests {
 
     #[test]
     fn test_windows_memory_mapped_file_data() {
-        let file_name = format!("/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}", CACHED.this_process_id);
+        let file_name = format!(
+            "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
+            CACHED.this_process_id
+        );
 
         let file_length = CACHED.get_allocation_granularity() as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);

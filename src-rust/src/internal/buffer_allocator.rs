@@ -1,15 +1,19 @@
-﻿use crate::structs::errors::BufferAllocationError;
+use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
-use crate::structs::params::{BufferAllocatorSettings};
+use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::address_range::AddressRange;
-use crate::utilities::mathematics::{add_with_overflow_cap, round_down, round_up, subtract_with_underflow_cap};
+use crate::utilities::mathematics::{
+    add_with_overflow_cap, round_down, round_up, subtract_with_underflow_cap,
+};
 
-pub fn allocate(settings: &mut BufferAllocatorSettings) -> Result<LocatorItem, BufferAllocationError> {
+pub fn allocate(
+    settings: &mut BufferAllocatorSettings,
+) -> Result<LocatorItem, BufferAllocationError> {
     settings.sanitize();
-    
+
     #[cfg(target_os = "windows")]
     return crate::internal::buffer_allocator_windows::allocate_windows(settings);
-    
+
     #[cfg(target_os = "linux")]
     return crate::internal::buffer_allocator_linux::allocate_linux(settings);
 
@@ -26,16 +30,15 @@ pub unsafe fn get_possible_buffer_addresses(
     allocation_granularity: usize,
     results: &mut [usize; 4],
 ) -> &[usize] {
-    
     // Get range for page and min-max region.
     let min_max_range = AddressRange::new(minimum_ptr, maximum_ptr);
     let page_range = AddressRange::new(page_start, page_end);
-    
+
     // Check if there is any overlap at all.
     if !page_range.overlaps(&min_max_range) {
         return &results[0..0];
     }
-    
+
     // Three possible cases here:
     //   1. Page fits entirely inside min-max range and is smaller.
     if buf_size > page_range.size() {
@@ -64,12 +67,11 @@ pub unsafe fn get_possible_buffer_addresses(
     }
 
     // Round down from page max.
-    let page_max_aligned =
-        round_down(subtract_with_underflow_cap(page_range.end_pointer, buf_size), allocation_granularity);
-    let page_max_range = AddressRange::new(
-        page_max_aligned,
-        page_max_aligned + buf_size,
+    let page_max_aligned = round_down(
+        subtract_with_underflow_cap(page_range.end_pointer, buf_size),
+        allocation_granularity,
     );
+    let page_max_range = AddressRange::new(page_max_aligned, page_max_aligned + buf_size);
 
     if page_range.contains(&page_max_range) && min_max_range.contains(&page_max_range) {
         results[num_items] = page_max_range.start_pointer;
@@ -91,12 +93,11 @@ pub unsafe fn get_possible_buffer_addresses(
     }
 
     // Round down from ptr max.
-    let ptr_max_aligned =
-        round_down(subtract_with_underflow_cap(maximum_ptr, buf_size), allocation_granularity);
-    let ptr_max_range = AddressRange::new(
-        ptr_max_aligned,
-        ptr_max_aligned + buf_size,
+    let ptr_max_aligned = round_down(
+        subtract_with_underflow_cap(maximum_ptr, buf_size),
+        allocation_granularity,
     );
+    let ptr_max_range = AddressRange::new(ptr_max_aligned, ptr_max_aligned + buf_size);
 
     if page_range.contains(&ptr_max_range) && min_max_range.contains(&ptr_max_range) {
         results[num_items] = ptr_max_range.start_pointer;
@@ -108,13 +109,13 @@ pub unsafe fn get_possible_buffer_addresses(
 
 #[cfg(test)]
 mod tests {
-    use std::ffi::c_void;
+    use super::*;
     #[cfg(target_os = "windows")]
     use crate::internal::buffer_allocator_windows::{Kernel32, LocalKernel32};
-    use crate::{utilities::cached::CACHED};
-    use super::*;
+    use crate::utilities::cached::CACHED;
+    use std::ffi::c_void;
 
-    const ALLOCATION_GRANULARITY: usize = 65536;  // Assuming 64KB Allocation Granularity
+    const ALLOCATION_GRANULARITY: usize = 65536; // Assuming 64KB Allocation Granularity
 
     #[test]
     fn page_does_not_overlap_with_min_max() {
@@ -129,7 +130,16 @@ mod tests {
 
         unsafe {
             let buffer: &mut [usize; 4] = &mut [0; 4];
-            let result = get_possible_buffer_addresses(min_ptr, max_ptr, page_start, page_end, buf_size, ALLOCATION_GRANULARITY, buffer).len();
+            let result = get_possible_buffer_addresses(
+                min_ptr,
+                max_ptr,
+                page_start,
+                page_end,
+                buf_size,
+                ALLOCATION_GRANULARITY,
+                buffer,
+            )
+            .len();
             assert_eq!(0, result);
         }
     }
@@ -139,7 +149,7 @@ mod tests {
         let min_ptr = 100000;
         let max_ptr = 200000;
         let page_size = 30000;
-        let buf_size = 50000;  // Greater than page_size
+        let buf_size = 50000; // Greater than page_size
 
         // Page is within min-max range
         let page_start = min_ptr;
@@ -147,7 +157,16 @@ mod tests {
 
         unsafe {
             let buffer: &mut [usize; 4] = &mut [0; 4];
-            let result = get_possible_buffer_addresses(min_ptr, max_ptr, page_start, page_end, buf_size, ALLOCATION_GRANULARITY, buffer).len();
+            let result = get_possible_buffer_addresses(
+                min_ptr,
+                max_ptr,
+                page_start,
+                page_end,
+                buf_size,
+                ALLOCATION_GRANULARITY,
+                buffer,
+            )
+            .len();
             assert_eq!(0, result);
         }
     }
@@ -165,7 +184,15 @@ mod tests {
 
         unsafe {
             let buffer: &mut [usize; 4] = &mut [0; 4];
-            let result = get_possible_buffer_addresses(min_ptr, max_ptr, page_start, page_end, buf_size, ALLOCATION_GRANULARITY, buffer)[0];
+            let result = get_possible_buffer_addresses(
+                min_ptr,
+                max_ptr,
+                page_start,
+                page_end,
+                buf_size,
+                ALLOCATION_GRANULARITY,
+                buffer,
+            )[0];
             assert!(result > 0);
         }
     }
@@ -178,12 +205,20 @@ mod tests {
         let buf_size = 30000;
 
         // Page start is not aligned with allocation granularity
-        let page_start = min_ptr + 5000;  // Not multiple of 65536
+        let page_start = min_ptr + 5000; // Not multiple of 65536
         let page_end = page_start + page_size;
 
         unsafe {
             let buffer: &mut [usize; 4] = &mut [0; 4];
-            let result = get_possible_buffer_addresses(min_ptr, max_ptr, page_start, page_end, buf_size, ALLOCATION_GRANULARITY, buffer)[0];
+            let result = get_possible_buffer_addresses(
+                min_ptr,
+                max_ptr,
+                page_start,
+                page_end,
+                buf_size,
+                ALLOCATION_GRANULARITY,
+                buffer,
+            )[0];
             assert_eq!(result, round_up(page_start, ALLOCATION_GRANULARITY));
         }
     }
@@ -204,8 +239,19 @@ mod tests {
 
         unsafe {
             let buffer: &mut [usize; 4] = &mut [0; 4];
-            let result = get_possible_buffer_addresses(min_ptr, max_ptr, page_start, page_end, buf_size, ALLOCATION_GRANULARITY, buffer)[0];
-            assert_eq!(result, round_down(max_ptr - buf_size, ALLOCATION_GRANULARITY));
+            let result = get_possible_buffer_addresses(
+                min_ptr,
+                max_ptr,
+                page_start,
+                page_end,
+                buf_size,
+                ALLOCATION_GRANULARITY,
+                buffer,
+            )[0];
+            assert_eq!(
+                result,
+                round_down(max_ptr - buf_size, ALLOCATION_GRANULARITY)
+            );
         }
     }
 
@@ -218,15 +264,26 @@ mod tests {
 
         // Page end is not aligned with allocation granularity
         let page_start = min_ptr;
-        let page_end = page_start + page_size - 5000;  // Not multiple of 65536
+        let page_end = page_start + page_size - 5000; // Not multiple of 65536
 
         unsafe {
             let buffer: &mut [usize; 4] = &mut [0; 4];
-            let result = get_possible_buffer_addresses(min_ptr, max_ptr, page_start, page_end, buf_size, ALLOCATION_GRANULARITY, buffer)[0];
-            assert_eq!(result, round_down(page_end - buf_size, ALLOCATION_GRANULARITY));
+            let result = get_possible_buffer_addresses(
+                min_ptr,
+                max_ptr,
+                page_start,
+                page_end,
+                buf_size,
+                ALLOCATION_GRANULARITY,
+                buffer,
+            )[0];
+            assert_eq!(
+                result,
+                round_down(page_end - buf_size, ALLOCATION_GRANULARITY)
+            );
         }
     }
-    
+
     // Allocation Tests
 
     #[test]
@@ -250,7 +307,6 @@ mod tests {
 
     #[test]
     fn can_allocate_up_to_max_address() {
-
         let mut settings = BufferAllocatorSettings {
             min_address: CACHED.max_address / 2,
             max_address: CACHED.max_address,
@@ -269,7 +325,6 @@ mod tests {
 
     // For testing use only.
     fn free(item: LocatorItem) {
-
         #[cfg(target_os = "windows")]
         free_windows(item);
 
@@ -284,7 +339,7 @@ mod tests {
         let success = k32.virtual_free(item.base_address.0 as *mut c_void, 0);
         assert!(success);
     }
-    
+
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn free_libc(item: LocatorItem) {
         unsafe {

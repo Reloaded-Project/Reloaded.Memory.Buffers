@@ -1,11 +1,11 @@
-﻿#[cfg(any(target_os = "windows", target_os = "linux"))]
+#[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::ffi::c_void;
 
 use std::ptr::NonNull;
 
-#[cfg(target_os = "windows")]
-use windows::Win32::System::Memory::{MEM_RELEASE, VirtualFree, VirtualFreeEx};
 use crate::utilities::cached::CACHED;
+#[cfg(target_os = "windows")]
+use windows::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE};
 
 #[cfg(target_os = "macos")]
 use mach::kern_return::KERN_SUCCESS;
@@ -26,24 +26,22 @@ use crate::internal::buffer_allocator_windows::ProcessHandle;
 ///
 /// The memory is automatically deallocated when this struct is dropped,
 /// if you wish to keep it around, make sure to store it in a field or somewhere else.
-/// 
+///
 /// # Remarks
-/// 
+///
 /// This structure is used as result of allocation options.
 pub struct PrivateAllocation {
-
     /// Address of the buffer in memory.
     pub base_address: NonNull<u8>,
 
     /// Exact size of allocated data.
     pub size: usize,
-    
+
     /// Function that frees the memory.
-    _this_process_id: u32
+    _this_process_id: u32,
 }
 
 impl PrivateAllocation {
-
     /// Creates a private allocation returned to user upon allocating a region of memory.
     ///
     /// # Arguments
@@ -65,7 +63,7 @@ impl PrivateAllocation {
         Self {
             base_address,
             size,
-            _this_process_id: process_id
+            _this_process_id: process_id,
         }
     }
 
@@ -96,11 +94,14 @@ impl PrivateAllocation {
                 if result.0 == 0 {
                     // "Failed to free memory on Windows"
                 }
-
             } else {
-
                 let process_handle = ProcessHandle::open_process(self._this_process_id);
-                let result = VirtualFreeEx( process_handle.unwrap().get_handle(), self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
+                let result = VirtualFreeEx(
+                    process_handle.unwrap().get_handle(),
+                    self.base_address.as_ptr() as *mut c_void,
+                    0,
+                    MEM_RELEASE,
+                );
                 if result.0 == 0 {
                     // "Failed to free memory on Windows in External Process"
                 }
@@ -113,11 +114,14 @@ impl PrivateAllocation {
     pub(crate) fn drop_macos(&mut self) {
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
-                let result = mach_vm_deallocate(mach_task_self(), self.base_address.as_ptr() as mach_vm_address_t, self.size as mach_vm_size_t);
+                let result = mach_vm_deallocate(
+                    mach_task_self(),
+                    self.base_address.as_ptr() as mach_vm_address_t,
+                    self.size as mach_vm_size_t,
+                );
                 if result != KERN_SUCCESS {
                     // "Failed to free memory on MacOS"
                 }
-
             } else {
                 // Not Implemented
             };
@@ -129,11 +133,13 @@ impl PrivateAllocation {
     pub(crate) fn drop_linux(&mut self) {
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
-                let result = libc::munmap(self.base_address.as_ptr() as *mut c_void, self.size as usize);
+                let result = libc::munmap(
+                    self.base_address.as_ptr() as *mut c_void,
+                    self.size as usize,
+                );
                 if result != 0 {
                     // Failed to free memory on Linux
                 }
-
             } else {
                 // Not Implemented
             };

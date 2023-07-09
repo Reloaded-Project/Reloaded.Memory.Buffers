@@ -1,6 +1,6 @@
-﻿use std::cmp;
-use crate::utilities::mathematics;
 use crate::utilities::cached::CACHED;
+use crate::utilities::mathematics;
+use std::cmp;
 
 /// Settings to pass to the buffer allocator.
 #[derive(Debug, Clone, Copy)]
@@ -19,20 +19,20 @@ pub struct BufferAllocatorSettings {
     pub target_process_id: u32,
 
     /// Amount of times library should retry after failing to allocate a region.
-    /// 
+    ///
     /// # Remarks
     /// This is useful when there's high memory pressure, meaning pages become unavailable between the time
     /// they are found and the time we try to allocate them.
     pub retry_count: i32,
 
     /// Whether to use brute force to find a suitable address.
-    /// 
+    ///
     /// # Remarks
-    /// 
-    /// In the original library, this was for some reason only ever needed in FFXIV under Wine; and was contributed 
-    /// (prior to rewrite) by the Dalamud folks. In Wine and on FFXIV *only*; this was ever the case. 
+    ///
+    /// In the original library, this was for some reason only ever needed in FFXIV under Wine; and was contributed
+    /// (prior to rewrite) by the Dalamud folks. In Wine and on FFXIV *only*; this was ever the case.
     /// Inclusion of a brute force approach is a last ditch workaround for that.
-    /// 
+    ///
     /// This setting is only used on Windows targets today.
     pub brute_force: bool,
 }
@@ -78,7 +78,10 @@ impl BufferAllocatorSettings {
         }
 
         self.size = cmp::max(self.size, 1);
-        self.size = mathematics::round_up(self.size as usize, CACHED.get_allocation_granularity() as usize) as u32;
+        self.size = mathematics::round_up(
+            self.size as usize,
+            CACHED.get_allocation_granularity() as usize,
+        ) as u32;
     }
 }
 
@@ -105,8 +108,14 @@ mod tests {
         let size: usize = 3000;
         let settings = BufferAllocatorSettings::from_proximity(proximity, target, size);
 
-        assert_eq!(settings.max_address, mathematics::add_with_overflow_cap(target, proximity));
-        assert_eq!(settings.min_address, mathematics::subtract_with_underflow_cap(target, proximity));
+        assert_eq!(
+            settings.max_address,
+            mathematics::add_with_overflow_cap(target, proximity)
+        );
+        assert_eq!(
+            settings.min_address,
+            mathematics::subtract_with_underflow_cap(target, proximity)
+        );
         assert_eq!(settings.size, size as u32);
         assert_eq!(settings.target_process_id, CACHED.this_process_id);
         assert_eq!(settings.retry_count, 8);
@@ -122,12 +131,20 @@ mod tests {
         settings.sanitize();
 
         if cfg!(windows) {
-            assert_eq!(settings.min_address, CACHED.get_allocation_granularity() as usize);
-        }
-        else {
+            assert_eq!(
+                settings.min_address,
+                CACHED.get_allocation_granularity() as usize
+            );
+        } else {
             assert_eq!(settings.min_address, 0);
         }
 
-        assert_eq!(settings.size, mathematics::round_up(cmp::max(1, 1) as usize, CACHED.get_allocation_granularity() as usize) as u32);
+        assert_eq!(
+            settings.size,
+            mathematics::round_up(
+                cmp::max(1, 1) as usize,
+                CACHED.get_allocation_granularity() as usize
+            ) as u32
+        );
     }
 }

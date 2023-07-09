@@ -1,5 +1,5 @@
-use std::cell::{Cell};
 use crate::structs::internal::LocatorItem;
+use std::cell::Cell;
 
 /// An individual item in the buffer locator that can be dropped (disposed).
 ///
@@ -8,7 +8,7 @@ use crate::structs::internal::LocatorItem;
 /// Use at your own risk.
 /// Unsafe.
 pub struct SafeLocatorItem {
-    pub item: Cell<*mut LocatorItem>
+    pub item: Cell<*mut LocatorItem>,
 }
 
 impl SafeLocatorItem {
@@ -16,14 +16,16 @@ impl SafeLocatorItem {
     ///
     /// The item used with this constructor must be locked.
     pub unsafe fn new(item: *mut LocatorItem) -> Self {
-        Self { item: Cell::new(item) }
+        Self {
+            item: Cell::new(item),
+        }
     }
 
     /// Appends the data to this buffer.
     ///
     /// It is the caller's responsibility to ensure there is sufficient space in the buffer.
-    /// When returning buffers from the library, the library will ensure there's at least 
-    /// the requested amount of space; so if the total size of your data falls under that 
+    /// When returning buffers from the library, the library will ensure there's at least
+    /// the requested amount of space; so if the total size of your data falls under that
     /// space, you are good.
     pub unsafe fn append_bytes(&self, data: &[u8]) -> usize {
         (*self.item.get()).append_bytes(data)
@@ -36,11 +38,13 @@ impl SafeLocatorItem {
     /// Returns: Address of the written data.
     ///
     /// It is the caller's responsibility to ensure there is sufficient space in the buffer.
-    /// When returning buffers from the library, the library will ensure there's at least 
-    /// the requested amount of space; so if the total size of your data falls under that 
+    /// When returning buffers from the library, the library will ensure there's at least
+    /// the requested amount of space; so if the total size of your data falls under that
     /// space, you are good.
     pub unsafe fn append_copy<T>(&self, data: &T) -> usize
-        where T: Copy {
+    where
+        T: Copy,
+    {
         (*self.item.get()).append_copy(data)
     }
 }
@@ -48,6 +52,8 @@ impl SafeLocatorItem {
 /// Safely dispose.
 impl Drop for SafeLocatorItem {
     fn drop(&mut self) {
-        unsafe { (*self.item.get()).unlock(); }
+        unsafe {
+            (*self.item.get()).unlock();
+        }
     }
 }

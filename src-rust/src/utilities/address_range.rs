@@ -1,4 +1,4 @@
-﻿/// Defines a physical address range with a minimum and maximum address.
+/// Defines a physical address range with a minimum and maximum address.
 pub struct AddressRange {
     pub start_pointer: usize,
     pub end_pointer: usize,
@@ -50,8 +50,10 @@ impl AddressRange {
     ///
     /// * `true` if there are any overlaps in the address ranges, `false` otherwise.
     pub fn overlaps(&self, other: &AddressRange) -> bool {
-        self.point_in_range(other.start_pointer) || self.point_in_range(other.end_pointer)
-            || other.point_in_range(self.start_pointer) || other.point_in_range(self.end_pointer)
+        self.point_in_range(other.start_pointer)
+            || self.point_in_range(other.end_pointer)
+            || other.point_in_range(self.start_pointer)
+            || other.point_in_range(self.end_pointer)
     }
 
     /// Checks if a number "point", is between min and max of this address range.
