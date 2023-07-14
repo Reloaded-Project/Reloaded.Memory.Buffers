@@ -2,5 +2,8 @@
     "rust-analyzer.checkOnSave.command": "clippy",
     "[rust]": {
         "editor.formatOnSave": true
-    }
+    },
+    "coverage-gutters.coverageFileNames": [
+        "cobertura.xml"
+    ]
 }
