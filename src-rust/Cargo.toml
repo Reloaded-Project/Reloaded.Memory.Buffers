@@ -19,6 +19,8 @@ lazy_static = "1.4.0"
 dirs = "5.0.1"
 errno = "0.3.1"
 criterion = "0.5.1"
+
+[target.'cfg(unix)'.dependencies]
 pprof = { version = "0.12", features = ["flamegraph", "criterion"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
