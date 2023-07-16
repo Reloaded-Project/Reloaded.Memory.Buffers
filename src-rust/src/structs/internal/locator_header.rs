@@ -245,14 +245,12 @@ impl LocatorHeader {
 
                 unsafe {
                     let target = self.get_item(self.num_items as usize);
-                    *target = LocatorItem::new(allocated_memory.base_address.0, size);
-                    let item = {
-                        let item = target;
-                        SafeLocatorItem {
-                            item: Cell::new(item),
-                        }
+                    *target = allocated_memory;
+                    let item = SafeLocatorItem {
+                        item: Cell::new(target),
                     };
 
+                    self.num_items += 1;
                     self.unlock();
                     Ok(item)
                 }
@@ -537,7 +535,9 @@ mod tests {
         let max_address = CACHED.max_address;
 
         // Act
+        let item_count = header.num_items;
         let result = header.try_allocate_item(size, min_address, max_address);
+        assert_eq!(item_count + 1, header.num_items);
 
         // Assert
         assert!(result.is_ok());
@@ -564,7 +564,9 @@ mod tests {
         let max_address = CACHED.max_address;
 
         // Act
+        let item_count = header.num_items;
         let result = header.try_allocate_item(size, min_address, max_address);
+        assert_eq!(item_count, header.num_items);
 
         // Assert
         assert!(result.is_err());
