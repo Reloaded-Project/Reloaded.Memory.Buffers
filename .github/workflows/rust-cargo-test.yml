@@ -23,3 +23,4 @@ jobs:
         uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/test-and-coverage@v1 # upgrade if needed
         with:
           rust_project_path: src-rust
+          upload_coverage: true
