@@ -33,7 +33,10 @@ impl MemoryMapEntry {
 /// * an error if the function fails.
 fn parse_memory_map_from_process_id(process_id: i32) -> io::Result<Vec<MemoryMapEntry>> {
     // Construct the path to the maps file for the given process ID.
-    let maps_path = format!("/proc/{}/maps", process_id);
+    // no std!!
+    let mut maps_path = String::from("/proc/");
+    maps_path.push_str(&process_id.to_string());
+    maps_path.push_str("/maps");
 
     // Read all the lines from the file into a single string.
     let all_lines = read_to_string(maps_path)?;

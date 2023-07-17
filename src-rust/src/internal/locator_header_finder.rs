@@ -69,10 +69,9 @@ impl LocatorHeaderFinder {
     }
 
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
-        let name = format!(
-            "/Reloaded.Memory.Buffers.MemoryBuffer, PID {}",
-            CACHED.this_process_id
-        );
+        // no_std
+        let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");
+        name.push_str(&CACHED.get_this_process_id().to_string());
 
         #[cfg(target_os = "windows")]
         return Box::new(WindowsMemoryMappedFile::new(
