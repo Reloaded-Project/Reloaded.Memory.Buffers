@@ -1,12 +1,31 @@
+use std::ptr::NonNull;
+
 use crate::internal::buffer_allocator;
 use crate::internal::locator_header_finder::LocatorHeaderFinder;
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorHeader;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
-use std::ptr::NonNull;
 
 pub struct Buffers {}
+
+#[no_mangle]
+pub extern "C" fn rust_function() {
+    let settings = BufferSearchSettings {
+        min_address: 0_usize,
+        max_address: i32::MAX as usize,
+        size: 4096,
+    };
+
+    // Automatically dropped.
+    let item = Buffers::get_buffer(&settings).unwrap();
+
+    // Append some data.
+    let data = [0x0; 4096];
+    unsafe {
+        item.append_bytes(&data);
+    }
+}
 
 impl Buffers {
     /// Allocates some memory with user specified settings.
