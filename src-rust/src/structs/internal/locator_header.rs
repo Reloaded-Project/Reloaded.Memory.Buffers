@@ -435,7 +435,7 @@ mod tests {
         unsafe {
             // Arrange
             let mut header_buf: [u8; LENGTH] = [0; LENGTH];
-            let mut header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
+            let header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
 
             (*header).this_address = Unaligned(header);
             (*header).num_items = 2;
@@ -469,7 +469,7 @@ mod tests {
         unsafe {
             // Arrange
             let mut header_buf: [u8; LENGTH] = [0; LENGTH];
-            let mut header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
+            let header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
 
             (*header).this_address = Unaligned(header);
             (*header).num_items = 2;
@@ -498,7 +498,7 @@ mod tests {
         unsafe {
             // Arrange
             let mut header_buf: [u8; LENGTH] = [0; LENGTH];
-            let mut header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
+            let header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
 
             (*header).this_address = Unaligned(header);
             (*header).num_items = 2;
