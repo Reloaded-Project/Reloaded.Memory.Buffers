@@ -20,3 +20,4 @@ jobs:
         uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/test-in-wine@v1 # upgrade if needed
         with:
           rust_project_path: src-rust
+          rust_branch: nightly

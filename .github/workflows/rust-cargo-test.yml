@@ -24,3 +24,4 @@ jobs:
         with:
           rust_project_path: src-rust
           upload_coverage: true
+          rust_branch: nightly
