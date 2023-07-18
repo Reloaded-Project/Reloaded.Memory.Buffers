@@ -89,14 +89,48 @@ impl Buffers {
 #[cfg(test)]
 mod tests {
     use super::Buffers;
-    use crate::structs::params::BufferSearchSettings;
+    use crate::{
+        internal::locator_header_finder::LocatorHeaderFinder,
+        structs::params::{BufferAllocatorSettings, BufferSearchSettings},
+        utilities::cached::CACHED,
+    };
+    use std;
+
+    #[cfg(not(target_os = "macos"))]
+    #[test]
+    fn allocate_private_memory_in_2gib() {
+        let mut settings = BufferAllocatorSettings::new();
+        settings.min_address = 0;
+        settings.max_address = std::i32::MAX as usize;
+
+        let result = Buffers::allocate_private_memory(&mut settings);
+        assert!(result.is_ok());
+
+        let item = result.unwrap();
+        assert!(!item.base_address.as_ptr().is_null());
+        assert!(item.size >= settings.size as usize);
+    }
+
+    #[test]
+    fn allocate_private_memory_up_to_max_address() {
+        let mut settings = BufferAllocatorSettings::new();
+        settings.min_address = CACHED.max_address / 2;
+        settings.max_address = CACHED.max_address;
+
+        let result = Buffers::allocate_private_memory(&mut settings);
+        assert!(result.is_ok());
+
+        let item = result.unwrap();
+        assert!(!item.base_address.as_ptr().is_null());
+        assert!(item.size >= settings.size as usize);
+    }
 
     /// Baseline test to ensure that the buffer get logic is ok.
     #[test]
-    fn test_get_buffer() {
+    fn get_buffer_baseline() {
         let settings = BufferSearchSettings {
-            min_address: 0_usize,
-            max_address: i32::MAX as usize,
+            min_address: (CACHED.max_address / 2),
+            max_address: CACHED.max_address,
             size: 4096,
         };
 
@@ -107,6 +141,32 @@ mod tests {
         let data = [0x0; 4096];
         unsafe {
             item.append_bytes(&data);
+        }
+    }
+
+    #[test]
+    fn get_buffer_with_proximity() {
+        const SIZE: usize = 4096;
+        let base_address = CACHED.max_address - (std::i32::MAX as usize);
+
+        unsafe {
+            LocatorHeaderFinder::reset();
+        }
+
+        let item = Buffers::get_buffer(&BufferSearchSettings::from_proximity(
+            std::i32::MAX as usize,
+            base_address,
+            SIZE,
+        ));
+
+        assert!(item.is_ok());
+
+        unsafe {
+            let locator_item = item.unwrap().item.get();
+            assert!((*locator_item).size as usize >= SIZE);
+
+            let offset = ((*locator_item).base_address.0 as i64 - base_address as i64).abs();
+            assert!(offset < (i32::MAX as i64));
         }
     }
 }

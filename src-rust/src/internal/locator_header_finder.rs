@@ -90,7 +90,7 @@ impl LocatorHeaderFinder {
     }
 
     #[cfg(test)]
-    unsafe fn reset() {
+    pub(crate) unsafe fn reset() {
         LOCATOR_HEADER_ADDRESS = null_mut();
         MMF = None;
     }
