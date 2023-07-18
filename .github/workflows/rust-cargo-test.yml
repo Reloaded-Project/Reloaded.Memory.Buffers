@@ -2,9 +2,9 @@ name: Test and Upload Coverage
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, crab ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, crab ]
   workflow_dispatch:
 
 jobs:
