@@ -2,6 +2,7 @@ use crate::utilities::cached::CACHED;
 use crate::utilities::mathematics;
 
 /// Settings to pass to buffer search mechanisms.
+#[derive(Debug, Clone, Copy)]
 pub struct BufferSearchSettings {
     /// Minimum address of the allocation.
     pub min_address: usize,

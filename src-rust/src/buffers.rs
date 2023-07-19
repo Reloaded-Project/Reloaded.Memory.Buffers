@@ -4,6 +4,7 @@ use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorHeader;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
+use crate::utilities::mathematics::round_up;
 use std::ptr::NonNull;
 
 pub struct Buffers {}
@@ -32,6 +33,59 @@ impl Buffers {
             alloc.size as usize,
             settings.target_process_id,
         ))
+    }
+
+    /// Gets a buffer with user specified requirements and provided alignment.
+    ///
+    /// # Arguments
+    ///
+    /// * `settings` - Settings with which to allocate the memory.
+    /// * `alignment` - Alignment of the buffer. Max 4096, but recommended <= 64.
+    ///
+    /// # Returns
+    ///
+    /// Item allowing you to write to the buffer.
+    /// Make sure you drop it, by using `drop` function.
+    ///
+    /// # Remarks
+    ///
+    /// Allocating inside another process is only supported on Windows.
+    ///
+    /// This function is 'dumb', it will look for buffer with size `settings.size + alignment` and
+    /// then align it; as there is no current logic which takes alignment into account when searching
+    /// for a buffer (feel free to PR it though!).
+    ///
+    /// Thus, this function might miss some buffers which could accomodate the alignment requirement.
+    /// It is recommended to use this when the alignment requirement is less than '64 bytes'
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the memory cannot be allocated within the needed constraints when there
+    /// is no existing suitable buffer.
+    pub fn get_buffer_aligned(
+        settings: &BufferSearchSettings,
+        alignment: u32,
+    ) -> Result<SafeLocatorItem, BufferAllocationError> {
+        // Add expected size.
+        let mut new_settings = *settings;
+        new_settings.size += alignment;
+
+        let result = Self::get_buffer(&new_settings);
+
+        if result.is_ok() {
+            // No error. (Hot Path)
+            return result;
+        }
+
+        // If we have an error, pass it back.
+        unsafe {
+            let locator_item_cell = &result.as_ref().unwrap_unchecked().item;
+            let locator_item = locator_item_cell.get();
+            let base_address = (*locator_item).base_address.0;
+            let aligned_address = round_up(base_address, alignment as usize);
+            (*locator_item).base_address.0 = aligned_address;
+            result
+        }
     }
 
     /// Gets a buffer with user specified requirements.
@@ -88,6 +142,8 @@ impl Buffers {
 
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
+
     use super::Buffers;
     use crate::{
         internal::locator_header_finder::LocatorHeaderFinder,
@@ -141,6 +197,35 @@ mod tests {
         let data = [0x0; 4096];
         unsafe {
             item.append_bytes(&data);
+        }
+    }
+
+    #[rstest]
+    #[case(64)]
+    #[case(128)]
+    #[case(256)]
+    fn get_buffer_aligned_test(#[case] alignment: u32) {
+        let settings = BufferSearchSettings {
+            min_address: (CACHED.max_address / 2),
+            max_address: CACHED.max_address,
+            size: 4096,
+        };
+
+        // The function should succeed with these settings.
+        let item = Buffers::get_buffer_aligned(&settings, alignment);
+
+        match item {
+            Ok(item) => {
+                // Check that the address is aligned as expected.
+                unsafe {
+                    assert_eq!((*item.item.get()).base_address.0 % alignment as usize, 0);
+                }
+            }
+            Err(err) => {
+                // Handle the error (just print here).
+                println!("Error getting buffer: {}", err);
+                unreachable!();
+            }
         }
     }
 
