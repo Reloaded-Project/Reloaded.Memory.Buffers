@@ -4,6 +4,7 @@ use std::cmp;
 
 /// Settings to pass to the buffer allocator.
 #[derive(Debug, Clone, Copy)]
+#[repr(C)]
 pub struct BufferAllocatorSettings {
     /// Minimum address of the allocation.
     pub min_address: usize,
@@ -126,7 +127,7 @@ mod tests {
         assert_eq!(settings.target_process_id, CACHED.this_process_id);
         assert_eq!(settings.retry_count, 8);
         assert!(settings.brute_force);
-    }   
+    }
 
     #[test]
     fn test_sanitize() {

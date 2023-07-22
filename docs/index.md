@@ -89,6 +89,25 @@ With the following properties:
 	}
 	```
 
+=== "C/C++"
+
+	```cpp
+	BufferSearchSettings settings;
+	settings.MinAddress = 0;
+	settings.MaxAddress = INT_MAX;
+	settings.Size = 4096;
+
+	// Automatically dropped.
+	GetBufferResult result = buffers_get_buffer(&settings);
+
+	// Append some data.
+	unsigned char data[4096] = {0}; // some data from heap, or something :wink:
+	if (result.IsOk) {
+		locatoritem_append_bytes(result.Ok, data, sizeof(data));
+		free_get_buffer_result(result);
+	}
+	```
+
 ### Get A Buffer (With Proximity)
 
 !!! info "Gets a buffer where 4096 bytes written will be within 2GiB of 0x140000000."
@@ -108,7 +127,7 @@ With the following properties:
 === "Rust"
 
 	```rust
-	let settings = BufferAllocatorSettings::from_proximity(i32::MAX, 0x140000000 as usize, 4096);
+	let settings = BufferSearchSettings::from_proximity(i32::MAX, 0x140000000 as usize, 4096);
 	
 	// Automatically dropped.
 	let item = Buffers::get_buffer(settings)?;
@@ -117,6 +136,20 @@ With the following properties:
 	unsafe {
 		item?.append_bytes(data);
 	}
+	```
+
+=== "C/C++"
+
+	```c
+	// Get the buffer
+	BufferSearchSettings settings = buffersearchsettings_from_proximity(INT32_MAX, base_address, SIZE);
+	GetBufferResult result = buffers_get_buffer(&settings);
+
+	// Append some data.
+	locatoritem_append_bytes(result.Ok, &data[0], data.Length);
+
+	// Dispose
+	free_get_buffer_result(result);
 	```
 
 ### Allocate Memory
@@ -154,9 +187,21 @@ With the following properties:
 	let item = Buffers::allocate_private_memory(&mut settings).unwrap();
 
 	// You have allocated memory in first 2GiB of address space.
-	// Disposing this memory (via `using` statement) will free it.
 	assert!(item.base_address.as_ptr() != std::ptr::null_mut());
 	assert!(item.size >= settings.size as usize);
+	```
+
+=== "C/C++"
+
+	```cpp
+	BufferSearchSettings settings;
+	settings.MinAddress = 0;
+	settings.MaxAddress = INT_MAX;
+	settings.Size = 4096;
+
+	AllocationResult item = allocate_private_memory(&mut settings);
+
+	// You have allocated memory in first 2GiB of address space.
 	```
 
 !!! note "You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows."

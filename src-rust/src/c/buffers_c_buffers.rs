@@ -218,6 +218,46 @@ pub unsafe extern "C" fn free_get_buffer_result(item: GetBufferResult) {
     }
 }
 
+/// Creates settings such that the returned buffer will always be within `proximity` bytes of `target`.
+///
+/// # Arguments
+///
+/// * `proximity` - Max proximity (number of bytes) to target.
+/// * `target` - Target address.
+/// * `size` - Size required in the settings.
+///
+/// # Returns
+///
+/// * `BufferSearchSettings` - Settings that would satisfy this search.
+#[no_mangle]
+pub extern "C" fn buffersearchsettings_from_proximity(
+    proximity: usize,
+    target: usize,
+    size: usize,
+) -> BufferSearchSettings {
+    BufferSearchSettings::from_proximity(proximity, target, size)
+}
+
+/// Creates settings such that the returned buffer will always be within `proximity` bytes of `target`.
+///
+/// # Arguments
+///
+/// * `proximity` - Max proximity (number of bytes) to target.
+/// * `target` - Target address.
+/// * `size` - Size required in the settings.
+///
+/// # Returns
+///
+/// * `BufferAllocatorSettings` - Settings that would satisfy this search.
+#[no_mangle]
+pub extern "C" fn bufferallocatorsettings_from_proximity(
+    proximity: usize,
+    target: usize,
+    size: usize,
+) -> BufferAllocatorSettings {
+    BufferAllocatorSettings::from_proximity(proximity, target, size)
+}
+
 /// Returns all exported functions inside a struct.
 #[no_mangle]
 pub extern "C" fn get_functions() -> BuffersFunctions {
@@ -230,6 +270,8 @@ pub extern "C" fn get_functions() -> BuffersFunctions {
         free_locator_item,
         free_allocation_result,
         free_get_buffer_result,
+        buffersearchsettings_from_proximity,
+        bufferallocatorsettings_from_proximity,
         locatoritem_bytes_left,
         locatoritem_min_address,
         locatoritem_max_address,
@@ -245,7 +287,7 @@ pub extern "C" fn get_functions() -> BuffersFunctions {
 
 #[cfg(test)]
 mod tests {
-    use crate::c::buffers_c_buffers::{buffers_allocate_private_memory, buffers_get_buffer};
+    use crate::c::buffers_c_buffers::{buffers_allocate_private_memory, buffers_get_buffer, buffersearchsettings_from_proximity};
     use crate::c::buffers_c_buffers::{free_allocation_result, free_get_buffer_result};
     use crate::c::buffers_c_locatoritem::{
         locatoritem_append_bytes, locatoritem_bytes_left, locatoritem_min_address,
@@ -349,7 +391,7 @@ mod tests {
         }
 
         let settings =
-            BufferSearchSettings::from_proximity(std::i32::MAX as usize, base_address, SIZE);
+            buffersearchsettings_from_proximity(std::i32::MAX as usize, base_address, SIZE);
 
         let result = buffers_get_buffer(&settings);
 

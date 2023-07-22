@@ -92,6 +92,34 @@ pub struct BuffersFunctions {
     /// Frees a get buffer result returned from the 'buffers' operation.
     pub free_get_buffer_result: unsafe extern "C" fn(GetBufferResult),
 
+    /// Creates settings such that the returned buffer will always be within `proximity` bytes of `target`.
+    ///
+    /// # Arguments
+    ///
+    /// * `proximity` - Max proximity (number of bytes) to target.
+    /// * `target` - Target address.
+    /// * `size` - Size required in the settings.
+    ///
+    /// # Returns
+    ///
+    /// * `BufferSearchSettings` - Settings that would satisfy this search.
+    pub buffersearchsettings_from_proximity:
+        extern "C" fn(usize, usize, usize) -> BufferSearchSettings,
+
+    /// Creates settings such that the returned buffer will always be within `proximity` bytes of `target`.
+    ///
+    /// # Arguments
+    ///
+    /// * `proximity` - Max proximity (number of bytes) to target.
+    /// * `target` - Target address.
+    /// * `size` - Size required in the settings.
+    ///
+    /// # Returns
+    ///
+    /// * `BufferAllocatorSettings` - Settings that would satisfy this search.
+    pub bufferallocatorsettings_from_proximity:
+        extern "C" fn(usize, usize, usize) -> BufferAllocatorSettings,
+
     /// Returns the amount of bytes left in the buffer.
     pub locatoritem_bytes_left: unsafe extern "C" fn(item: *const LocatorItem) -> u32,
 

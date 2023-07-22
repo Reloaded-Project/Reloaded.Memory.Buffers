@@ -3,6 +3,7 @@ use crate::utilities::mathematics;
 
 /// Settings to pass to buffer search mechanisms.
 #[derive(Debug, Clone, Copy)]
+#[repr(C)]
 pub struct BufferSearchSettings {
     /// Minimum address of the allocation.
     pub min_address: usize,
