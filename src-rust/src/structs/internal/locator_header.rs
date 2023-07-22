@@ -266,12 +266,12 @@ impl LocatorHeader {
     ///
     /// # Returns
     ///
-    /// Address of next header.
+    /// Result with the address of next header, or error string.
     ///
-    pub fn get_next_locator(&mut self) -> *mut LocatorHeader {
+    pub fn get_next_locator(&mut self) -> Result<*mut LocatorHeader, &'static str> {
         // No-op if already exists.
         if self.has_next_locator() {
-            return self.next_locator_ptr.value;
+            return Ok(self.next_locator_ptr.value);
         }
 
         self.lock();
@@ -279,7 +279,7 @@ impl LocatorHeader {
         // Check again, in case it was created while we were waiting for the lock.
         if self.has_next_locator() {
             self.unlock();
-            return self.next_locator_ptr.value;
+            return Ok(self.next_locator_ptr.value);
         }
 
         // Allocate the next locator.
@@ -290,8 +290,8 @@ impl LocatorHeader {
             );
             if addr.is_null() {
                 self.unlock();
-                panic!(
-                    "Failed to allocate memory for LocatorHeader. Is this process out of memory?"
+                return Err(
+                    "Failed to allocate memory for LocatorHeader. Is this process out of memory?",
                 );
             }
 
@@ -299,7 +299,7 @@ impl LocatorHeader {
             (*self.next_locator_ptr.value).initialize(alloc_size as usize);
             self.unlock();
 
-            self.next_locator_ptr.value
+            Ok(self.next_locator_ptr.value)
         }
     }
 }
@@ -602,8 +602,8 @@ mod tests {
         header.num_items = MAX_ITEM_COUNT as u8;
 
         // Act
-        let next = header.get_next_locator();
-        let next_cached = header.get_next_locator();
+        let next = header.get_next_locator().unwrap();
+        let next_cached = header.get_next_locator().unwrap();
 
         // Assert
         assert_eq!(next as usize, next_cached as usize);

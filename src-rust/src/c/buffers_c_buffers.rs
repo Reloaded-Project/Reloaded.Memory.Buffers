@@ -6,7 +6,6 @@ use std::{
 
 use crate::{
     buffers::Buffers,
-    buffers_api::BuffersApi,
     structs::{
         internal::LocatorItem,
         params::{BufferAllocatorSettings, BufferSearchSettings},

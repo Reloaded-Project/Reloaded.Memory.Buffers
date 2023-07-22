@@ -1,7 +1,6 @@
-use crate::buffers_api::BuffersApi;
 use crate::internal::buffer_allocator;
 use crate::internal::locator_header_finder::LocatorHeaderFinder;
-use crate::structs::errors::BufferAllocationError;
+use crate::structs::errors::{BufferAllocationError, BufferSearchError};
 use crate::structs::internal::LocatorHeader;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
@@ -10,7 +9,7 @@ use std::ptr::NonNull;
 
 pub struct Buffers {}
 
-impl BuffersApi for Buffers {
+impl Buffers {
     /// Allocates some memory with user specified settings.
     /// The allocated memory is for your use only.
     ///
@@ -25,7 +24,7 @@ impl BuffersApi for Buffers {
     /// # Remarks
     ///
     /// Allocating inside another process is only supported on Windows.
-    fn allocate_private_memory(
+    pub fn allocate_private_memory(
         settings: &mut BufferAllocatorSettings,
     ) -> Result<PrivateAllocation, BufferAllocationError> {
         let alloc = buffer_allocator::allocate(settings)?;
@@ -63,10 +62,10 @@ impl BuffersApi for Buffers {
     ///
     /// Returns an error if the memory cannot be allocated within the needed constraints when there
     /// is no existing suitable buffer.
-    fn get_buffer_aligned(
+    pub fn get_buffer_aligned(
         settings: &BufferSearchSettings,
         alignment: u32,
-    ) -> Result<SafeLocatorItem, BufferAllocationError> {
+    ) -> Result<SafeLocatorItem, BufferSearchError> {
         // Add expected size.
         let mut new_settings = *settings;
         new_settings.size += alignment;
@@ -108,9 +107,9 @@ impl BuffersApi for Buffers {
     ///
     /// Returns an error if the memory cannot be allocated within the needed constraints when there
     /// is no existing suitable buffer.
-    fn get_buffer(
+    pub fn get_buffer(
         settings: &BufferSearchSettings,
-    ) -> Result<SafeLocatorItem, BufferAllocationError> {
+    ) -> Result<SafeLocatorItem, BufferSearchError> {
         unsafe { Self::get_buffer_recursive(settings, LocatorHeaderFinder::find()) }
     }
 }
@@ -119,7 +118,7 @@ impl Buffers {
     unsafe fn get_buffer_recursive(
         settings: &BufferSearchSettings,
         locator: *mut LocatorHeader,
-    ) -> Result<SafeLocatorItem, BufferAllocationError> {
+    ) -> Result<SafeLocatorItem, BufferSearchError> {
         let item = (*locator).get_first_available_item_locked(
             settings.size,
             settings.min_address,
@@ -139,7 +138,11 @@ impl Buffers {
         }
 
         // If we can't allocate a new one
-        Self::get_buffer_recursive(settings, unsafe { (*locator).get_next_locator() })
+        let next_locator = (*locator).get_next_locator();
+        match next_locator {
+            Ok(locator) => Self::get_buffer_recursive(settings, locator),
+            Err(error) => Err(BufferSearchError { settings: *settings, text: error }),
+        }        
     }
 }
 
@@ -149,7 +152,6 @@ mod tests {
 
     use super::Buffers;
     use crate::{
-        buffers::BuffersApi,
         internal::locator_header_finder::LocatorHeaderFinder,
         structs::params::{BufferAllocatorSettings, BufferSearchSettings},
         utilities::cached::CACHED,
@@ -159,8 +161,6 @@ mod tests {
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn allocate_private_memory_in_2gib() {
-        use crate::buffers::BuffersApi;
-
         let mut settings = BufferAllocatorSettings::new();
         settings.min_address = 0;
         settings.max_address = std::i32::MAX as usize;
