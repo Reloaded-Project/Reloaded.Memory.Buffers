@@ -33,17 +33,15 @@ pub fn allocate_osx(
                 let mut actual_address = current_address;
                 let mut available_size: u64 = 0;
                 let region_info = vm_region_basic_info_data_64_t::default();
-                let kr = unsafe {
-                    mach_vm_region(
-                        self_task,
-                        &mut actual_address,
-                        &mut available_size,
-                        vm_region::VM_REGION_BASIC_INFO_64,
-                        &region_info as *const mach::vm_region::vm_region_basic_info_64 as *mut i32,
-                        &mut count,
-                        &mut object_name,
-                    )
-                };
+                let kr = mach_vm_region(
+                    self_task,
+                    &mut actual_address,
+                    &mut available_size,
+                    vm_region::VM_REGION_BASIC_INFO_64,
+                    &region_info as *const mach::vm_region::vm_region_basic_info_64 as *mut i32,
+                    &mut count,
+                    &mut object_name,
+                );
 
                 if kr == 1 {
                     let padding = max_address as usize - current_address as usize;
