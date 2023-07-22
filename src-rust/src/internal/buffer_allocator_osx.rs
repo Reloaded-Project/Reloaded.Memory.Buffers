@@ -17,22 +17,80 @@ pub fn allocate_osx(
     settings: &BufferAllocatorSettings,
 ) -> Result<LocatorItem, BufferAllocationError> {
     let max_address = min(CACHED.max_address, settings.max_address);
-    let current_address = settings.min_address;
+    let min_address = settings.min_address;
 
     unsafe {
         let self_task = mach_task_self();
         for _ in 0..settings.retry_count {
-            let pages = get_free_pages(current_address, max_address, self_task);
-            for page in pages {
-                let mut result_addr: usize = 0;
-                if try_allocate_buffer(page.0, page.1, settings, self_task, &mut result_addr) {
-                    return Ok(LocatorItem {
-                        base_address: Unaligned::new(result_addr),
-                        size: settings.size,
-                        position: 0,
-                        is_taken: Default::default(),
-                    });
+            let mut count =
+                mem::size_of::<vm_region_basic_info_data_64_t>() as mach_msg_type_number_t;
+            let mut object_name: mach_port_t = 0;
+
+            let max_address = max_address as u64;
+            let mut current_address = min_address as u64;
+
+            while current_address <= max_address {
+                let mut actual_address = current_address;
+                let mut available_size: u64 = 0;
+                let region_info = vm_region_basic_info_data_64_t::default();
+                let kr = unsafe {
+                    mach_vm_region(
+                        self_task,
+                        &mut actual_address,
+                        &mut available_size,
+                        vm_region::VM_REGION_BASIC_INFO_64,
+                        &region_info as *const mach::vm_region::vm_region_basic_info_64 as *mut i32,
+                        &mut count,
+                        &mut object_name,
+                    )
+                };
+
+                if kr == 1 {
+                    let padding = max_address as usize - current_address as usize;
+                    if padding > 0 {
+                        let mut result_addr: usize = 0;
+                        if try_allocate_buffer(
+                            current_address as usize,
+                            padding,
+                            settings,
+                            self_task,
+                            &mut result_addr,
+                        ) {
+                            return Ok(LocatorItem {
+                                base_address: Unaligned::new(result_addr),
+                                size: settings.size,
+                                position: 0,
+                                is_taken: Default::default(),
+                            });
+                        }
+                    }
+                    break;
                 }
+
+                if kr != 0 {
+                    break;
+                }
+
+                let free_bytes = actual_address - current_address;
+                if free_bytes > 0 {
+                    let mut result_addr: usize = 0;
+                    if try_allocate_buffer(
+                        current_address as usize,
+                        free_bytes as usize,
+                        settings,
+                        self_task,
+                        &mut result_addr,
+                    ) {
+                        return Ok(LocatorItem {
+                            base_address: Unaligned::new(result_addr),
+                            size: settings.size,
+                            position: 0,
+                            is_taken: Default::default(),
+                        });
+                    }
+                }
+
+                current_address = actual_address + available_size;
             }
         }
 
@@ -41,57 +99,6 @@ pub fn allocate_osx(
             "Failed to allocate buffer on OSX",
         ))
     }
-}
-
-fn get_free_pages(
-    min_address: usize,
-    max_addr: usize,
-    self_task: mach_port_t,
-) -> Vec<(usize, usize)> {
-    let mut result: Vec<(usize, usize)> = Vec::new();
-    let mut count = mem::size_of::<vm_region_basic_info_data_64_t>() as mach_msg_type_number_t;
-    let mut object_name: mach_port_t = 0;
-
-    let max_address = max_addr as u64;
-    let mut current_address = min_address as u64;
-
-    while current_address <= max_address {
-        let mut actual_address = current_address;
-        let mut available_size: u64 = 0;
-        let region_info = vm_region_basic_info_data_64_t::default();
-        let kr = unsafe {
-            mach_vm_region(
-                self_task,
-                &mut actual_address,
-                &mut available_size,
-                vm_region::VM_REGION_BASIC_INFO_64,
-                &region_info as *const mach::vm_region::vm_region_basic_info_64 as *mut i32,
-                &mut count,
-                &mut object_name,
-            )
-        };
-
-        if kr == 1 {
-            let padding = max_addr - current_address as usize;
-            if padding > 0 {
-                result.push((current_address as usize, padding));
-            }
-            break;
-        }
-
-        if kr != 0 {
-            break;
-        }
-
-        let free_bytes = actual_address - current_address;
-        if free_bytes > 0 {
-            result.push((current_address as usize, free_bytes as usize));
-        }
-
-        current_address = actual_address + available_size;
-    }
-
-    result
 }
 
 fn try_allocate_buffer(
