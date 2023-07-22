@@ -39,3 +39,38 @@ jobs:
         with:
           rust_project_path: src-rust
           rust_branch: nightly
+
+  build-c-libs:
+    needs: test-native
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - id: build-libs
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1 # upgrade if needed
+        with:
+          rust_project_path: src-rust
+          target: ${{ matrix.target }}
