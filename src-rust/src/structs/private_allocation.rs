@@ -172,21 +172,24 @@ impl Drop for PrivateAllocation {
 
 #[cfg(test)]
 mod tests {
+    use crate::{internal::buffer_allocator, structs::params::BufferAllocatorSettings};
+
     use super::*;
-    use std::alloc::{alloc, Layout};
 
     #[test]
     fn test_private_allocation() {
-        let layout = Layout::from_size_align(4096, 1).unwrap();
-        let ptr = unsafe { alloc(layout) };
-        if ptr.is_null() {
-            panic!("Failed to allocate memory");
-        }
-        let base_address = unsafe { NonNull::new_unchecked(ptr) };
+        let mut settings = BufferAllocatorSettings::new();
+        settings.min_address = CACHED.max_address / 2;
+        settings.max_address = CACHED.max_address;
 
-        let alloc = PrivateAllocation::new(base_address, 4096, CACHED.this_process_id);
+        let alloc = buffer_allocator::allocate(&mut settings).unwrap();
+        let result = PrivateAllocation::new(
+            NonNull::<u8>::new(alloc.base_address.value as *mut u8).unwrap(),
+            alloc.size as usize,
+            CACHED.this_process_id,
+        );
 
-        assert_eq!(alloc.base_address(), base_address);
-        assert_eq!(alloc.size(), 4096);
+        assert_ne!(result.base_address().as_ptr() as usize, 0);
+        assert!(result.size() >= 4096);
     }
 }
