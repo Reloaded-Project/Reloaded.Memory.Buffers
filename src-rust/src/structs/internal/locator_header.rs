@@ -45,8 +45,8 @@ impl LocatorHeader {
     #[cfg(test)]
     pub fn new() -> Self {
         LocatorHeader {
-            this_address: Unaligned(std::ptr::null_mut()),
-            next_locator_ptr: Unaligned(std::ptr::null_mut::<LocatorHeader>()),
+            this_address: Unaligned::new(std::ptr::null_mut()),
+            next_locator_ptr: Unaligned::new(std::ptr::null_mut::<LocatorHeader>()),
             is_locked: AtomicI32::new(0),
             flags: 0,
             num_items: 0,
@@ -59,15 +59,15 @@ impl LocatorHeader {
     ///
     /// * `length` - Number of bytes available.
     pub(crate) fn initialize(&mut self, length: usize) {
-        self.this_address = Unaligned(self as *mut LocatorHeader);
-        self.next_locator_ptr = Unaligned(std::ptr::null_mut());
+        self.this_address = Unaligned::new(self as *mut LocatorHeader);
+        self.next_locator_ptr = Unaligned::new(std::ptr::null_mut());
         self.is_locked = AtomicI32::new(0);
         self.flags = 0;
 
         let mut num_items = 0u8;
         let mut remaining_bytes = (length - LENGTH) as u32;
         unsafe {
-            let buffer_address = (self.this_address.0 as *mut u8).add(LENGTH);
+            let buffer_address = (self.this_address.value as *mut u8).add(LENGTH);
             let mut current_item = self.get_first_item();
 
             while remaining_bytes > 0 {
@@ -96,7 +96,7 @@ impl LocatorHeader {
 
     /// Returns true if next locator is present.
     pub fn has_next_locator(&self) -> bool {
-        !self.next_locator_ptr.0.is_null()
+        !self.next_locator_ptr.value.is_null()
     }
 
     /// Returns true if this buffer is full.
@@ -271,7 +271,7 @@ impl LocatorHeader {
     pub fn get_next_locator(&mut self) -> *mut LocatorHeader {
         // No-op if already exists.
         if self.has_next_locator() {
-            return self.next_locator_ptr.0;
+            return self.next_locator_ptr.value;
         }
 
         self.lock();
@@ -279,7 +279,7 @@ impl LocatorHeader {
         // Check again, in case it was created while we were waiting for the lock.
         if self.has_next_locator() {
             self.unlock();
-            return self.next_locator_ptr.0;
+            return self.next_locator_ptr.value;
         }
 
         // Allocate the next locator.
@@ -295,11 +295,11 @@ impl LocatorHeader {
                 );
             }
 
-            self.next_locator_ptr.0 = addr as *mut LocatorHeader;
-            (*self.next_locator_ptr.0).initialize(alloc_size as usize);
+            self.next_locator_ptr.value = addr as *mut LocatorHeader;
+            (*self.next_locator_ptr.value).initialize(alloc_size as usize);
             self.unlock();
 
-            self.next_locator_ptr.0
+            self.next_locator_ptr.value
         }
     }
 }
@@ -437,16 +437,16 @@ mod tests {
             let mut header_buf: [u8; LENGTH] = [0; LENGTH];
             let header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
 
-            (*header).this_address = Unaligned(header);
+            (*header).this_address = Unaligned::new(header);
             (*header).num_items = 2;
 
             let first_item = (*header).get_first_item();
-            (*first_item).base_address = Unaligned(100);
+            (*first_item).base_address = Unaligned::new(100);
             (*first_item).size = 50;
             (*first_item).position = 25;
 
             let second_item = (*header).get_item(1);
-            (*second_item).base_address = Unaligned(200);
+            (*second_item).base_address = Unaligned::new(200);
             (*second_item).size = 50;
             (*second_item).position = 25;
 
@@ -457,7 +457,7 @@ mod tests {
             assert!(result.is_some());
             let result = result.unwrap();
             let locator_item = result.item.get();
-            let base_address = (*locator_item).base_address.0;
+            let base_address = (*locator_item).base_address.value;
             assert_eq!(base_address, 100);
             assert!((*locator_item).is_taken());
         }
@@ -471,16 +471,16 @@ mod tests {
             let mut header_buf: [u8; LENGTH] = [0; LENGTH];
             let header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
 
-            (*header).this_address = Unaligned(header);
+            (*header).this_address = Unaligned::new(header);
             (*header).num_items = 2;
 
             let first_item = (*header).get_first_item();
-            (*first_item).base_address = Unaligned(100);
+            (*first_item).base_address = Unaligned::new(100);
             (*first_item).size = 50;
             (*first_item).position = 30;
 
             let second_item = (*header).get_item(1);
-            (*second_item).base_address = Unaligned(200);
+            (*second_item).base_address = Unaligned::new(200);
             (*second_item).size = 50;
             (*second_item).position = 30;
 
@@ -500,16 +500,16 @@ mod tests {
             let mut header_buf: [u8; LENGTH] = [0; LENGTH];
             let header: *mut LocatorHeader = header_buf.as_mut_ptr() as *mut LocatorHeader;
 
-            (*header).this_address = Unaligned(header);
+            (*header).this_address = Unaligned::new(header);
             (*header).num_items = 2;
 
             let first_item = (*header).get_first_item();
-            (*first_item).base_address = Unaligned(100);
+            (*first_item).base_address = Unaligned::new(100);
             (*first_item).size = 50;
             (*first_item).position = 0;
 
             let second_item = (*header).get_item(1);
-            (*second_item).base_address = Unaligned(200);
+            (*second_item).base_address = Unaligned::new(200);
             (*second_item).size = 50;
             (*second_item).position = 0;
 
@@ -543,7 +543,7 @@ mod tests {
         assert!(result.is_ok());
         let item = result.unwrap();
         unsafe {
-            let address = (*item.item.get()).base_address.0;
+            let address = (*item.item.get()).base_address.value;
             assert!(address >= min_address);
             assert!(address <= max_address);
         }

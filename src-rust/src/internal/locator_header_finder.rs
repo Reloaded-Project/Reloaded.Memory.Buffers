@@ -233,7 +233,7 @@ mod tests {
                 let item = header.get_item(i as usize);
                 assert_eq!((*item).position, 0);
 
-                let base_address = (*item).base_address.0;
+                let base_address = (*item).base_address.value;
                 assert_ne!(0, base_address);
                 assert!((*item).size > 0);
             }

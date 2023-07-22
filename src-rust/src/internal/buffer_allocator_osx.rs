@@ -27,7 +27,7 @@ pub fn allocate_osx(
                 let mut result_addr: usize = 0;
                 if try_allocate_buffer(page.0, page.1, settings, self_task, &mut result_addr) {
                     return Ok(LocatorItem {
-                        base_address: Unaligned(result_addr),
+                        base_address: Unaligned::new(result_addr),
                         size: settings.size,
                         position: 0,
                         is_taken: Default::default(),

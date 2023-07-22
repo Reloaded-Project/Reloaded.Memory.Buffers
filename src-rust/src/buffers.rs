@@ -1,3 +1,4 @@
+use crate::buffers_api::BuffersApi;
 use crate::internal::buffer_allocator;
 use crate::internal::locator_header_finder::LocatorHeaderFinder;
 use crate::structs::errors::BufferAllocationError;
@@ -9,7 +10,7 @@ use std::ptr::NonNull;
 
 pub struct Buffers {}
 
-impl Buffers {
+impl BuffersApi for Buffers {
     /// Allocates some memory with user specified settings.
     /// The allocated memory is for your use only.
     ///
@@ -24,12 +25,12 @@ impl Buffers {
     /// # Remarks
     ///
     /// Allocating inside another process is only supported on Windows.
-    pub fn allocate_private_memory(
+    fn allocate_private_memory(
         settings: &mut BufferAllocatorSettings,
     ) -> Result<PrivateAllocation, BufferAllocationError> {
         let alloc = buffer_allocator::allocate(settings)?;
         Ok(PrivateAllocation::new(
-            NonNull::new(alloc.base_address.0 as *mut u8).unwrap(),
+            NonNull::new(alloc.base_address.value as *mut u8).unwrap(),
             alloc.size as usize,
             settings.target_process_id,
         ))
@@ -62,7 +63,7 @@ impl Buffers {
     ///
     /// Returns an error if the memory cannot be allocated within the needed constraints when there
     /// is no existing suitable buffer.
-    pub fn get_buffer_aligned(
+    fn get_buffer_aligned(
         settings: &BufferSearchSettings,
         alignment: u32,
     ) -> Result<SafeLocatorItem, BufferAllocationError> {
@@ -81,9 +82,9 @@ impl Buffers {
         unsafe {
             let locator_item_cell = &result.as_ref().unwrap_unchecked().item;
             let locator_item = locator_item_cell.get();
-            let base_address = (*locator_item).base_address.0;
+            let base_address = (*locator_item).base_address.value;
             let aligned_address = round_up(base_address, alignment as usize);
-            (*locator_item).base_address.0 = aligned_address;
+            (*locator_item).base_address.value = aligned_address;
             result
         }
     }
@@ -107,12 +108,14 @@ impl Buffers {
     ///
     /// Returns an error if the memory cannot be allocated within the needed constraints when there
     /// is no existing suitable buffer.
-    pub fn get_buffer(
+    fn get_buffer(
         settings: &BufferSearchSettings,
     ) -> Result<SafeLocatorItem, BufferAllocationError> {
         unsafe { Self::get_buffer_recursive(settings, LocatorHeaderFinder::find()) }
     }
+}
 
+impl Buffers {
     unsafe fn get_buffer_recursive(
         settings: &BufferSearchSettings,
         locator: *mut LocatorHeader,
@@ -146,6 +149,7 @@ mod tests {
 
     use super::Buffers;
     use crate::{
+        buffers::BuffersApi,
         internal::locator_header_finder::LocatorHeaderFinder,
         structs::params::{BufferAllocatorSettings, BufferSearchSettings},
         utilities::cached::CACHED,
@@ -155,6 +159,8 @@ mod tests {
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn allocate_private_memory_in_2gib() {
+        use crate::buffers::BuffersApi;
+
         let mut settings = BufferAllocatorSettings::new();
         settings.min_address = 0;
         settings.max_address = std::i32::MAX as usize;
@@ -218,7 +224,10 @@ mod tests {
             Ok(item) => {
                 // Check that the address is aligned as expected.
                 unsafe {
-                    assert_eq!((*item.item.get()).base_address.0 % alignment as usize, 0);
+                    assert_eq!(
+                        (*item.item.get()).base_address.value % alignment as usize,
+                        0
+                    );
                 }
             }
             Err(err) => {
@@ -250,7 +259,7 @@ mod tests {
             let locator_item = item.unwrap().item.get();
             assert!((*locator_item).size as usize >= SIZE);
 
-            let offset = ((*locator_item).base_address.0 as i64 - base_address as i64).abs();
+            let offset = ((*locator_item).base_address.value as i64 - base_address as i64).abs();
             assert!(offset < (i32::MAX as i64));
         }
     }

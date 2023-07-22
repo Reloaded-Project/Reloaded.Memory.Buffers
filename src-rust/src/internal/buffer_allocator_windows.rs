@@ -271,7 +271,7 @@ fn try_allocate_buffer<T: Kernel32>(
         }
 
         return Some(LocatorItem {
-            base_address: Unaligned(allocated as usize),
+            base_address: Unaligned::new(allocated as usize),
             size: settings.size,
             position: 0,
             is_taken: AtomicI32::from(0),

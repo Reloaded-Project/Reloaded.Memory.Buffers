@@ -299,7 +299,7 @@ mod tests {
         };
 
         let item = allocate(&mut settings).unwrap();
-        let base_addr = item.base_address.0;
+        let base_addr = item.base_address.value;
         assert_ne!(base_addr, 0);
         assert!(item.size >= settings.size);
         free(item);
@@ -317,7 +317,7 @@ mod tests {
         };
 
         let item = allocate(&mut settings).unwrap();
-        let base_addr = item.base_address.0;
+        let base_addr = item.base_address.value;
         assert_ne!(base_addr, 0);
         assert!(item.size >= settings.size);
         free(item);
@@ -336,14 +336,14 @@ mod tests {
     #[cfg(target_os = "windows")]
     fn free_windows(item: LocatorItem) {
         let k32 = LocalKernel32 {};
-        let success = k32.virtual_free(item.base_address.0 as *mut c_void, 0);
+        let success = k32.virtual_free(item.base_address.value as *mut c_void, 0);
         assert!(success);
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn free_libc(item: LocatorItem) {
         unsafe {
-            libc::munmap(item.base_address.0 as *mut c_void, item.size as usize);
+            libc::munmap(item.base_address.value as *mut c_void, item.size as usize);
         }
     }
 }

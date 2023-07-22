@@ -115,4 +115,11 @@ pub(crate) mod utilities {
     pub mod linux_map_parser;
 }
 
+pub mod c {
+    mod buffers_c_buffers;
+    mod buffers_c_locatoritem;
+    mod buffers_fnptr;
+}
+
 pub mod buffers;
+pub mod buffers_api;

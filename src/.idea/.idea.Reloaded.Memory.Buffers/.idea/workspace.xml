@@ -8,28 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7868721-33ff-496d-8851-2998ad92ac1c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../docs/specification/buffer-locator.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/specification/buffer-locator.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/.cargo/config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/.cargo/config.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_linux.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_linux.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_osx.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_osx.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_windows.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/internal/buffer_allocator_windows.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/structs/internal/locator_header.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/structs/internal/locator_header.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/cached.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/cached.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/linux_map_parser.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/linux_map_parser.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src-rust/src/utilities/wrappers.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../src-rust/src/utilities/wrappers.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Reloaded.Memory.Buffers/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.Posix.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.Posix.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Internal/LocatorHeaderFinder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/IMemoryMappedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/IMemoryMappedFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/LinuxMemoryMappedFile.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/OSX/Mach.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/OSX/Mach.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/UnixMemoryMappedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/UnixMemoryMappedFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/WindowsMemoryMappedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Native/WindowsMemoryMappedFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Reloaded.Memory.Buffers/Reloaded.Memory.Buffers.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,19 +20,7 @@
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4b76c3e709534801a173f34a1d6b3dfc522790/02/e2f44df6/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/159be8d190cfdf77c9e33529f2e856c5b46ba1f2c86243059845f7c61b5/Process.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/24bb4567e978ba6557a972f5cf4aa3f6fd8ba16c0f913b05ccb9fb6d2c92c69/UnmanagedMemoryAccessor.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/275c91e8825d3a2b394ea2c03e30eebf62ed063dedd5d339c6ea4e6b9224053/BooleanAsserts.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/55aace5114c7cd3f34188c997e4963c2124a09990711a964c7fc27de62783a1/Thread.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/73441e6a7f3ccccf47132a199b7717aea94a6bc8257f63c550e2ad6c2f6c97/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/753d44b40e7dfcf2a0534343444ce1ebaac652db5adaf638d71f2ea97e562f/MethodInvoker.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/85448f861b1cb95910693f28a5ce3363967c79953b460b176d97298ae5ed0/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8c16b4fb43da5719d1882d3e2ff69cb363a64fd4975f9d317b1b8af6a7232/SafeHandle.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/906d7cfe7139647e7fcafb24c420abecae95b3e4e75b63dd63c4cf38d6e3/AssertionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9a209f68f4ce1c95d56e8b81418cbd83292f43a099c856e312373bf7eed9e7/MemoryMappedFile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/da212f05885d76c98f09053e4797422b69e4a8/ExternalMemory_srcgen.g.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dd56f65861984286baf6e9eb53082f579da442d/Memory_srcgen.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d5d3a3c589809668ab73b1cef238e8816d948670a8ae5d1bd6c0aeedc8e17fb/XUnit2TestFramework.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reloaded.Memory.Buffers/obj/Debug/netstandard2.0/Reloaded.Memory.Buffers.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
@@ -71,28 +38,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;crab&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "crab",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\sewer\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\sewer\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\sewer\\AppData\\Local\\Symbols\\src&quot;
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "/home/sewer/.config/JetBrains/Rider2023.1/resharper-host/DecompilerCache",
+      "/home/sewer/.config/JetBrains/Rider2023.1/resharper-host/SourcesCache",
+      "/home/sewer/.local/share/Symbols/src"
     ]
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -154,6 +121,7 @@
       <workItem from="1686960851949" duration="513000" />
       <workItem from="1687022292708" duration="2542000" />
       <workItem from="1687033533654" duration="14123000" />
+      <workItem from="1689656543513" duration="895000" />
     </task>
     <servers />
   </component>
@@ -269,14 +237,7 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Reloaded.Memory.Buffers.Tests/Tests/Structs/LocatorHeaderTests.cs</url>
           <line>208</line>
-          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="208" containingFunctionPresentation="Method 'TryAllocateItem_ShouldAllocateItem_WhenHeaderIsNotFullAndWithinAddressLimits'">
-            <startOffsets>
-              <option value="5728" />
-            </startOffsets>
-            <endOffsets>
-              <option value="5810" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="C:\Users\sewer\Desktop\Projects\Reloaded.Memory.Buffers\src\Reloaded.Memory.Buffers.Tests\Tests\Structs\LocatorHeaderTests.cs" initialLine="208" containingFunctionPresentation="Method 'TryAllocateItem_ShouldAllocateItem_WhenHeaderIsNotFullAndWithinAddressLimits'" />
           <option name="timeStamp" value="78" />
         </line-breakpoint>
       </breakpoints>

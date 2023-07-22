@@ -25,7 +25,7 @@ impl LocatorItem {
     /// * `size` - The size.
     pub fn new(base_address: usize, size: u32) -> Self {
         Self {
-            base_address: Unaligned(base_address),
+            base_address: Unaligned::new(base_address),
             size,
             position: 0,
             is_taken: AtomicI32::new(0),
@@ -39,17 +39,17 @@ impl LocatorItem {
 
     /// Returns the minimum address of this locator item.
     pub fn min_address(&self) -> usize {
-        self.base_address.0
+        self.base_address.value
     }
 
     /// Returns the minimum address of this locator item.
     pub fn max_address(&self) -> usize {
-        self.base_address.0 + self.size as usize
+        self.base_address.value + self.size as usize
     }
 
     /// Returns true if the buffer is allocated, false otherwise.
     pub fn is_allocated(&self) -> bool {
-        self.base_address.0 != 0
+        self.base_address.value != 0
     }
 
     /// Returns true if the current item is locked, else false.
@@ -75,6 +75,7 @@ impl LocatorItem {
 
     /// Unlocks the object in a thread-safe manner.
     pub fn unlock(&mut self) {
+        // Need to amend C API if we ever need to do anything more here, since it forgets item.
         self.is_taken.store(0, Ordering::SeqCst);
     }
 
@@ -95,8 +96,9 @@ impl LocatorItem {
         }
 
         // Calculate the start and end positions within the buffer
-        let start_available_address = self.base_address.0 + self.position as usize;
-        let end_available_address = add_with_overflow_cap(self.base_address.0, self.size as usize);
+        let start_available_address = self.base_address.value + self.position as usize;
+        let end_available_address =
+            add_with_overflow_cap(self.base_address.value, self.size as usize);
 
         // Check if the requested memory lies within the remaining buffer and within the specified address range
         // If any of the checks fail, the buffer can't be used
@@ -126,7 +128,7 @@ impl LocatorItem {
     /// This function is safe provided that the caller ensures that the buffer is large enough to hold the data.
     /// There is no error thrown if size is insufficient.
     pub unsafe fn append_bytes(&mut self, data: &[u8]) -> usize {
-        let address = self.base_address.0 + self.position as usize;
+        let address = self.base_address.value + self.position as usize;
         let data_len = data.len();
 
         std::ptr::copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
@@ -154,7 +156,7 @@ impl LocatorItem {
     where
         T: Copy,
     {
-        let address = (self.base_address.0 + self.position as usize) as *mut T;
+        let address = (self.base_address.value + self.position as usize) as *mut T;
         *address = data;
         self.position += std::mem::size_of::<T>() as u32;
         address as usize
@@ -272,7 +274,7 @@ mod tests {
         for (position, base_address, max_address, size, expected) in &test_cases {
             // Arrange
             let locator_item = LocatorItem {
-                base_address: Unaligned(*base_address),
+                base_address: Unaligned::new(*base_address),
                 position: *position as u32,
                 size: (max_address - base_address) as u32,
                 is_taken: AtomicI32::new(0),

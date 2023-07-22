@@ -7,6 +7,7 @@ use std::cell::Cell;
 ///
 /// Use at your own risk.
 /// Unsafe.
+#[repr(C)]
 pub struct SafeLocatorItem {
     pub item: Cell<*mut LocatorItem>,
 }
@@ -36,9 +37,9 @@ impl SafeLocatorItem {
     /// When returning buffers from the library, the library will ensure there's at least
     /// the requested amount of space; so if the total size of your data falls under that
     /// space, you are good.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// This function is unsafe because it writes to raw (untracked by Rust) memory.
     pub unsafe fn append_copy<T>(&self, data: &T) -> usize
     where
@@ -52,6 +53,7 @@ impl SafeLocatorItem {
 impl Drop for SafeLocatorItem {
     fn drop(&mut self) {
         unsafe {
+            // Need to amend C API if we ever need to do anything more here, since it forgets item.
             (*self.item.get()).unlock();
         }
     }

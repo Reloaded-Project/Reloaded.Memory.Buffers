@@ -30,6 +30,7 @@ use crate::internal::buffer_allocator_windows::ProcessHandle;
 /// # Remarks
 ///
 /// This structure is used as result of allocation options.
+#[repr(C)]
 pub struct PrivateAllocation {
     /// Address of the buffer in memory.
     pub base_address: NonNull<u8>,
@@ -83,6 +84,17 @@ impl PrivateAllocation {
     /// Returns the size of the allocation.
     pub fn size(&self) -> usize {
         self.size
+    }
+
+    /// Returns an empty allocation, intended to be used as a non-result when an error is present.
+    pub(crate) fn null() -> Self {
+        unsafe {
+            Self {
+                base_address: NonNull::new_unchecked(std::ptr::null_mut()),
+                size: Default::default(),
+                _this_process_id: Default::default(),
+            }
+        }
     }
 
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
