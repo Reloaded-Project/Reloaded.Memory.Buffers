@@ -1,4 +1,4 @@
-name: Build, Test and Publish
+name: C# Build, Test and Publish
 on:
   push:
     branches: [ master, refactor-reloaded3-compliance ]
