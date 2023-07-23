@@ -17,13 +17,15 @@ public unsafe class BufferLocatorTests
     {
         // Arrange
         using var map = LocatorHeaderFinder.OpenOrCreateMemoryMappedFile();
-
+        ((LocatorHeader*)map.Data)->Initialize(map.Length);
+        
         // Act
         LocatorHeader* address = LocatorHeaderFinder.Find(out LocatorHeaderFinder.FindReason reason);
 
         // Assert
         ((nuint)address).Should().NotBeNull();
         reason.Should().Be(LocatorHeaderFinder.FindReason.PreviouslyExisted);
+        LocatorHeaderFinder.Reset();
     }
 
     [Fact]

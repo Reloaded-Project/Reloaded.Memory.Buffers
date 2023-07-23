@@ -66,11 +66,9 @@ internal class UnixMemoryMappedFile : IMemoryMappedFile
     {
         _memoryMappedFile.Dispose();
         _view.Dispose();
+        _stream.Dispose();
 
         if (!AlreadyExisted)
-        {
-            _stream.Dispose();
             File.Delete(_stream.Name);
-        }
     }
 }

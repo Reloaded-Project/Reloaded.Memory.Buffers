@@ -95,8 +95,8 @@ impl UnixMemoryMappedFile {
 impl Drop for UnixMemoryMappedFile {
     fn drop(&mut self) {
         let _ = unsafe { munmap(self.data as *mut c_void, self.length) };
+        unsafe { close(self.file_descriptor) };
         if !self.already_existed {
-            unsafe { close(self.file_descriptor) };
             let _ = std::fs::remove_file(Path::new(&self.file_path));
         }
     }
