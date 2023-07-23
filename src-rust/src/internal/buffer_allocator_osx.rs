@@ -69,8 +69,8 @@ pub fn allocate_osx(
                     break;
                 }
 
-                let free_bytes = actual_address - current_address;
-                if free_bytes > 0 {
+                if actual_address > current_address {
+                    let free_bytes = actual_address - current_address;
                     let mut result_addr: usize = 0;
                     if try_allocate_buffer(
                         current_address as usize,

@@ -61,9 +61,8 @@ internal static partial class BufferAllocator
             if (kr != 0)
                 break;
 
-            var freeBytes = actualAddress - currentAddress;
-            if (freeBytes > 0)
-                result.Add((currentAddress, freeBytes));
+            if (actualAddress > currentAddress)
+                result.Add((currentAddress, actualAddress - currentAddress));
 
             currentAddress = actualAddress + availableSize;
         }
