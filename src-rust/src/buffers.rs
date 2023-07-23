@@ -135,9 +135,7 @@ impl Buffers {
             (*locator).try_allocate_item(settings.size, settings.min_address, settings.max_address);
 
         match result {
-            Ok(new_item) => {
-                return Ok(new_item);
-            }
+            Ok(new_item) => Ok(new_item),
             Err(error) => {
                 if error == ItemAllocationError::CannotAllocateMemory {
                     return Err(BufferSearchError {
