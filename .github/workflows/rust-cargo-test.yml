@@ -74,3 +74,21 @@ jobs:
         with:
           rust_project_path: src-rust
           target: ${{ matrix.target }}
+
+  build-c-headers:
+    needs: build-c-libs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate C++ bindings
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
+        with:
+          rust_project_path: src-rust
+          config_file: cbindgen_cpp.toml
+          header_file: bindings_cpp.hpp
+  
+      - name: Generate C bindings
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
+        with:
+          rust_project_path: src-rust
+          config_file: cbindgen_c.toml
+          header_file: bindings_c.h
