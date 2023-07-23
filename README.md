@@ -13,8 +13,8 @@
 		<img src="https://img.shields.io/crates/dv/reloaded_memory_buffers" alt="NuGet" />
 	</a>
 	<!-- Build Status -->
-	<a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/actions/workflows/rust-cargo-test.yml">
-		<img src="https://img.shields.io/github/actions/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/rust-cargo-test.yml" alt="Build Status" />
+	<a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/actions/workflows/rust.yml">
+		<img src="https://img.shields.io/github/actions/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/rust.yml" alt="Build Status" />
 	</a>
 	<br/>
 	<!-- NuGet -->

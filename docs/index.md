@@ -13,6 +13,15 @@ hide:
 	<a href="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers">
 		<img src="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers/branch/master/graph/badge.svg" alt="Coverage" />
 	</a>
+	<!-- Crates -->
+	<a href="https://crates.io/crates/reloaded_memory_buffers">
+		<img src="https://img.shields.io/crates/dv/reloaded_memory_buffers" alt="NuGet" />
+	</a>
+	<!-- Build Status -->
+	<a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/actions/workflows/rust.yml">
+		<img src="https://img.shields.io/github/actions/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/rust.yml" alt="Build Status" />
+	</a>
+	<br/>
 	<!-- NuGet -->
 	<a href="https://www.nuget.org/packages/Reloaded.Memory.Buffers">
 		<img src="https://img.shields.io/nuget/v/Reloaded.Memory.Buffers.svg" alt="NuGet" />
