@@ -3,6 +3,8 @@ name: Rust Build, Test & Publish
 on:
   push:
     branches: [ main, master, crab ]
+    tags:
+      - '*'
   pull_request:
     branches: [ main, master, crab ]
   workflow_dispatch:
