@@ -68,6 +68,9 @@ pub mod structs {
 
         pub mod buffer_search_error;
         pub use buffer_search_error::BufferSearchError;
+
+        pub mod item_allocation_error;
+        pub use item_allocation_error::ItemAllocationError;
     }
 
     pub mod safe_locator_item;

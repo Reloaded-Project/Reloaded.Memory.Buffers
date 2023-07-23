@@ -1,6 +1,6 @@
 use crate::internal::buffer_allocator;
 use crate::internal::locator_header_finder::LocatorHeaderFinder;
-use crate::structs::errors::{BufferAllocationError, BufferSearchError};
+use crate::structs::errors::{BufferAllocationError, BufferSearchError, ItemAllocationError};
 use crate::structs::internal::LocatorHeader;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
@@ -131,18 +131,32 @@ impl Buffers {
         }
 
         // Otherwise try to allocate a new one.
-        if let Ok(new_item) =
-            (*locator).try_allocate_item(settings.size, settings.min_address, settings.max_address)
-        {
-            return Ok(new_item);
-        }
+        let result =
+            (*locator).try_allocate_item(settings.size, settings.min_address, settings.max_address);
 
+        match result {
+            Ok(new_item) => {
+                return Ok(new_item);
+            }
+            Err(error) => {
+                if error == ItemAllocationError::CannotAllocateMemory {
+                    return Err(BufferSearchError {
+                        settings: *settings,
+                        text: error.as_string(),
+                    });
+                }
+
+                let next_locator = (*locator).get_next_locator();
+                match next_locator {
+                    Ok(locator) => Self::get_buffer_recursive(settings, locator),
+                    Err(error) => Err(BufferSearchError {
+                        settings: *settings,
+                        text: error,
+                    }),
+                }
+            }
+        }
         // If we can't allocate a new one
-        let next_locator = (*locator).get_next_locator();
-        match next_locator {
-            Ok(locator) => Self::get_buffer_recursive(settings, locator),
-            Err(error) => Err(BufferSearchError { settings: *settings, text: error }),
-        }        
     }
 }
 

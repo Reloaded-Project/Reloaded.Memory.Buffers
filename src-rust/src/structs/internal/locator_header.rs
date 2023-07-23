@@ -1,4 +1,5 @@
 use crate::internal::buffer_allocator::allocate;
+use crate::structs::errors::ItemAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::structs::SafeLocatorItem;
@@ -218,9 +219,9 @@ impl LocatorHeader {
         size: u32,
         min_address: usize,
         max_address: usize,
-    ) -> Result<SafeLocatorItem, &'static str> {
+    ) -> Result<SafeLocatorItem, ItemAllocationError> {
         if self.is_full() {
-            return Err("No more space in locator header");
+            return Err(ItemAllocationError::NoSpaceInHeader);
         }
 
         // Note: We don't need to check if an item was created while we were waiting for the lock,
@@ -230,7 +231,7 @@ impl LocatorHeader {
 
         if self.is_full() {
             self.unlock();
-            return Err("No more space in locator header");
+            return Err(ItemAllocationError::NoSpaceInHeader);
         }
 
         let mut settings = BufferAllocatorSettings::new();
@@ -257,7 +258,7 @@ impl LocatorHeader {
             }
             Err(_) => {
                 self.unlock();
-                Err("Could not allocate memory")
+                Err(ItemAllocationError::CannotAllocateMemory)
             }
         }
     }
@@ -541,8 +542,8 @@ mod tests {
 
         // Assert
         assert!(result.is_ok());
-        let item = result.unwrap();
         unsafe {
+            let item = result.unwrap_unchecked();
             let address = (*item.item.get()).base_address.value;
             assert!(address >= min_address);
             assert!(address <= max_address);
