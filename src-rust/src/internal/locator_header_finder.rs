@@ -102,7 +102,7 @@ impl LocatorHeaderFinder {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn cleanup() {
-        LocatorHeaderFinder::cleanup_posix(BASE_DIR.as_str(), |path| {
+        LocatorHeaderFinder::cleanup_posix(BASE_DIR, |path| {
             if let Err(err) = fs::remove_file(path) {
                 eprintln!("Failed to delete file {}: {}", path.display(), err);
             }

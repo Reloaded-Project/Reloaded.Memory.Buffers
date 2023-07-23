@@ -1,28 +1,18 @@
 use errno::errno;
-use lazy_static::lazy_static;
+
 use libc::{
     c_int, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_EXEC, PROT_READ,
     PROT_WRITE, S_IRWXU,
 };
 use std::ffi::{c_void, CString};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 #[cfg(target_os = "macos")]
 use libc::c_uint;
 
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 
-lazy_static! {
-    pub static ref BASE_DIR: String = {
-        let mut base_dir = dirs::home_dir().unwrap();
-        if base_dir == PathBuf::from("/") {
-            base_dir = std::env::temp_dir();
-        }
-
-        base_dir = base_dir.join(".reloaded/memory.buffers");
-        base_dir.to_str().unwrap().to_string()
-    };
-}
+pub const BASE_DIR: &str = "/tmp/.reloaded/memory.buffers";
 
 pub struct UnixMemoryMappedFile {
     pub file_descriptor: i32,

@@ -15,14 +15,7 @@ internal class UnixMemoryMappedFile : IMemoryMappedFile
 {
     public static readonly string BaseDir;
 
-    static UnixMemoryMappedFile()
-    {
-        var user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        if (user is "/" or "")
-            user = Path.GetTempPath();
-
-        BaseDir = Path.Combine(user, ".reloaded/memory.buffers");
-    }
+    static UnixMemoryMappedFile() => BaseDir = "/tmp/.reloaded/memory.buffers";
 
     public bool AlreadyExisted { get; }
     public unsafe byte* Data { get; }

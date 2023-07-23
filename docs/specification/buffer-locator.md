@@ -169,7 +169,7 @@ Code below shows basic use of `Memory Mapped Files`:
     #include <sys/mman.h>
     #include <fcntl.h>
 
-    // BaseDir = `$HOME/.reloaded/memory.buffers`
+    // BaseDir = `/tmp/.reloaded/memory.buffers`
     previouslyExisted = true;
     int pid = getpid(); // Get current process ID
     std::string name = "/Reloaded.Memory.Buffers.MemoryBuffer, PID " + std::to_string(pid);
@@ -196,7 +196,7 @@ Code below shows basic use of `Memory Mapped Files`:
 
 !!! tip "Register the remainder of that (usually 64K) buffer after header as first [Items](#item) in the locator."
 
-!!! tip "On Linux & OSX we bind to real files; we use directory `$HOME/.reloaded/memory.buffers` for this, because on OSX there is no way to query open files to prevent memory leaks after crashes; and on Linux; some kernels don't allow executable shared memory objects."
+!!! tip "On Linux & OSX we bind to real files; we use directory `/tmp/.reloaded/memory.buffers` for this, because on OSX there is no way to query open files to prevent memory leaks after crashes; and on Linux; some kernels don't allow executable shared memory objects."
 
 For the users implementing from other languages, here are the raw OS APIs for reference:  
 
@@ -292,7 +292,7 @@ The code for this might look something like the following:
 
 !!! warning "Given expected use is in hooking frameworks where crashes are expected to be common on dev machines."
 
-In these scenarios, we cannot waste memory. For both OSX and Linux, we look through `$HOME/.reloaded/memory.buffers` for any unused mapping, and delete/unlink them.
+In these scenarios, we cannot waste memory. For both OSX and Linux, we look through `/tmp/.reloaded/memory.buffers` for any unused mapping, and delete/unlink them.
 
 In the reference library, the following code is ran upon successful opening of existing memory mapped file (i.e. only ever once per library instance).  
 
@@ -371,9 +371,7 @@ In the reference library, the following code is ran upon successful opening of e
     bool IsProcessRunning(pid_t pid);
     
     void Cleanup() {
-        const char* homeDir = getenv("HOME");
-        if (homeDir == nullptr) homeDir = getpwuid(getuid())->pw_dir;
-        CleanupPosix(std::string(homeDir) + "/.reloaded/memory.buffers");
+        CleanupPosix("/tmp/.reloaded/memory.buffers");
     }
     
     void CleanupPosix(const std::string& mmfDirectory) {
