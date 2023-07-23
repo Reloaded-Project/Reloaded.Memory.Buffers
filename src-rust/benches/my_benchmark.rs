@@ -1,10 +1,8 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use reloaded_memory_buffers::{
-    buffers::Buffers, buffers_api::BuffersApi, structs::params::BufferSearchSettings,
-};
 
 #[cfg(not(target_os = "windows"))]
 use pprof::criterion::{Output, PProfProfiler};
+use reloaded_memory_buffers::{buffers::Buffers, structs::params::BufferSearchSettings};
 
 fn get_buffer() {
     let settings = BufferSearchSettings {
