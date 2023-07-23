@@ -1,0 +1,130 @@
+use crate::internal::memory_mapped_file::MemoryMappedFile;
+use std::ffi::CString;
+use windows::core::PCSTR;
+use windows::imp::CloseHandle;
+use windows::Win32::Foundation::{HANDLE, INVALID_HANDLE_VALUE};
+use windows::Win32::System::Memory::{
+    CreateFileMappingA, MapViewOfFile, OpenFileMappingA, UnmapViewOfFile, FILE_MAP_ALL_ACCESS,
+    MEMORYMAPPEDVIEW_HANDLE, PAGE_EXECUTE_READWRITE,
+};
+
+pub struct WindowsMemoryMappedFile {
+    already_existed: bool,
+    data: *mut u8,
+    length: usize,
+    map_handle: HANDLE,
+}
+
+impl WindowsMemoryMappedFile {
+    pub fn new(name: &str, length: usize) -> WindowsMemoryMappedFile {
+        let file_name = CString::new(name).unwrap();
+        let mut already_existed = true;
+
+        unsafe {
+            let mut map_handle = OpenFileMappingA(
+                FILE_MAP_ALL_ACCESS.0,
+                false,
+                PCSTR(file_name.as_ptr() as *const u8),
+            );
+
+            // No file existed, as open failed. Try create a new one.
+            if map_handle.is_err() {
+                map_handle = CreateFileMappingA(
+                    INVALID_HANDLE_VALUE,
+                    None,
+                    PAGE_EXECUTE_READWRITE,
+                    0,
+                    length as u32,
+                    PCSTR(file_name.as_ptr() as *const u8),
+                );
+
+                already_existed = false;
+            }
+
+            let data = MapViewOfFile(
+                HANDLE(map_handle.as_mut().unwrap().0),
+                FILE_MAP_ALL_ACCESS,
+                0,
+                0,
+                length,
+            )
+            .unwrap()
+            .0 as *mut u8;
+
+            WindowsMemoryMappedFile {
+                already_existed,
+                data,
+                length,
+                map_handle: map_handle.unwrap(),
+            }
+        }
+    }
+}
+
+impl Drop for WindowsMemoryMappedFile {
+    fn drop(&mut self) {
+        unsafe {
+            UnmapViewOfFile(MEMORYMAPPEDVIEW_HANDLE(self.data as isize));
+            CloseHandle(self.map_handle.0);
+        }
+    }
+}
+
+impl MemoryMappedFile for WindowsMemoryMappedFile {
+    fn already_existed(&self) -> bool {
+        self.already_existed
+    }
+    unsafe fn data(&self) -> *mut u8 {
+        self.data
+    }
+    fn length(&self) -> usize {
+        self.length
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utilities::cached::CACHED;
+
+    #[test]
+    fn test_windows_memory_mapped_file_creation() {
+        // Let's create a memory mapped file with a specific size.
+        let file_name = format!(
+            "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
+            CACHED.this_process_id
+        );
+        let file_length = CACHED.get_allocation_granularity() as usize;
+        let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
+
+        assert_eq!(mmf.already_existed, false);
+        assert_eq!(mmf.length, file_length);
+
+        // Assert the file can be opened again (i.e., it exists)
+        let mmf_existing = WindowsMemoryMappedFile::new(&file_name, file_length);
+        assert_eq!(mmf_existing.already_existed, true);
+    }
+
+    #[test]
+    fn test_windows_memory_mapped_file_data() {
+        let file_name = format!(
+            "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
+            CACHED.this_process_id
+        );
+
+        let file_length = CACHED.get_allocation_granularity() as usize;
+        let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
+
+        // Let's test we can read and write to the data.
+        unsafe {
+            let data_ptr = mmf.data;
+            assert_ne!(data_ptr, std::ptr::null_mut());
+
+            // Write a value
+            *data_ptr = 123;
+
+            // Read it back
+            assert_eq!(*data_ptr, 123);
+        }
+    }
+}

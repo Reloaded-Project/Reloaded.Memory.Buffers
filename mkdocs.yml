@@ -52,3 +52,4 @@ nav:
       - Overview: specification/overview.md
       - Buffer Locator: specification/buffer-locator.md
       - Allocation Algorithm: specification/allocation-algorithm.md
+  - Contributing: Reloaded/Pages/contributing.md

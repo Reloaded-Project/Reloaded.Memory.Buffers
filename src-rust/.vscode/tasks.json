@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Reloaded: Cargo Watch Tarpaulin (Auto Coverage on Save)",
+        "type": "shell",
+        "command": "cargo watch -x \"tarpaulin --skip-clean --out Xml --out Html --engine llvm --target-dir target/coverage-build\" -w src/",
+        "group": "test",
+        "presentation": {
+          "reveal": "always"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Reloaded: Generate Code Coverage",
+        "type": "shell",
+        "command": "cargo tarpaulin --out Xml --out Html --engine llvm --target-dir target/coverage-build",
+        "group": "test",
+        "presentation": {
+          "reveal": "always"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+  

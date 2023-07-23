@@ -8,6 +8,15 @@
 	<a href="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers">
 		<img src="https://codecov.io/gh/Reloaded-Project/Reloaded.Memory.Buffers/branch/master/graph/badge.svg" alt="Coverage" />
 	</a>
+	<!-- Crates -->
+	<a href="https://crates.io/crates/reloaded_memory_buffers">
+		<img src="https://img.shields.io/crates/dv/reloaded_memory_buffers" alt="NuGet" />
+	</a>
+	<!-- Build Status -->
+	<a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/actions/workflows/rust-cargo-test.yml">
+		<img src="https://img.shields.io/github/actions/workflow/status/Reloaded-Project/Reloaded.Memory.Buffers/rust-cargo-test.yml" alt="Build Status" />
+	</a>
+	<br/>
 	<!-- NuGet -->
 	<a href="https://www.nuget.org/packages/Reloaded.Memory.Buffers">
 		<img src="https://img.shields.io/nuget/v/Reloaded.Memory.Buffers.svg" alt="NuGet" />
@@ -20,7 +29,7 @@
 
 ## About
 
-`Reloaded.Memory.Buffers` is a library for allocating memory between a given minimum and maximum memory address.
+`Reloaded.Memory.Buffers` is a library for allocating memory between a given minimum and maximum memory address, for C# and Rust.
 
 With the following properties:
 
@@ -46,6 +55,8 @@ These are just examples:
 ## Usage
 
 !!! info "The library provides a simple high level API to use."
+
+!!! info "See [Wiki](https://reloaded-project.github.io/Reloaded.Memory.Buffers/) for Rust usage"
 
 ### Get A Buffer
 

@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
@@ -65,9 +66,9 @@ public class BufferAllocatorTestsAllocation
         if (Polyfills.IsWindows())
         {
             if (settings.TargetProcess.Id == Polyfills.GetProcessId())
-                Kernel32.VirtualFree(item.BaseAddress, (nuint)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE);
+                Assert.True(Kernel32.VirtualFree(item.BaseAddress, (UIntPtr)0, Kernel32.MEM_ALLOCATION_TYPE.MEM_RELEASE));
             else
-                Kernel32.VirtualFreeEx((nint)settings.TargetProcess.Id, item.BaseAddress, (nuint)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_FREE);
+                Assert.True(Kernel32.VirtualFreeEx((nint)settings.TargetProcess.Id, (UIntPtr)0, (nuint)item.Size, Kernel32.MEM_ALLOCATION_TYPE.MEM_RELEASE));
         }
         else if (Polyfills.IsLinux() || Polyfills.IsMacOS())
         {

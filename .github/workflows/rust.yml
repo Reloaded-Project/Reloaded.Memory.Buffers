@@ -1,0 +1,115 @@
+name: Test and Upload Coverage
+
+on:
+  push:
+    branches: [ main, master, crab ]
+  pull_request:
+    branches: [ main, master, crab ]
+  workflow_dispatch:
+
+jobs:
+  test-native:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - id: test-rust
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/test-and-coverage@v1 # upgrade if needed
+        with:
+          rust_project_path: src-rust
+          upload_coverage: true
+          rust_branch: nightly
+
+  test-wine:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - id: test-rust
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/test-in-wine@v1 # upgrade if needed
+        with:
+          rust_project_path: src-rust
+          rust_branch: nightly
+
+  build-c-libs:
+    needs: test-native
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - id: build-libs
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1 # upgrade if needed
+        with:
+          rust_project_path: src-rust
+          target: ${{ matrix.target }}
+
+  build-c-headers:
+    needs: build-c-libs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Generate C++ bindings
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
+        with:
+          rust_project_path: src-rust
+          config_file: cbindgen_cpp.toml
+          header_file: bindings_cpp.hpp
+  
+      - name: Generate C bindings
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
+        with:
+          rust_project_path: src-rust
+          config_file: cbindgen_c.toml
+          header_file: bindings_c.h
+
+  publish-crate:
+    needs: build-c-headers
+    # Publish only on tags
+    if: startsWith(github.ref, 'refs/tags/') 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Publish to crates.io
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/publish-crate@v1
+        with:
+          rust_project_path: src-rust
+          token: ${{ secrets.CRATES_IO_TOKEN }}
+    

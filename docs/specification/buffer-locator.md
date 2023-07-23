@@ -158,37 +158,7 @@ Code below shows basic use of `Memory Mapped Files`:
         allocationGranularity);
     ```
 
-=== "C++ (Linux)"
-
-    ```cpp
-    // Note: Untested AI generated code (with manual correction), for reference only.
-    // Note: Missing error handling.
-    #include <sys/mman.h>
-    #include <sys/stat.h>
-    #include <fcntl.h>
-    #include <unistd.h>
-    #include <iostream>
-
-    // Construct the name
-    bool previouslyExisted = true;
-    int pid = getpid(); // Get current process ID
-    char bufferName[256];
-    sprintf_s(bufferName, sizeof(bufferName), "/Reloaded.Memory.Buffers.MemoryBuffer, PID %d", pid); 
-
-    // Open Memory Mapped File
-    int fd = shm_open(bufferName, O_RDWR, S_IRUSR | S_IWUSR);
-    if (fd == -1) {
-        // If the file mapping object doesn't exist, create it
-        fd = shm_open(bufferName, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
-        ftruncate(fd, 4096);
-        previouslyExisted = false;
-    }
-
-    // Map the view
-    void* data = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    ```
-
-=== "C++ (OSX)"
+=== "C++ (OSX & LINUX)"
 
     ```cpp
     // Note: Untested AI generated code (with manual correction), for reference only.
@@ -226,15 +196,14 @@ Code below shows basic use of `Memory Mapped Files`:
 
 !!! tip "Register the remainder of that (usually 64K) buffer after header as first [Items](#item) in the locator."
 
-!!! tip "On OSX we bind to real files; we use directory `$HOME/.reloaded/memory.buffers` for this, because there is no way to query open files to prevent memory leaks after crashes."
+!!! tip "On Linux & OSX we bind to real files; we use directory `$HOME/.reloaded/memory.buffers` for this, because on OSX there is no way to query open files to prevent memory leaks after crashes; and on Linux; some kernels don't allow executable shared memory objects."
 
 For the users implementing from other languages, here are the raw OS APIs for reference:  
 
-| Platform | APIs                                                                       |
-|----------|----------------------------------------------------------------------------|
-| Windows  | `CreateFileMapping`, `OpenFileMapping`, `MapViewOfFile`, `UnmapViewOfFile` |
-| Linux    | `shm_open`, `shm_unlink`, `mmap`, `munmap`                                 |
-| OSX      | `open`, `close`, `mmap`, `munmap`                                          |
+| Platform            | APIs                                                                       |
+|---------------------|----------------------------------------------------------------------------|
+| Windows             | `CreateFileMapping`, `OpenFileMapping`, `MapViewOfFile`, `UnmapViewOfFile` |
+| Linux & OSX (Posix) | `open`, `close`, `mmap`, `munmap`                                          |
 
 Notice the presence of `previouslyExisted` bool.  
 This is used to determine if the locator structure needs to be kept alive.
@@ -323,9 +292,7 @@ The code for this might look something like the following:
 
 !!! warning "Given expected use is in hooking frameworks where crashes are expected to be common on dev machines."
 
-In these scenarios, we cannot waste memory. For Linux, we can look through `/dev/shm` for any unused mapping, and unlink them.  
-
-For OSX we look through `$HOME/.reloaded/memory.buffers` for any unused mapping, and unlink them.  
+In these scenarios, we cannot waste memory. For both OSX and Linux, we look through `$HOME/.reloaded/memory.buffers` for any unused mapping, and delete/unlink them.
 
 In the reference library, the following code is ran upon successful opening of existing memory mapped file (i.e. only ever once per library instance).  
 
@@ -337,28 +304,18 @@ In the reference library, the following code is ran upon successful opening of e
         // Keep the view around forever for other modThjers/programs/etc. to use.
     
         // Note: At runtime this is only ever executed once per library instance, so this should be okay.
-        // On Linux we need to execute a runtime check to ensure that after a crash, no MMF was left over.
+        // On Linux and OSX we need to execute a runtime check to ensure that after a crash, no MMF was left over.
         // because the OS does not auto dispose them.
-        if (Polyfills.IsLinux())
+        CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
         {
-            const string shmDirectoryPath = "/dev/shm";
-            CleanupPosix(shmDirectoryPath, (path) => Posix.shm_unlink(path));
-        }
-        else if (Polyfills.IsMacOS())
-        {
-            CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
-            {
-                try { File.Delete(path); }
-                catch (Exception) { /* Ignored */ }
-            });
-        }
+            try { File.Delete(path); }
+            catch (Exception) { /* Ignored */ }
+        });
     }
     
     private static void CleanupPosix(string mmfDirectory, Action<string> deleteFile)
     {
         const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
-    
-        // Read all files in /dev/shm
         var files = Directory.EnumerateFiles(mmfDirectory);
     
         foreach (var file in files)
@@ -414,13 +371,9 @@ In the reference library, the following code is ran upon successful opening of e
     bool IsProcessRunning(pid_t pid);
     
     void Cleanup() {
-    #ifdef __linux__
-        CleanupPosix("/dev/shm");
-    #elif __APPLE__
         const char* homeDir = getenv("HOME");
         if (homeDir == nullptr) homeDir = getpwuid(getuid())->pw_dir;
         CleanupPosix(std::string(homeDir) + "/.reloaded/memory.buffers");
-    #endif
     }
     
     void CleanupPosix(const std::string& mmfDirectory) {
@@ -442,11 +395,7 @@ In the reference library, the following code is ran upon successful opening of e
     
                 if (!IsProcessRunning(pid)) {
                     std::string filePath = mmfDirectory + "/" + fileName;
-    #ifdef __linux__
-                    shm_unlink(filePath.c_str());
-    #elif __APPLE__
                     std::remove(filePath.c_str());
-    #endif
                 }
             }
             closedir(dir);
@@ -492,7 +441,7 @@ item->IsTaken = 0;
 
 !!! tip "[Allocation algorithm is documented here](./allocation-algorithm.md)"
 
-!!! tip "Use C# high level API (detailed in [usage](../usage.md)) for additional reference."
+!!! tip "Use C# high level API (detailed in [usage](../index.md#usage)) for additional reference."
 
 If an additional buffer requires to be allocated, the following steps are taken:
 

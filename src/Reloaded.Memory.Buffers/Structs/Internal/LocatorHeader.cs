@@ -222,6 +222,7 @@ internal unsafe struct LocatorHeader
             var target = GetItem(NumItems);
             *target = result;
             item = new SafeLocatorItem(target);
+            NumItems++;
             return true;
         }
         finally

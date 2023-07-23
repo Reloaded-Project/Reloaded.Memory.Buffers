@@ -43,5 +43,5 @@ internal partial class Mach
     }
 
     public const int VM_REGION_BASIC_INFO_64 = 9;
-    public const int VM_REGION_BASIC_INFO_COUNT = 64; // sizeof(vm_region_basic_info_64)
+    public const int VM_REGION_BASIC_INFO_COUNT = 9; // sizeof(vm_region_basic_info_64) / sizeof(int)
 }

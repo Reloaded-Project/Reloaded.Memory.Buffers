@@ -115,7 +115,7 @@ internal static partial class BufferAllocator
             // Sanity test in case of '0' value input.
             if (allocated != addr)
             {
-                k32.VirtualFree(allocated, (nuint)settings.Size);
+                k32.VirtualFree(allocated, (UIntPtr)0);
                 continue;
             }
 

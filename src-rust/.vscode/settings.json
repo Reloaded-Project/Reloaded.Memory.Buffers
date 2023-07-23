@@ -1,0 +1,14 @@
+{
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "[rust]": {
+        "editor.formatOnSave": true
+    },
+    "coverage-gutters.coverageFileNames": [
+        "cobertura.xml",
+        "lcov.info",
+        "cov.xml",
+        "coverage.xml",
+        "jacoco.xml",
+        "coverage.cobertura.xml"
+    ]
+}

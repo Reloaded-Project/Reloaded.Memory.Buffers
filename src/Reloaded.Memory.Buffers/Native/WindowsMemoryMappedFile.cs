@@ -41,7 +41,9 @@ internal class WindowsMemoryMappedFile : IMemoryMappedFile
     /// <inheritdoc />
     public void Dispose()
     {
-        _memoryMappedFile.Dispose();
         _view.Dispose();
+
+        if (!AlreadyExisted)
+            _memoryMappedFile.Dispose();
     }
 }

@@ -1,0 +1,7 @@
+﻿[build]
+# Note: This breaks IntelliJ Rust. Remove this line temporarily if working from that IDE.
+# target = ['x86_64-unknown-linux-gnu','x86_64-apple-darwin','x86_64-pc-windows-gnu']
+
+# This is needed for Memory Mapped File based Tests.
+[env]
+RUST_TEST_THREADS = "1"

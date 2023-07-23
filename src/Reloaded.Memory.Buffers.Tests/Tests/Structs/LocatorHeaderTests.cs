@@ -206,7 +206,9 @@ public class LocatorHeaderTests
         nuint maxAddress = Cached.GetMaxAddress();
 
         // Act
+        var itemCount = header->NumItems;
         bool result = header->TryAllocateItem(size, minAddress, maxAddress, out var item);
+        header->NumItems.Should().Be((byte)(itemCount + 1));
 
         // Assert
         result.Should().BeTrue();
@@ -231,7 +233,9 @@ public class LocatorHeaderTests
         nuint maxAddress = uint.MaxValue;
 
         // Act
+        var itemCount = header->NumItems;
         bool result = header->TryAllocateItem(size, minAddress, maxAddress, out var item);
+        header->NumItems.Should().Be(itemCount);
 
         // Assert
         result.Should().BeFalse();

@@ -15,32 +15,22 @@ internal static partial class LocatorHeaderFinder
         // Keep the view around forever for other mods/programs/etc. to use.
 
         // Note: At runtime this is only ever executed once per library instance, so this should be okay.
-        // On Linux we need to execute a runtime check to ensure that after a crash, no MMF was left over.
+        // On Linux and OSX we need to execute a runtime check to ensure that after a crash, no MMF was left over.
         // because the OS does not auto dispose them.
-        if (Polyfills.IsLinux())
-        {
-            const string shmDirectoryPath = "/dev/shm";
-            CleanupPosix(shmDirectoryPath, (path) => Posix.shm_unlink(path));
-        }
-        else if (Polyfills.IsMacOS())
-        {
 #pragma warning disable RCS1075
 #pragma warning disable CA1416
-            CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
-            {
-                try { File.Delete(path); }
-                catch (Exception) { /* Ignored */ }
-            });
+        CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
+        {
+            try { File.Delete(path); }
+            catch (Exception) { /* Ignored */ }
+        });
 #pragma warning restore RCS1075
 #pragma warning restore CA1416
-        }
     }
 
     private static void CleanupPosix(string mmfDirectory, Action<string> deleteFile)
     {
         const string memoryMappedFilePrefix = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
-
-        // Read all files in /dev/shm
         var files = Directory.EnumerateFiles(mmfDirectory);
 
         foreach (var file in files)
