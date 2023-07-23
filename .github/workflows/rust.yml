@@ -79,6 +79,10 @@ jobs:
     needs: build-c-libs
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
       - name: Generate C++ bindings
         uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
         with:
