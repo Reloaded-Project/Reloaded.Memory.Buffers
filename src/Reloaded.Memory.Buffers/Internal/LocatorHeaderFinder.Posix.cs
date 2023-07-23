@@ -19,11 +19,14 @@ internal static partial class LocatorHeaderFinder
         // because the OS does not auto dispose them.
 #pragma warning disable RCS1075
 #pragma warning disable CA1416
-        CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
+        if (Polyfills.IsMacOS() || Polyfills.IsLinux())
         {
-            try { File.Delete(path); }
-            catch (Exception) { /* Ignored */ }
-        });
+            CleanupPosix(UnixMemoryMappedFile.BaseDir, (path) =>
+            {
+                try { File.Delete(path); }
+                catch (Exception) { /* Ignored */ }
+            });
+        }
 #pragma warning restore RCS1075
 #pragma warning restore CA1416
     }
