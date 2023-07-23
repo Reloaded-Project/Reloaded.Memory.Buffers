@@ -41,7 +41,6 @@ jobs:
           rust_branch: nightly
 
   build-c-libs:
-    needs: test-native
     strategy:
       matrix:
         include:
@@ -76,7 +75,6 @@ jobs:
           target: ${{ matrix.target }}
 
   build-c-headers:
-    needs: build-c-libs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -98,7 +96,7 @@ jobs:
           header_file: bindings_c.h
 
   publish-crate:
-    needs: build-c-headers
+    needs: ["build-c-headers", "build-c-libs", "test-wine", "test-native"]
     # Publish only on tags
     if: startsWith(github.ref, 'refs/tags/') 
     runs-on: ubuntu-latest
