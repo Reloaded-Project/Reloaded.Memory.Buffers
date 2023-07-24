@@ -112,6 +112,19 @@ jobs:
         with:
           path: artifacts
 
+      - name: Compress Artifacts
+        shell: bash
+        run: |
+          dir="artifacts" # Replace with your subdirectory
+          for subdir in "$dir"/*; do
+            if [ -d "$subdir" ]; then
+              base=$(basename "$subdir")
+              zip -r "$dir/$base.zip" "$subdir"
+              rm -r "$subdir"
+            fi
+          done
+          ls -A ./artifacts
+
       - name: GitHub Release Artifacts
         uses: softprops/action-gh-release@v1
         with:
