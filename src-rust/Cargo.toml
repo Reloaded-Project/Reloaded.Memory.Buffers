@@ -3,6 +3,7 @@ name = "reloaded-memory-buffers"
 version = "3.0.4"
 edition = "2021"
 authors = [ "sewer56" ]
+description = "Shared, Concurrent, Permanent Memory Allocator tied to Process Lifetime"
 documentation = "https://reloaded-project.github.io/Reloaded.Memory.Buffers/"
 readme = "../README.md"
 repository = "https://github.com/Reloaded-Project/Reloaded.Memory.Buffers"
