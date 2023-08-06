@@ -218,6 +218,37 @@ mod tests {
         }
     }
 
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn memory_is_executable() {
+        let settings = BufferSearchSettings {
+            min_address: (CACHED.max_address / 2),
+            max_address: CACHED.max_address,
+            size: 4096,
+        };
+
+        let item = Buffers::get_buffer(&settings).unwrap();
+
+        // Prepare a simple piece of x86_64 code: `mov rax, 0x1234567812345678; ret`
+        let code = [
+            0x48, 0xB8, 0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34,
+            0x12, // mov rax, 0x1234567812345678
+            0xC3, // ret
+        ];
+
+        unsafe {
+            let code_ptr = (*item.item.get()).base_address.value as *mut u8;
+            item.append_bytes(&code);
+
+            // Cast the buffer to a function pointer and execute it.
+            let func: extern "C" fn() -> u64 = std::mem::transmute(code_ptr);
+
+            // If the memory is executable, this will return 0x1234567812345678.
+            let result = func();
+            assert_eq!(result, 0x1234567812345678);
+        }
+    }
+
     #[rstest]
     #[case(64)]
     #[case(128)]

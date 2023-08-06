@@ -5,7 +5,8 @@ use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
 use crate::utilities::wrappers::Unaligned;
 use libc::{mach_msg_type_number_t, mach_port_t, mach_task_self, mach_vm_size_t};
-use mach::vm::{mach_vm_allocate, mach_vm_region};
+use mach::vm::{mach_vm_allocate, mach_vm_deallocate, mach_vm_protect, mach_vm_region};
+use mach::vm_prot::*;
 use mach::vm_region;
 use mach::vm_region::vm_region_basic_info_data_64_t;
 use mach::vm_types::mach_vm_address_t;
@@ -118,7 +119,7 @@ fn try_allocate_buffer(
 
     for addr in buffer_pointers {
         let mut allocated: mach_vm_address_t = *addr as mach_vm_address_t;
-        let kr = unsafe {
+        let mut kr = unsafe {
             mach_vm_allocate(
                 self_task,
                 &mut allocated,
@@ -128,6 +129,24 @@ fn try_allocate_buffer(
         };
 
         if kr != 0 {
+            continue;
+        }
+
+        kr = unsafe {
+            mach_vm_protect(
+                self_task,
+                allocated,
+                settings.size as mach_vm_size_t,
+                0,
+                VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE,
+            )
+        };
+
+        if kr != 0 {
+            unsafe {
+                mach_vm_deallocate(self_task, allocated, settings.size as mach_vm_size_t);
+            }
+
             continue;
         }
 
