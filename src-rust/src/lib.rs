@@ -79,7 +79,11 @@ pub mod structs {
     pub mod private_allocation;
     pub use private_allocation::PrivateAllocation;
 
-    pub(crate) mod internal {
+    /// Provides access to underlying internal structures.
+    /// i.e. The Raw structures used in the backend.
+    ///
+    /// Unsafe and for advanced users only, not recommended for general use.
+    pub mod internal {
         pub mod locator_item;
         pub use locator_item::LocatorItem;
 

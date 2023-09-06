@@ -33,16 +33,17 @@ pub(crate) const MAX_ITEM_COUNT: u32 =
 /// Represents the header of an individual memory locator.
 #[repr(C, align(1))]
 pub struct LocatorHeader {
-    pub(crate) this_address: Unaligned<*mut LocatorHeader>,
-    pub(crate) next_locator_ptr: Unaligned<*mut LocatorHeader>,
-    pub(crate) is_locked: AtomicI32,
-    pub(crate) flags: u8,
-    pub(crate) num_items: u8,
+    pub this_address: Unaligned<*mut LocatorHeader>,
+    pub next_locator_ptr: Unaligned<*mut LocatorHeader>,
+    pub is_locked: AtomicI32,
+    pub flags: u8,
+    pub num_items: u8,
     padding: [u8; 2],
 }
 
 impl LocatorHeader {
     /// Creates a new LocatorHeader instance.
+    #[allow(clippy::new_without_default)]
     #[cfg(test)]
     pub fn new() -> Self {
         LocatorHeader {
@@ -141,16 +142,16 @@ impl LocatorHeader {
     }
 
     /// Gets the first item.
-    pub unsafe fn get_first_item(&self) -> *mut LocatorItem {
+    pub fn get_first_item(&self) -> *mut LocatorItem {
         // Add 1 to the address to get the address of the first item.
-        (self as *const LocatorHeader).add(1) as *mut LocatorItem
+        unsafe { (self as *const LocatorHeader).add(1) as *mut LocatorItem }
     }
 
     /// Gets the item at a specific index.
     ///
     /// index: Index to get item at.
-    pub unsafe fn get_item(&self, index: usize) -> *mut LocatorItem {
-        self.get_first_item().add(index)
+    pub fn get_item(&self, index: usize) -> *mut LocatorItem {
+        unsafe { self.get_first_item().add(index) }
     }
 
     /// Gets the first available item with a lock.
@@ -160,6 +161,10 @@ impl LocatorHeader {
     /// * `size` - Required size of the buffer.
     /// * `min_address` - Minimum address for the allocation.
     /// * `max_address` - Maximum address for the allocation.
+    ///
+    /// # Safety
+    ///
+    /// Uses raw pointers, thus is technically unsafe.
     ///
     /// # Returns
     ///

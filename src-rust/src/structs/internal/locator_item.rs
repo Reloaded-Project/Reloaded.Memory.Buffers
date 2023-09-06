@@ -152,6 +152,10 @@ impl LocatorItem {
     /// It is the caller's responsibility to ensure there is sufficient space in the buffer.
     /// When returning buffers from the library, the library will ensure there's at least the requested amount of space;
     /// so if the total size of your data falls under that space, you are good.
+    ///
+    /// # Safety
+    ///
+    /// Uses raw pointers, thus is technically unsafe.
     pub unsafe fn append_copy<T>(&mut self, data: T) -> usize
     where
         T: Copy,
