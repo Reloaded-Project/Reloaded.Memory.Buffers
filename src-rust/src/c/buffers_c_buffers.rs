@@ -27,13 +27,13 @@ use super::{
 pub struct AllocationResult {
     /// This is true if the 'ok' field can be consumed.
     /// If this is false, read the error in 'err' field, then free it with 'free_string'.
-    is_ok: bool,
+    pub is_ok: bool,
 
     /// The details of the successful allocation information.
-    ok: PrivateAllocation,
+    pub ok: PrivateAllocation,
 
     /// An error.
-    err: *const c_char,
+    pub err: *const c_char,
 }
 
 /// The result of fetching a buffer.
@@ -41,13 +41,13 @@ pub struct AllocationResult {
 pub struct GetBufferResult {
     /// This is true if the 'ok' field can be consumed.
     /// If this is false, read the error in 'err' field, then free it with 'free_string'.
-    is_ok: bool,
+    pub is_ok: bool,
 
     /// The details of the fetched buffer.
-    ok: *mut LocatorItem,
+    pub ok: *mut LocatorItem,
 
     /// An error.
-    err: *const c_char,
+    pub err: *const c_char,
 }
 
 /// Allocates some memory with user specified settings.
