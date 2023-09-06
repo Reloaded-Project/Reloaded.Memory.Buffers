@@ -906,7 +906,7 @@ checksum = "4bf2521270932c3c7bed1a59151222bd7643c79310f2916f01925e1e16255698"
 
 [[package]]
 name = "reloaded-memory-buffers"
-version = "3.1.1"
+version = "3.1.2"
 dependencies = [
  "criterion",
  "dirs",
