@@ -36,7 +36,7 @@ pub struct BuffersFunctions {
     /// # Returns
     ///
     /// Item allowing you to write to the buffer.
-    /// Make sure you drop it, by using `drop` function.
+    /// Make sure you free it when done, by using `free_get_buffer_result` function.
     ///
     /// # Remarks
     ///
@@ -65,7 +65,7 @@ pub struct BuffersFunctions {
     /// # Returns
     ///
     /// Item allowing you to write to the buffer.
-    /// Make sure you drop it, by using `drop` function.
+    /// Make sure you free it when done, by using `free_get_buffer_result` function.
     ///
     /// # Remarks
     ///
