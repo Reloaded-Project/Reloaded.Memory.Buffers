@@ -187,8 +187,10 @@ pub extern "C" fn free_string(s: *mut c_char) {
 
 /// Frees an error string returned from the library.
 #[no_mangle]
-pub unsafe extern "C" fn free_locator_item(item: *mut LocatorItem) {
-    (*item).unlock();
+pub extern "C" fn free_locator_item(item: *mut LocatorItem) {
+    unsafe {
+        (*item).unlock();
+    }
 }
 
 /// Frees a private allocation returned from the library.
@@ -209,7 +211,7 @@ pub extern "C" fn free_allocation_result(item: AllocationResult) {
 
 /// Frees a get buffer result returned from the 'buffers' operation.
 #[no_mangle]
-pub unsafe extern "C" fn free_get_buffer_result(item: GetBufferResult) {
+pub extern "C" fn free_get_buffer_result(item: GetBufferResult) {
     if item.is_ok {
         free_locator_item(item.ok);
     } else {
@@ -367,14 +369,12 @@ mod tests {
 
         if result.is_ok {
             // Check that the address is aligned as expected.
-            unsafe {
-                assert_eq!(
-                    crate::c::buffers_c_locatoritem::locatoritem_min_address(result.ok)
-                        % alignment as usize,
-                    0
-                );
-                free_get_buffer_result(result);
-            }
+            assert_eq!(
+                crate::c::buffers_c_locatoritem::locatoritem_min_address(result.ok)
+                    % alignment as usize,
+                0
+            );
+            free_get_buffer_result(result);
         } else {
             // Handle the error (just print here).
             println!("Error getting buffer: {:?}", result.err);
@@ -400,12 +400,10 @@ mod tests {
 
         assert!(result.is_ok);
 
-        unsafe {
-            assert!(locatoritem_bytes_left(result.ok) >= SIZE as u32);
+        assert!(locatoritem_bytes_left(result.ok) >= SIZE as u32);
 
-            let offset = (locatoritem_min_address(result.ok) as i64 - base_address as i64).abs();
-            assert!(offset < (i32::MAX as i64));
-            free_get_buffer_result(result);
-        }
+        let offset = (locatoritem_min_address(result.ok) as i64 - base_address as i64).abs();
+        assert!(offset < (i32::MAX as i64));
+        free_get_buffer_result(result);
     }
 }

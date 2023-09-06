@@ -121,10 +121,13 @@ pub(crate) mod utilities {
     pub mod linux_map_parser;
 }
 
+/// Provides a C interface to the library.
 pub mod c {
-    mod buffers_c_buffers;
-    mod buffers_c_locatoritem;
-    mod buffers_fnptr;
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
+    pub mod buffers_c_buffers;
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
+    pub mod buffers_c_locatoritem;
+    pub mod buffers_fnptr;
 }
 
 pub mod buffers;

@@ -25,7 +25,7 @@ pub struct UnixMemoryMappedFile {
 impl UnixMemoryMappedFile {
     pub fn new(name: &str, length: usize) -> UnixMemoryMappedFile {
         let mut new_name = String::with_capacity(BASE_DIR.len() + name.len());
-        new_name.push_str(&BASE_DIR);
+        new_name.push_str(BASE_DIR);
         new_name.push_str(name);
 
         let file_name = CString::new(new_name.to_string()).expect("CString::new failed");
