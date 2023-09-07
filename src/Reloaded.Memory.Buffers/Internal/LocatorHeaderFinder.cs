@@ -12,6 +12,7 @@ internal static unsafe partial class LocatorHeaderFinder
 {
     private static LocatorHeader* s_locatorHeaderAddress;
     private static IMemoryMappedFile? s_mmf;
+    private static object _lock = new();
 
     /// <summary>
     ///     Retrieves the address of the first locator.
@@ -34,24 +35,27 @@ internal static unsafe partial class LocatorHeaderFinder
         }
 
         // Create or open the memory-mapped file
-        IMemoryMappedFile mmf = OpenOrCreateMemoryMappedFile();
-
-        // If the MMF previously existed, we need to read the real address from the header, then close
-        // our mapping.
-        if (mmf.AlreadyExisted)
+        lock (_lock)
         {
-            s_locatorHeaderAddress = ((LocatorHeader*)mmf.Data)->ThisAddress;
-            reason = FindReason.PreviouslyExisted;
-            mmf.Dispose();
+            IMemoryMappedFile mmf = OpenOrCreateMemoryMappedFile();
+
+            // If the MMF previously existed, we need to read the real address from the header, then close
+            // our mapping.
+            if (mmf.AlreadyExisted)
+            {
+                s_locatorHeaderAddress = ((LocatorHeader*)mmf.Data)->ThisAddress;
+                reason = FindReason.PreviouslyExisted;
+                mmf.Dispose();
+                return s_locatorHeaderAddress;
+            }
+
+            Cleanup();
+            s_mmf = mmf;
+            s_locatorHeaderAddress = (LocatorHeader*)mmf.Data;
+            s_locatorHeaderAddress->Initialize(mmf.Length);
+            reason = FindReason.Created;
             return s_locatorHeaderAddress;
         }
-
-        Cleanup();
-        s_mmf = mmf;
-        s_locatorHeaderAddress = (LocatorHeader*)mmf.Data;
-        s_locatorHeaderAddress->Initialize(mmf.Length);
-        reason = FindReason.Created;
-        return s_locatorHeaderAddress;
     }
 
     internal static IMemoryMappedFile OpenOrCreateMemoryMappedFile()
