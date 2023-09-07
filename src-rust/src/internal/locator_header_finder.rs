@@ -142,7 +142,9 @@ impl LocatorHeaderFinder {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn is_process_running(pid: i32) -> bool {
-        unsafe { kill(pid, 0) != 0 }
+        unsafe {
+            return kill(pid, 0) == 0 || *libc::__errno_location() == libc::EPERM;
+        }
     }
 }
 
