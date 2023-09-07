@@ -6,7 +6,7 @@
     <RootNamespace>Reloaded.Memory.Buffers</RootNamespace>
     <PackageProjectUrl>https://github.com/Reloaded-Project/Reloaded.Memory.Buffers</PackageProjectUrl>
     <Description>An implementation of efficient, shared, concurrent and permanent storage of objects in unmanaged memory in static, non-changing locations that last the lifetime of a given process. Allows allocating memory between a given minimum and maximum address. Useful stuff for DLL Injection and Hooking.</Description>
-    <Version>3.0.5</Version>
+    <Version>3.0.6</Version>
     <Authors>Sewer56</Authors>
     <Product>Reloaded Memory Buffers Library</Product>
     <PackageId>Reloaded.Memory.Buffers</PackageId>
