@@ -1,3 +1,5 @@
+use core::fmt::Display;
+
 use crate::structs::params::BufferSearchSettings;
 
 #[derive(Debug, Clone)]
@@ -6,7 +8,7 @@ pub struct BufferSearchError {
     pub text: &'static str,
 }
 
-impl std::fmt::Display for BufferSearchError {
+impl Display for BufferSearchError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
