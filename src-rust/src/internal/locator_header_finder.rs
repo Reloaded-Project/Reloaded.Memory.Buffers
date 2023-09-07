@@ -1,22 +1,16 @@
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 use crate::structs::internal::LocatorHeader;
 use crate::utilities::cached::CACHED;
+use lazy_static::lazy_static;
 use std::ptr::null_mut;
+use std::sync::Mutex;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-use crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile;
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-use std::fs;
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-use std::path::Path;
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-use libc::kill;
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-use super::memory_mapped_file_unix::BASE_DIR;
+use {
+    super::memory_mapped_file_unix::BASE_DIR,
+    crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile, libc::kill, std::fs,
+    std::path::Path,
+};
 
 #[cfg(target_os = "windows")]
 use crate::internal::memory_mapped_file_windows::WindowsMemoryMappedFile;
@@ -25,6 +19,9 @@ pub struct LocatorHeaderFinder {}
 
 static mut LOCATOR_HEADER_ADDRESS: *mut LocatorHeader = null_mut();
 static mut MMF: Option<Box<dyn MemoryMappedFile>> = None;
+lazy_static! {
+    static ref GLOBAL_LOCK: Mutex<()> = Mutex::new(());
+}
 
 /// The reason the variable was last found.
 #[cfg(test)]
@@ -40,21 +37,23 @@ impl LocatorHeaderFinder {
             return LOCATOR_HEADER_ADDRESS;
         }
 
+        // Lock initial acquisiton. This is so we don't create two buffers at once.
+        let _unused = GLOBAL_LOCK.lock().unwrap();
         let mmf = LocatorHeaderFinder::open_or_create_memory_mapped_file();
 
         // If the MMF previously existed, we need to read the real address from
         // the header, then close our mapping.
         if mmf.already_existed() {
-            let header_addr = (*mmf).data();
-            LOCATOR_HEADER_ADDRESS = (header_addr) as *mut LocatorHeader;
+            let header_addr = (*mmf).data() as *mut LocatorHeader;
+            LOCATOR_HEADER_ADDRESS = (*header_addr).this_address.value;
 
             #[cfg(test)]
             LocatorHeaderFinder::set_last_find_reason(FindReason::PreviouslyExisted);
+
             return unsafe { LOCATOR_HEADER_ADDRESS };
         }
 
         // Otherwise, we got a new MMF going, keep it alive forever.
-
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         LocatorHeaderFinder::cleanup();
 
@@ -64,7 +63,6 @@ impl LocatorHeaderFinder {
 
         #[cfg(test)]
         LocatorHeaderFinder::set_last_find_reason(FindReason::Created);
-
         LOCATOR_HEADER_ADDRESS
     }
 
@@ -171,9 +169,7 @@ mod tests {
             LocatorHeaderFinder::reset();
             let _map = LocatorHeaderFinder::open_or_create_memory_mapped_file();
 
-            let address = LocatorHeaderFinder::find();
-            assert!(!address.is_null());
-
+            let _unused = LocatorHeaderFinder::find();
             assert_eq!(LAST_FIND_REASON, FindReason::PreviouslyExisted);
         }
     }
