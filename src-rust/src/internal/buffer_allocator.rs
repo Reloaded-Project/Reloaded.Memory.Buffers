@@ -328,7 +328,7 @@ mod tests {
         #[cfg(target_os = "windows")]
         free_windows(item);
 
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(unix)]
         free_libc(item);
     }
 
@@ -340,7 +340,7 @@ mod tests {
         assert!(success);
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     fn free_libc(item: LocatorItem) {
         unsafe {
             libc::munmap(item.base_address.value as *mut c_void, item.size as usize);

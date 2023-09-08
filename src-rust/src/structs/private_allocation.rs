@@ -1,26 +1,22 @@
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::ffi::c_void;
-
 use std::ptr::NonNull;
 
 use crate::utilities::cached::CACHED;
-#[cfg(target_os = "windows")]
-use windows::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE};
-
-#[cfg(target_os = "macos")]
-use mach::kern_return::KERN_SUCCESS;
-
-#[cfg(target_os = "macos")]
-use mach::traps::mach_task_self;
-
-#[cfg(target_os = "macos")]
-use mach::vm::mach_vm_deallocate;
-
-#[cfg(target_os = "macos")]
-use mach::vm_types::{mach_vm_address_t, mach_vm_size_t};
 
 #[cfg(target_os = "windows")]
-use crate::internal::buffer_allocator_windows::ProcessHandle;
+use {
+    crate::internal::buffer_allocator_windows::ProcessHandle,
+    windows::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE},
+};
+
+#[cfg(target_os = "macos")]
+use {
+    mach::kern_return::KERN_SUCCESS,
+    mach::traps::mach_task_self,
+    mach::vm::mach_vm_deallocate,
+    mach::vm_types::{mach_vm_address_t, mach_vm_size_t},
+};
 
 /// Provides information about a recently made allocation.
 ///

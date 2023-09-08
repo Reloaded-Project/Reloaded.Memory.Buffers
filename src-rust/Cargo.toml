@@ -32,6 +32,9 @@ pprof = { version = "0.12", features = ["flamegraph", "criterion"] }
 [target.'cfg(target_os = "macos")'.dependencies]
 mach = "0.3.2"
 
+[target.'cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))'.dependencies]
+mmap-rs = "0.6.0"
+
 [target.'cfg(target_os = "windows")'.dependencies.windows]
 version = "0.48.0"
 features = [
