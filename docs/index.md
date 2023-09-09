@@ -46,6 +46,8 @@ With the following properties:
 - ***Large Address Aware:*** On Windows, the library can correctly leverage all 4GB in 32-bit processes.  
 - ***Cross Platform***: Supports Windows, OSX and Linux.  
 
+Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited) Android support](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/3).
+
 ## Example Use Cases
 
 !!! tip "These are just examples."
