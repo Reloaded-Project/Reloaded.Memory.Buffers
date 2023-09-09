@@ -220,7 +220,7 @@ mod tests {
 
     #[cfg(target_arch = "x86_64")]
     #[test]
-    fn memory_is_executable() {
+    fn memory_is_executable_x64() {
         let settings = BufferSearchSettings {
             min_address: (CACHED.max_address / 2),
             max_address: CACHED.max_address,
@@ -239,6 +239,39 @@ mod tests {
         unsafe {
             let code_ptr = (*item.item.get()).base_address.value as *mut u8;
             item.append_bytes(&code);
+
+            // Cast the buffer to a function pointer and execute it.
+            let func: extern "C" fn() -> u64 = std::mem::transmute(code_ptr);
+
+            // If the memory is executable, this will return 0x1234567812345678.
+            let result = func();
+            assert_eq!(result, 0x1234567812345678);
+        }
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[test]
+    fn memory_is_executable_aarch64() {
+        let settings = BufferSearchSettings {
+            min_address: (CACHED.max_address / 2),
+            max_address: CACHED.max_address,
+            size: 4096,
+        };
+
+        let item = Buffers::get_buffer(&settings).unwrap();
+
+        // Prepare a simple piece of x86_64 code: `mov rax, 0x1234567812345678; ret`
+        let code = [
+            0x00, 0xCF, 0x8A, 0xD2, // movz x0, #0x5678, LSL #0
+            0x80, 0x46, 0xA2, 0xF2, // movk x0, #0x1234, LSL #16
+            0x00, 0xCF, 0xCA, 0xF2, // movk x0, #0x5678, LSL #32
+            0x80, 0x46, 0xE2, 0xF2, // movk x0, #0x1234, LSL #48
+            0xC0, 0x03, 0x5F, 0xD6, // ret
+        ];
+
+        unsafe {
+            let code_ptr = (*item.item.get()).base_address.value as *mut u8;
+            item.append_code(&code);
 
             // Cast the buffer to a function pointer and execute it.
             let func: extern "C" fn() -> u64 = std::mem::transmute(code_ptr);
