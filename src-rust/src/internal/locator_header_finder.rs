@@ -162,8 +162,7 @@ unsafe fn init_locatorheader_standard() -> *mut LocatorHeader {
 unsafe fn init_locatorheader_memorymappedfiles_unsupported() -> *mut LocatorHeader {
     let mmap = MmapOptions::new(MmapOptions::allocation_granularity())
         .unwrap()
-        .with_unsafe_flags(UnsafeMmapFlags::JIT)
-        .map_exec_mut()
+        .map_mut()
         .unwrap();
 
     LOCATOR_HEADER_ADDRESS = mmap.start() as *mut LocatorHeader;

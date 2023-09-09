@@ -63,7 +63,7 @@ impl UnixMemoryMappedFile {
             mmap(
                 std::ptr::null_mut::<c_void>(),
                 length,
-                PROT_READ | PROT_WRITE | PROT_EXEC,
+                PROT_READ | PROT_WRITE,
                 MAP_SHARED,
                 file_descriptor,
                 0,
