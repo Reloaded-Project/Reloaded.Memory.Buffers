@@ -19,6 +19,10 @@ pub fn allocate(
 
     #[cfg(target_os = "macos")]
     return crate::internal::buffer_allocator_osx::allocate_osx(settings);
+
+    // Fallback for non-hot-path OSes.
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    crate::internal::buffer_allocator_mmap_rs::allocate_mmap_rs(settings)
 }
 
 pub unsafe fn get_possible_buffer_addresses(

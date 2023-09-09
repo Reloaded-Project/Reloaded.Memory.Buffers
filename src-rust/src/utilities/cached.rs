@@ -3,15 +3,6 @@ use std::process;
 #[cfg(target_os = "windows")]
 use windows::Win32::System::SystemInformation::{GetSystemInfo, SYSTEM_INFO};
 
-#[cfg(not(target_os = "windows"))]
-use libc;
-
-#[cfg(target_os = "linux")]
-const SC_PAGESIZE: i32 = 30; // from `man 3 sysconf`
-
-#[cfg(target_os = "macos")]
-const SC_PAGESIZE: i32 = 29; // from `man 3 sysconf`
-
 lazy_static! {
     pub static ref CACHED: Cached = Cached::new();
 }
@@ -37,15 +28,12 @@ impl Cached {
             &mut page_size,
         );
 
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        Self::get_address_and_allocation_granularity_posix(
+        #[cfg(not(target_os = "windows"))]
+        Self::get_address_and_allocation_granularity_mmap_rs(
             &mut allocation_granularity,
             &mut max_address,
             &mut page_size,
         );
-
-        #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
-        panic!("Platform not supported");
 
         Cached {
             max_address,
@@ -72,25 +60,23 @@ impl Cached {
     }
 
     #[allow(overflowing_literals)]
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    fn get_address_and_allocation_granularity_posix(
+    #[cfg(not(target_os = "windows"))]
+    fn get_address_and_allocation_granularity_mmap_rs(
         allocation_granularity: &mut i32,
         max_address: &mut usize,
         page_size: &mut i32,
     ) {
-        // Note: On POSIX, applications are aware of full address space by default.
-        // Technically a chunk of address space is reserved for kernel, however for our use case that's not a concern.
-        // Note 2: There is no API on Linux (or OSX) to get max address; so we'll restrict to signed 48-bits on x64 for now.
+        // Note: This is a fallback mechanism dependent on mmap-rs.
 
+        use mmap_rs::MmapOptions;
         if cfg!(target_pointer_width = "32") {
             *max_address = 0xFFFF_FFFF;
         } else if cfg!(target_pointer_width = "64") {
-            *max_address = 0x7FFFFFFFFFFF;
+            *max_address = 0x7FFFFFFFFFFF; // no max-address API, so restricted to Linux level
         }
 
-        *allocation_granularity = unsafe { libc::sysconf(SC_PAGESIZE) as i32 };
-
-        *page_size = *allocation_granularity;
+        *allocation_granularity = MmapOptions::allocation_granularity() as i32;
+        *page_size = MmapOptions::page_size() as i32;
     }
 
     pub fn get_allocation_granularity(&self) -> i32 {
