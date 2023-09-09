@@ -17,7 +17,7 @@ pub fn allocate_mmap_rs(
     settings: &BufferAllocatorSettings,
 ) -> Result<LocatorItem, BufferAllocationError> {
     for _ in 0..settings.retry_count {
-        let maps = MemoryAreas::open(None).map_err(|x| BufferAllocationError {
+        let maps = MemoryAreas::open(None).map_err(|_x| BufferAllocationError {
             settings: *settings,
             text: "Failed to Query Memory Pages via mmap-rs. Probably unsupported or lacking permissions.",
         })?;

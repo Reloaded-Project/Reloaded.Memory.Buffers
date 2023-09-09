@@ -1,15 +1,17 @@
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 use crate::structs::internal::LocatorHeader;
 use crate::utilities::cached::CACHED;
+use core::mem;
 use lazy_static::lazy_static;
+use mmap_rs::{MmapOptions, UnsafeMmapFlags};
 use std::ptr::null_mut;
 use std::sync::Mutex;
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[cfg(unix)]
 use {
     super::memory_mapped_file_unix::BASE_DIR,
-    crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile, libc::kill, std::fs,
-    std::path::Path,
+    crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile, errno::errno, libc::kill,
+    std::fs, std::path::Path,
 };
 
 #[cfg(target_os = "windows")]
@@ -39,31 +41,12 @@ impl LocatorHeaderFinder {
 
         // Lock initial acquisiton. This is so we don't create two buffers at once.
         let _unused = GLOBAL_LOCK.lock().unwrap();
-        let mmf = LocatorHeaderFinder::open_or_create_memory_mapped_file();
 
-        // If the MMF previously existed, we need to read the real address from
-        // the header, then close our mapping.
-        if mmf.already_existed() {
-            let header_addr = (*mmf).data() as *mut LocatorHeader;
-            LOCATOR_HEADER_ADDRESS = (*header_addr).this_address.value;
+        #[cfg(target_os = "android")]
+        return init_locatorheader_memorymappedfiles_unsupported();
 
-            #[cfg(test)]
-            LocatorHeaderFinder::set_last_find_reason(FindReason::PreviouslyExisted);
-
-            return unsafe { LOCATOR_HEADER_ADDRESS };
-        }
-
-        // Otherwise, we got a new MMF going, keep it alive forever.
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        LocatorHeaderFinder::cleanup();
-
-        LOCATOR_HEADER_ADDRESS = mmf.data().cast();
-        (*LOCATOR_HEADER_ADDRESS).initialize(mmf.length());
-        MMF = Some(mmf);
-
-        #[cfg(test)]
-        LocatorHeaderFinder::set_last_find_reason(FindReason::Created);
-        LOCATOR_HEADER_ADDRESS
+        #[cfg(not(target_os = "android"))]
+        return init_locatorheader_standard();
     }
 
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
@@ -77,14 +60,11 @@ impl LocatorHeaderFinder {
             CACHED.allocation_granularity as usize,
         ));
 
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(unix)]
         return Box::new(UnixMemoryMappedFile::new(
             &name,
             CACHED.allocation_granularity as usize,
         ));
-
-        #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
-        panic!("This platform is not supported! Only Windows/Linux/macOS are supported.");
     }
 
     #[cfg(test)]
@@ -98,7 +78,7 @@ impl LocatorHeaderFinder {
         LAST_FIND_REASON = reason;
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     fn cleanup() {
         LocatorHeaderFinder::cleanup_posix(BASE_DIR, |path| {
             if let Err(err) = fs::remove_file(path) {
@@ -107,7 +87,7 @@ impl LocatorHeaderFinder {
         });
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     fn cleanup_posix<T>(mmf_directory: &str, mut delete_file: T)
     where
         T: FnMut(&Path),
@@ -138,16 +118,58 @@ impl LocatorHeaderFinder {
         }
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     fn is_process_running(pid: i32) -> bool {
         unsafe {
-            #[cfg(target_os = "macos")]
-            return kill(pid, 0) == 0 || *libc::__error() == libc::EPERM;
-
-            #[cfg(target_os = "linux")]
-            return kill(pid, 0) == 0 || *libc::__errno_location() == libc::EPERM;
+            #[cfg(unix)]
+            return kill(pid, 0) == 0 || errno().0 == libc::EPERM;
         }
     }
+}
+
+unsafe fn init_locatorheader_standard() -> *mut LocatorHeader {
+    let mmf = LocatorHeaderFinder::open_or_create_memory_mapped_file();
+
+    // If the MMF previously existed, we need to read the real address from
+    // the header, then close our mapping.
+    if mmf.already_existed() {
+        let header_addr = (*mmf).data() as *mut LocatorHeader;
+        LOCATOR_HEADER_ADDRESS = (*header_addr).this_address.value;
+
+        #[cfg(test)]
+        LocatorHeaderFinder::set_last_find_reason(FindReason::PreviouslyExisted);
+
+        return unsafe { LOCATOR_HEADER_ADDRESS };
+    }
+
+    // Otherwise, we got a new MMF going, keep it alive forever.
+    #[cfg(unix)]
+    LocatorHeaderFinder::cleanup();
+
+    LOCATOR_HEADER_ADDRESS = mmf.data().cast();
+    (*LOCATOR_HEADER_ADDRESS).initialize(mmf.length());
+    MMF = Some(mmf);
+
+    #[cfg(test)]
+    LocatorHeaderFinder::set_last_find_reason(FindReason::Created);
+    LOCATOR_HEADER_ADDRESS
+}
+
+unsafe fn init_locatorheader_memorymappedfiles_unsupported() -> *mut LocatorHeader {
+    let mmap = MmapOptions::new(MmapOptions::allocation_granularity())
+        .unwrap()
+        .with_unsafe_flags(UnsafeMmapFlags::JIT)
+        .map_exec_mut()
+        .unwrap();
+
+    LOCATOR_HEADER_ADDRESS = mmap.start() as *mut LocatorHeader;
+    (*LOCATOR_HEADER_ADDRESS).initialize(mmap.size());
+
+    mem::forget(mmap);
+
+    #[cfg(test)]
+    LocatorHeaderFinder::set_last_find_reason(FindReason::Created);
+    LOCATOR_HEADER_ADDRESS
 }
 
 #[cfg(test)]
@@ -168,6 +190,7 @@ mod tests {
     use crate::utilities::cached::CACHED;
 
     #[test]
+    #[cfg(not(target_os = "android"))]
     fn find_should_return_address_when_previously_exists() {
         unsafe {
             LocatorHeaderFinder::reset();

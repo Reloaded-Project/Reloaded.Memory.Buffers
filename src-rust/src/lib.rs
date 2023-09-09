@@ -110,7 +110,7 @@ pub(crate) mod internal {
 
     pub mod memory_mapped_file;
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     pub mod memory_mapped_file_unix;
 
     #[cfg(target_os = "windows")]

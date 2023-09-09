@@ -1,3 +1,5 @@
+#![cfg(not(target_os = "android"))]
+
 use criterion::{criterion_group, criterion_main, Criterion};
 
 #[cfg(not(target_os = "windows"))]

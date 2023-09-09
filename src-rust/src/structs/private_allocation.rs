@@ -1,4 +1,3 @@
-#[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::ffi::c_void;
 use std::ptr::NonNull;
 
@@ -138,7 +137,7 @@ impl PrivateAllocation {
 
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
     #[cfg(target_os = "linux")]
-    pub(crate) fn drop_linux(&mut self) {
+    pub(crate) fn drop_unix(&mut self) {
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
                 let result = libc::munmap(self.base_address.as_ptr() as *mut c_void, self.size);
@@ -150,6 +149,14 @@ impl PrivateAllocation {
             };
         }
     }
+
+    /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    pub(crate) fn drop_mmap_rs(&mut self) {
+        todo!(
+            "Not possible to implement until https://github.com/StephanvanSchaik/mmap-rs/pull/40"
+        );
+    }
 }
 
 impl Drop for PrivateAllocation {
@@ -158,11 +165,15 @@ impl Drop for PrivateAllocation {
         #[cfg(target_os = "windows")]
         return PrivateAllocation::drop_windows(self);
 
-        #[cfg(target_os = "linux")]
-        return PrivateAllocation::drop_linux(self);
+        #[cfg(target_os = "linux")] // linux & co.
+        return PrivateAllocation::drop_unix(self);
 
         #[cfg(target_os = "macos")]
         return PrivateAllocation::drop_macos(self);
+
+        // non-hot-path-os
+        #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+        return PrivateAllocation::drop_mmap_rs(self);
     }
 }
 
