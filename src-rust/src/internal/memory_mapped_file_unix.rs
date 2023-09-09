@@ -90,6 +90,7 @@ impl UnixMemoryMappedFile {
     }
 
     #[cfg(unix)]
+    #[cfg(not(any(target_os = "macos", target_os = "ios")))]
     fn open_unix(file_name: CString, x: &mut c_int) {
         unsafe { *x = open(file_name.as_ptr(), O_RDWR | O_CREAT, S_IRWXU) }
     }
