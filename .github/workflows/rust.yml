@@ -2,11 +2,11 @@ name: Rust Build, Test & Publish
 
 on:
   push:
-    branches: [ main, master, crab ]
+    branches: [ main, master, crab, support-android-and-bsd ]
     tags:
       - '*'
   pull_request:
-    branches: [ main, master, crab ]
+    branches: [ main, master, crab, support-android-and-bsd ]
   workflow_dispatch:
 
 jobs:
