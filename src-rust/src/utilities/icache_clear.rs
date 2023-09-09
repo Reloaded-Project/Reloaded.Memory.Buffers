@@ -13,11 +13,33 @@ extern "C" {
 /// # Remarks
 ///
 /// This function is provided by LLVM. It might not work in non-LLVM backends.
+#[cfg(not(target_os = "windows"))] // MSVC fix
 pub fn clear_instruction_cache(start: *mut u8, end: *mut u8) {
     unsafe {
         __clear_cache(
             start as *mut core::ffi::c_void,
             end as *mut core::ffi::c_void,
         )
+    }
+}
+
+/// Clears the instruction cache for the specified range.
+///
+/// # Arguments
+///
+/// * `start` - The start address of the range to clear.
+/// * `end` - The end address of the range to clear.
+#[cfg(target_os = "windows")] // MSVC fix
+pub fn clear_instruction_cache(start: *mut u8, end: *mut u8) {
+    use windows::Win32::System::{
+        Diagnostics::Debug::FlushInstructionCache, Threading::GetCurrentProcess,
+    };
+
+    unsafe {
+        FlushInstructionCache(
+            GetCurrentProcess(),
+            Some(start as *const std::ffi::c_void),
+            end as usize - start as usize,
+        );
     }
 }
