@@ -121,6 +121,7 @@ pub(crate) mod utilities {
 
     pub mod address_range;
     pub mod cached;
+    pub mod icache_clear;
     pub mod map_parser_utilities;
     pub mod mathematics;
     pub mod wrappers;

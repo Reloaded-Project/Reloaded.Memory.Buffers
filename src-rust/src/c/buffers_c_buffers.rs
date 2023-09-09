@@ -11,6 +11,7 @@ use crate::{
         params::{BufferAllocatorSettings, BufferSearchSettings},
         PrivateAllocation,
     },
+    utilities::icache_clear::clear_instruction_cache,
 };
 
 use super::{
@@ -259,6 +260,17 @@ pub extern "C" fn bufferallocatorsettings_from_proximity(
     BufferAllocatorSettings::from_proximity(proximity, target, size)
 }
 
+/// Clears the instruction cache for the specified range.
+///
+/// # Arguments
+///
+/// * `start` - The start address of the range to clear.
+/// * `end` - The end address of the range to clear.
+#[no_mangle]
+pub extern "C" fn utilities_clear_instruction_cache(start: *mut u8, end: *mut u8) {
+    clear_instruction_cache(start, end);
+}
+
 /// Returns all exported functions inside a struct.
 #[no_mangle]
 pub extern "C" fn get_functions() -> BuffersFunctions {
@@ -283,6 +295,7 @@ pub extern "C" fn get_functions() -> BuffersFunctions {
         locatoritem_unlock,
         locatoritem_can_use,
         locatoritem_append_bytes,
+        utilities_clear_instruction_cache,
     }
 }
 

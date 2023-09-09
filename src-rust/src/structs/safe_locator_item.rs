@@ -13,6 +13,30 @@ pub struct SafeLocatorItem {
 }
 
 impl SafeLocatorItem {
+    /// Appends the code to this buffer.
+    /// This is same as [`append_bytes`] but automatically clears the instruction cache on given CPU.
+    ///
+    /// It is the caller's responsibility to ensure there is sufficient space in the buffer.
+    /// When returning buffers from the library, the library will ensure there's at least
+    /// the requested amount of space; so if the total size of your data falls under that
+    /// space, you are good.
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - The data to append to the item.
+    ///
+    /// # Returns
+    ///
+    /// The address of the written data.
+    ///
+    /// # Safety
+    ///
+    /// This function is safe provided that the caller ensures that the buffer is large enough to hold the data.
+    /// There is no error thrown if size is insufficient.
+    pub unsafe fn append_code(&self, data: &[u8]) -> usize {
+        (*self.item.get()).append_code(data)
+    }
+
     /// Appends the data to this buffer.
     ///
     /// It is the caller's responsibility to ensure there is sufficient space in the buffer.

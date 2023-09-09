@@ -1,4 +1,5 @@
-﻿use crate::utilities::mathematics::add_with_overflow_cap;
+﻿use crate::utilities::icache_clear::clear_instruction_cache;
+use crate::utilities::mathematics::add_with_overflow_cap;
 use crate::utilities::wrappers::Unaligned;
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::thread;
@@ -105,6 +106,37 @@ impl LocatorItem {
         // [start_available_address >= min_address] checks if in range.
         // [end_available_address <= max_address] checks if in range.
         start_available_address >= min_address && end_available_address <= max_address
+    }
+
+    /// Appends the code to this buffer.
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - The data to append to the item.
+    ///
+    /// # Returns
+    ///
+    /// The address of the written data.
+    ///
+    /// # Remarks
+    ///
+    /// It is the caller's responsibility to ensure there is sufficient space in the buffer.
+    /// When returning buffers from the library, the library will ensure there's at least the requested amount of space;
+    /// so if the total size of your data falls under that space, you are good.
+    ///
+    /// # Safety
+    ///
+    /// This function is safe provided that the caller ensures that the buffer is large enough to hold the data.
+    /// There is no error thrown if size is insufficient.
+    pub unsafe fn append_code(&mut self, data: &[u8]) -> usize {
+        let address = self.base_address.value + self.position as usize;
+        let data_len = data.len();
+
+        std::ptr::copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
+        self.position += data_len as u32;
+
+        clear_instruction_cache(address as *mut u8, (address + data_len) as *mut u8);
+        address
     }
 
     /// Appends the data to this buffer.

@@ -186,4 +186,12 @@ pub struct BuffersFunctions {
     /// There is no error thrown if size is insufficient.
     pub locatoritem_append_bytes:
         unsafe extern "C" fn(item: *mut LocatorItem, data: *const u8, data_len: usize) -> usize,
+
+    /// Clears the instruction cache for the specified range.
+    ///
+    /// # Arguments
+    ///
+    /// * `start` - The start address of the range to clear.
+    /// * `end` - The end address of the range to clear.
+    pub utilities_clear_instruction_cache: unsafe extern "C" fn(start: *mut u8, end: *mut u8),
 }

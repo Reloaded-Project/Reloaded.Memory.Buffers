@@ -46,7 +46,7 @@ impl LocatorHeaderFinder {
         return init_locatorheader_memorymappedfiles_unsupported();
 
         #[cfg(not(target_os = "android"))]
-        return init_locatorheader_standard();
+        return init_locatorheader_standard(); // OSes with unsupported Memory Mapped Files
     }
 
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {

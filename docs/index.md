@@ -217,6 +217,42 @@ Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited)
 
 !!! note "You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows."
 
+### Clear Instruction Cache
+
+!!! warning "Not currently available in C# version. Submit an issue request or PR if you need this."
+
+!!! info "This is required for some non-x86 architectures such as ARM64, PowerPC, MIPS etc."
+
+!!! tip "If you use `append_code` instead of `append_bytes`, clearing cache is automatically done."
+
+=== "Rust"
+
+	```rust
+	let mut settings = BufferAllocatorSettings::new();
+	settings.min_address = 0;
+	settings.max_address = i32::MAX as usize;
+	settings.size = 4096;
+
+	let item = Buffers::allocate_private_memory(&mut settings).unwrap();
+
+	// You have allocated memory in first 2GiB of address space.
+	assert!(item.base_address.as_ptr() != std::ptr::null_mut());
+	assert!(item.size >= settings.size as usize);
+	```
+
+=== "C/C++"
+
+	```cpp
+	BufferSearchSettings settings;
+	settings.MinAddress = 0;
+	settings.MaxAddress = INT_MAX;
+	settings.Size = 4096;
+
+	AllocationResult item = allocate_private_memory(&mut settings);
+
+	// You have allocated memory in first 2GiB of address space.
+	```
+
 ## Community Feedback
 
 If you have questions/bug reports/etc. feel free to [Open an Issue](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/new).
