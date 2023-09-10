@@ -4,7 +4,12 @@ use crate::structs::errors::{BufferAllocationError, BufferSearchError, ItemAlloc
 use crate::structs::internal::LocatorHeader;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
+use crate::utilities::disable_write_xor_execute::{
+    disable_write_xor_execute, restore_write_xor_execute,
+};
+use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::round_up;
+use core::u8;
 use std::ptr::NonNull;
 
 pub struct Buffers {}
@@ -111,6 +116,38 @@ impl Buffers {
         settings: &BufferSearchSettings,
     ) -> Result<SafeLocatorItem, BufferSearchError> {
         unsafe { Self::get_buffer_recursive(settings, LocatorHeaderFinder::find()) }
+    }
+
+    /// Call this method in order to safely be able to overwrite existing code that was
+    /// allocated by the library inside one of its buffers. (e.g. Hooking/detours code.)
+    ///
+    /// This callback handles various edge cases, (such as flushing caches), and flipping page permissions
+    /// on relevant platforms.
+    ///
+    /// # Parameters
+    ///
+    /// * `address` - The address of the code your callback will overwrite.
+    /// * `size` - The size of the code your callback will overwrite.
+    /// * `callback` - Your method to overwrite the code.
+    ///
+    /// # Safety
+    ///
+    /// Only use this with addresses allocated inside a Reloaded.Memory.Buffers buffer.  
+    /// Usage with any other memory is undefined behaviour.
+    ///
+    /// # Remarks
+    ///
+    /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
+    /// should not be skipped on non-x86 architectures.
+    pub fn overwrite_allocated_code(
+        address: *const u8,
+        size: usize,
+        callback: fn(*const u8, usize),
+    ) {
+        disable_write_xor_execute(address, size);
+        callback(address, size);
+        clear_instruction_cache(address as *mut u8, address.wrapping_add(size));
+        restore_write_xor_execute(address, size);
     }
 }
 
@@ -238,7 +275,7 @@ mod tests {
 
         unsafe {
             let code_ptr = (*item.item.get()).base_address.value as *mut u8;
-            item.append_bytes(&code);
+            item.append_code(&code);
 
             // Cast the buffer to a function pointer and execute it.
             let func: extern "C" fn() -> u64 = std::mem::transmute(code_ptr);

@@ -71,7 +71,7 @@ impl LocatorHeader {
         // We will use the remaining space for more headers on these affected platforms, and
         // on non-W^X platforms, we will use it for buffers.
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-        initialize_remaining_space_as_headers(&self as *mut LocatorHeader, remaining_bytes);
+        Self::initialize_remaining_space_as_headers(self as *mut LocatorHeader, remaining_bytes);
 
         #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
         self.initialize_remaining_space_as_buffers(remaining_bytes);
@@ -107,12 +107,12 @@ impl LocatorHeader {
     fn initialize_remaining_space_as_headers(header: *mut LocatorHeader, mut remaining_bytes: u32) {
         unsafe {
             let mut current_header = header;
-            while remaining_bytes > LENGTH {
+            while remaining_bytes > LENGTH as u32 {
                 let next_header = (current_header as *mut u8).add(LENGTH) as *mut LocatorHeader;
                 (*next_header).set_default_values();
-                (*current_header).next_locator_ptr = next_header;
+                (*current_header).next_locator_ptr = Unaligned::new(next_header);
                 current_header = next_header;
-                remaining_bytes -= LENGTH;
+                remaining_bytes -= LENGTH as u32;
             }
         }
     }

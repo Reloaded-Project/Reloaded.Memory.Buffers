@@ -1,4 +1,7 @@
-﻿use crate::utilities::icache_clear::clear_instruction_cache;
+﻿use crate::utilities::disable_write_xor_execute::{
+    disable_write_xor_execute, restore_write_xor_execute,
+};
+use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::add_with_overflow_cap;
 use crate::utilities::wrappers::Unaligned;
 use std::sync::atomic::{AtomicI32, Ordering};
@@ -129,6 +132,7 @@ impl LocatorItem {
     /// This function is safe provided that the caller ensures that the buffer is large enough to hold the data.
     /// There is no error thrown if size is insufficient.
     pub unsafe fn append_code(&mut self, data: &[u8]) -> usize {
+        disable_write_xor_execute(self.base_address.value as *const u8, data.len());
         let address = self.base_address.value + self.position as usize;
         let data_len = data.len();
 
@@ -136,6 +140,7 @@ impl LocatorItem {
         self.position += data_len as u32;
 
         clear_instruction_cache(address as *mut u8, (address + data_len) as *mut u8);
+        restore_write_xor_execute(self.base_address.value as *const u8, data.len());
         address
     }
 

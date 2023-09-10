@@ -1,7 +1,6 @@
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 use crate::structs::internal::LocatorHeader;
 use crate::utilities::cached::CACHED;
-use core::mem;
 use lazy_static::lazy_static;
 use std::ptr::null_mut;
 use std::sync::Mutex;
@@ -9,12 +8,8 @@ use std::sync::Mutex;
 #[cfg(unix)]
 use {
     super::memory_mapped_file_unix::BASE_DIR,
-    crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile,
-    errno::errno,
-    libc::kill,
-    mmap_rs::{MmapOptions, UnsafeMmapFlags},
-    std::fs,
-    std::path::Path,
+    crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile, errno::errno, libc::kill,
+    std::fs, std::path::Path,
 };
 
 #[cfg(target_os = "windows")]
@@ -158,8 +153,11 @@ unsafe fn init_locatorheader_standard() -> *mut LocatorHeader {
     LOCATOR_HEADER_ADDRESS
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(target_os = "android")]
 unsafe fn init_locatorheader_memorymappedfiles_unsupported() -> *mut LocatorHeader {
+    use core::mem;
+    use mmap_rs::MmapOptions;
+
     let mmap = MmapOptions::new(MmapOptions::allocation_granularity())
         .unwrap()
         .map_mut()

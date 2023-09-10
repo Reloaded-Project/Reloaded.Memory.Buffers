@@ -1,7 +1,7 @@
 use errno::errno;
 
 use libc::{
-    c_int, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_EXEC, PROT_READ,
+    c_int, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_READ,
     PROT_WRITE, S_IRWXU,
 };
 use std::ffi::{c_void, CString};

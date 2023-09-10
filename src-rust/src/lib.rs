@@ -128,6 +128,9 @@ pub(crate) mod utilities {
 
     #[cfg(target_os = "linux")]
     pub mod linux_map_parser;
+
+    // Internal, disables W^X for internal buffers.
+    pub(crate) mod disable_write_xor_execute;
 }
 
 /// Provides a C interface to the library.
