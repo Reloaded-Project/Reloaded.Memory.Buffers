@@ -75,8 +75,19 @@ impl Cached {
             *max_address = 0x7FFFFFFFFFFF; // no max-address API, so restricted to Linux level
         }
 
-        *allocation_granularity = MmapOptions::allocation_granularity() as i32;
-        *page_size = MmapOptions::page_size() as i32;
+        #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+        {
+            *page_size = MmapOptions::page_size() as i32;
+        }
+
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
+            // Apple lies about page size in libc on M1 says it's 4096 instead of 16384
+            *page_size = MmapOptions::page_size() as i32;
+        }
+
+        *allocation_granularity =
+            std::cmp::max(MmapOptions::allocation_granularity() as i32, *page_size);
     }
 
     pub fn get_allocation_granularity(&self) -> i32 {
