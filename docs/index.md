@@ -163,10 +163,11 @@ Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited)
 	free_get_buffer_result(result);
 	```
 
+!!! note "Use `append_code` instead of `append_bytes` if you need to add executable code. (Currently unavailable in C# port)"
+
 ### Allocate Memory
 
 !!! info "Allows you to temporarily allocate memory within a specific address range and size constraints."
-
 
 === "C#"
 
@@ -217,41 +218,31 @@ Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited)
 
 !!! note "You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows."
 
-### Clear Instruction Cache
+### Overwriting Allocated Instructions
 
-!!! warning "Not currently available in C# version. Submit an issue request or PR if you need this."
+!!! info "On non-x86 architectures, some extra actions may be needed when overwriting executable code allocated with `append_code`."
 
-!!! info "This is required for some non-x86 architectures such as ARM64, PowerPC, MIPS etc."
-
-!!! tip "If you use `append_code` instead of `append_bytes`, clearing cache is automatically done."
+!!! note "This involves clearing instruction cache, and abiding by Write XOR Execute restrictions."
 
 === "Rust"
 
 	```rust
-	let mut settings = BufferAllocatorSettings::new();
-	settings.min_address = 0;
-	settings.max_address = i32::MAX as usize;
-	settings.size = 4096;
-
-	let item = Buffers::allocate_private_memory(&mut settings).unwrap();
-
-	// You have allocated memory in first 2GiB of address space.
-	assert!(item.base_address.as_ptr() != std::ptr::null_mut());
-	assert!(item.size >= settings.size as usize);
+	Self::overwrite_allocated_code(address, size, |addr, size| {
+        // Do stuff with executable code 
+    });
 	```
 
 === "C/C++"
 
 	```cpp
-	BufferSearchSettings settings;
-	settings.MinAddress = 0;
-	settings.MaxAddress = INT_MAX;
-	settings.Size = 4096;
+	void do_stuff_with_executable_code(char* addr, size_t size) {
+		// Modify executable code in buffer
+	}
 
-	AllocationResult item = allocate_private_memory(&mut settings);
-
-	// You have allocated memory in first 2GiB of address space.
+	overwrite_allocated_code(address, size, do_stuff_with_executable_code);
 	```
+
+!!! warning "Not currently available in C# version. Submit an issue request or PR if you need this."
 
 ## Community Feedback
 
