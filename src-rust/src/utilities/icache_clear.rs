@@ -1,8 +1,3 @@
-extern "C" {
-    /// This function is provided by LLVM to clear the instruction cache for the specified range.
-    fn __clear_cache(start: *mut core::ffi::c_void, end: *mut core::ffi::c_void);
-}
-
 /// Clears the instruction cache for the specified range.
 ///
 /// # Arguments
@@ -13,14 +8,10 @@ extern "C" {
 /// # Remarks
 ///
 /// This function is provided by LLVM. It might not work in non-LLVM backends.
+#[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
 #[cfg(not(target_os = "windows"))] // MSVC fix
 pub fn clear_instruction_cache(start: *mut u8, end: *mut u8) {
-    unsafe {
-        __clear_cache(
-            start as *mut core::ffi::c_void,
-            end as *mut core::ffi::c_void,
-        )
-    }
+    clf::cache_line_flush_with_ptr(start, end);
 }
 
 /// Clears the instruction cache for the specified range.
@@ -29,6 +20,7 @@ pub fn clear_instruction_cache(start: *mut u8, end: *mut u8) {
 ///
 /// * `start` - The start address of the range to clear.
 /// * `end` - The end address of the range to clear.
+#[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
 #[cfg(target_os = "windows")] // MSVC fix
 pub fn clear_instruction_cache(start: *mut u8, end: *mut u8) {
     use windows::Win32::System::{
@@ -42,4 +34,10 @@ pub fn clear_instruction_cache(start: *mut u8, end: *mut u8) {
             end as usize - start as usize,
         );
     }
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+pub fn clear_instruction_cache(_start: *mut u8, _end: *mut u8) {
+    // x86 & x86_64 have unified data and instruction cache, thus flushing is not needed.
+    // Therefore it is a no-op
 }
