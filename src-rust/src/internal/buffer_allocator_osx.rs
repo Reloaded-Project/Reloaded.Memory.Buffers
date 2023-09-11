@@ -132,13 +132,25 @@ fn try_allocate_buffer(
             continue;
         }
 
+        // TODO: M1 W^X
+        // M1 macOS has strict W^X enforcement where pages are not allowed to be writeable
+        // and executable at the same time. Therefore, we have to work around this by allocating as RW
+        // and temporarily changing it on every write.
+
+        // This is not safe, but later we'll get a better workaround going.
+        #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+        const PROT: vm_prot_t = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE;
+
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        const PROT: vm_prot_t = VM_PROT_READ | VM_PROT_WRITE;
+
         kr = unsafe {
             mach_vm_protect(
                 self_task,
                 allocated,
                 settings.size as mach_vm_size_t,
                 0,
-                VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE,
+                PROT,
             )
         };
 
