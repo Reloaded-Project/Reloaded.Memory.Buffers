@@ -107,7 +107,7 @@ impl LocatorHeader {
     fn initialize_remaining_space_as_headers(header: *mut LocatorHeader, mut remaining_bytes: u32) {
         unsafe {
             let mut current_header = header;
-            while remaining_bytes > LENGTH as u32 {
+            while remaining_bytes >= LENGTH as u32 {
                 let next_header = (current_header as *mut u8).add(LENGTH) as *mut LocatorHeader;
                 (*next_header).set_default_values();
                 (*current_header).next_locator_ptr = Unaligned::new(next_header);
