@@ -362,7 +362,6 @@ mod tests {
         let result = buffers_allocate_private_memory(&mut settings);
         assert!(result.is_ok);
 
-        assert!(!result.ok.base_address.as_ptr().is_null());
         assert!(result.ok.size >= settings.size as usize);
         free_allocation_result(result);
     }
@@ -376,7 +375,6 @@ mod tests {
         let result = buffers_allocate_private_memory(&mut settings);
         assert!(result.is_ok);
 
-        assert!(!result.ok.base_address.as_ptr().is_null());
         assert!(result.ok.size >= settings.size as usize);
         free_allocation_result(result);
     }

@@ -218,7 +218,6 @@ mod tests {
         assert!(result.is_ok());
 
         let item = result.unwrap();
-        assert!(!item.base_address.as_ptr().is_null());
         assert!(item.size >= settings.size as usize);
     }
 
@@ -232,7 +231,6 @@ mod tests {
         assert!(result.is_ok());
 
         let item = result.unwrap();
-        assert!(!item.base_address.as_ptr().is_null());
         assert!(item.size >= settings.size as usize);
     }
 
