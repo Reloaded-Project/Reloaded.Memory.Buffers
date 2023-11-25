@@ -140,8 +140,8 @@ impl LocatorItem {
         std::ptr::copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
         self.position += data_len as u32;
 
-        clear_instruction_cache(address as *mut u8, (address + data_len) as *mut u8);
         restore_write_xor_execute(self.base_address.value as *const u8, data.len());
+        clear_instruction_cache(address as *mut u8, (address + data_len) as *mut u8);
         address
     }
 

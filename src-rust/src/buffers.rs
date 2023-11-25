@@ -146,8 +146,8 @@ impl Buffers {
     ) {
         disable_write_xor_execute(address, size);
         callback(address, size);
-        clear_instruction_cache(address as *mut u8, address.wrapping_add(size));
         restore_write_xor_execute(address, size);
+        clear_instruction_cache(address as *mut u8, address.wrapping_add(size));
     }
 }
 
