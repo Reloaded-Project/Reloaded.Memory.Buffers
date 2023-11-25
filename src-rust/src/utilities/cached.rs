@@ -68,7 +68,7 @@ impl Cached {
     ) {
         // Note: This is a fallback mechanism dependent on mmap-rs.
 
-        use mmap_rs::MmapOptions;
+        use mmap_rs_with_map_from_existing::MmapOptions;
         if cfg!(target_pointer_width = "32") {
             *max_address = 0xFFFF_FFFF;
         } else if cfg!(target_pointer_width = "64") {

@@ -156,7 +156,7 @@ unsafe fn init_locatorheader_standard() -> *mut LocatorHeader {
 #[cfg(target_os = "android")]
 unsafe fn init_locatorheader_memorymappedfiles_unsupported() -> *mut LocatorHeader {
     use core::mem;
-    use mmap_rs::MmapOptions;
+    use mmap_rs_with_map_from_existing::MmapOptions;
 
     let mmap = MmapOptions::new(MmapOptions::allocation_granularity())
         .unwrap()

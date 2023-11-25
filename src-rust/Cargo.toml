@@ -33,7 +33,7 @@ pprof = { version = "0.12", features = ["flamegraph", "criterion"] }
 mach = "0.3.2"
 
 [target.'cfg(not(target_os = "windows"))'.dependencies]
-mmap-rs = "0.6.0"
+mmap-rs-with-map-from-existing = "0.6.0"
 clf = "0.1.7"
 
 [target.'cfg(target_os = "windows")'.dependencies.windows]

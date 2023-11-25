@@ -1,6 +1,3 @@
-use core::cmp::min;
-use core::mem;
-
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
@@ -10,7 +7,9 @@ use crate::{
     internal::buffer_allocator::get_possible_buffer_addresses,
     utilities::map_parser_utilities::MemoryMapEntry,
 };
-use mmap_rs::{MemoryAreas, MmapOptions, UnsafeMmapFlags};
+use core::cmp::min;
+use core::mem;
+use mmap_rs_with_map_from_existing::{MemoryAreas, MmapOptions, UnsafeMmapFlags};
 
 // Implementation //
 pub fn allocate_mmap_rs(
@@ -24,10 +23,15 @@ pub fn allocate_mmap_rs(
 
         let mapped_regions: Vec<MemoryMapEntry> = maps
             .filter(|x| x.is_ok())
-            .map(|x: Result<mmap_rs::MemoryArea, mmap_rs::Error>| unsafe {
-                let area = x.unwrap_unchecked();
-                MemoryMapEntry::new(area.start(), area.end())
-            })
+            .map(
+                |x: Result<
+                    mmap_rs_with_map_from_existing::MemoryArea,
+                    mmap_rs_with_map_from_existing::Error,
+                >| unsafe {
+                    let area = x.unwrap_unchecked();
+                    MemoryMapEntry::new(area.start(), area.end())
+                },
+            )
             .collect();
 
         let free_regions = get_free_regions(&mapped_regions);
@@ -73,7 +77,10 @@ unsafe fn try_allocate_buffer(
             .with_unsafe_flags(UnsafeMmapFlags::MAP_FIXED)
             .with_unsafe_flags(UnsafeMmapFlags::JIT);
 
-        let map: Result<mmap_rs::MmapMut, mmap_rs::Error> = unsafe { mmapoptions.map_exec_mut() };
+        let map: Result<
+            mmap_rs_with_map_from_existing::MmapMut,
+            mmap_rs_with_map_from_existing::Error,
+        > = unsafe { mmapoptions.map_exec_mut() };
         if map.is_err() {
             continue;
         }
