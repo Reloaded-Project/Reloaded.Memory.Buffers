@@ -11,6 +11,10 @@ use crate::{
         params::{BufferAllocatorSettings, BufferSearchSettings},
         PrivateAllocation,
     },
+    utilities::{
+        disable_write_xor_execute::{disable_write_xor_execute, restore_write_xor_execute},
+        icache_clear::clear_instruction_cache,
+    },
 };
 
 use super::{
@@ -259,6 +263,49 @@ pub extern "C" fn bufferallocatorsettings_from_proximity(
     BufferAllocatorSettings::from_proximity(proximity, target, size)
 }
 
+/// Clears the instruction cache for the specified range.
+///
+/// # Arguments
+///
+/// * `start` - The start address of the range to clear.
+/// * `end` - The end address of the range to clear.
+#[no_mangle]
+pub extern "C" fn utilities_clear_instruction_cache(start: *mut u8, end: *mut u8) {
+    clear_instruction_cache(start, end);
+}
+
+/// Call this method in order to safely be able to overwrite existing code that was
+/// allocated by the library inside one of its buffers. (e.g. Hooking/detours code.)
+///
+/// This callback handles various edge cases, (such as flushing caches), and flipping page permissions
+/// on relevant platforms.
+///
+/// # Parameters
+///
+/// * `address` - The address of the code your callback will overwrite.
+/// * `size` - The size of the code your callback will overwrite.
+/// * `callback` - Your method to overwrite the code.
+///
+/// # Safety
+///
+/// Only use this with addresses allocated inside a Reloaded.Memory.Buffers buffer.  
+/// Usage with any other memory is undefined behaviour.
+///
+/// # Remarks
+///
+/// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
+/// should not be skipped on non-x86 architectures.
+pub extern "C" fn overwrite_allocated_code(
+    address: *const u8,
+    size: usize,
+    callback: extern "C" fn(*const u8, usize),
+) {
+    disable_write_xor_execute(address, size);
+    callback(address, size);
+    restore_write_xor_execute(address, size);
+    clear_instruction_cache(address as *mut u8, address.wrapping_add(size));
+}
+
 /// Returns all exported functions inside a struct.
 #[no_mangle]
 pub extern "C" fn get_functions() -> BuffersFunctions {
@@ -283,6 +330,8 @@ pub extern "C" fn get_functions() -> BuffersFunctions {
         locatoritem_unlock,
         locatoritem_can_use,
         locatoritem_append_bytes,
+        utilities_clear_instruction_cache,
+        overwrite_allocated_code,
     }
 }
 
@@ -313,7 +362,6 @@ mod tests {
         let result = buffers_allocate_private_memory(&mut settings);
         assert!(result.is_ok);
 
-        assert!(!result.ok.base_address.as_ptr().is_null());
         assert!(result.ok.size >= settings.size as usize);
         free_allocation_result(result);
     }
@@ -327,7 +375,6 @@ mod tests {
         let result = buffers_allocate_private_memory(&mut settings);
         assert!(result.is_ok);
 
-        assert!(!result.ok.base_address.as_ptr().is_null());
         assert!(result.ok.size >= settings.size as usize);
         free_allocation_result(result);
     }

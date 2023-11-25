@@ -105,9 +105,12 @@ pub(crate) mod internal {
     #[cfg(target_os = "windows")]
     pub mod buffer_allocator_windows;
 
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    pub mod buffer_allocator_mmap_rs;
+
     pub mod memory_mapped_file;
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     pub mod memory_mapped_file_unix;
 
     #[cfg(target_os = "windows")]
@@ -118,11 +121,16 @@ pub(crate) mod utilities {
 
     pub mod address_range;
     pub mod cached;
+    pub mod icache_clear;
+    pub mod map_parser_utilities;
     pub mod mathematics;
     pub mod wrappers;
 
     #[cfg(target_os = "linux")]
     pub mod linux_map_parser;
+
+    // Internal, disables W^X for internal buffers.
+    pub(crate) mod disable_write_xor_execute;
 }
 
 /// Provides a C interface to the library.

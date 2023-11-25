@@ -1,11 +1,11 @@
 name: C# Build, Test and Publish
 on:
   push:
-    branches: [ master, refactor-reloaded3-compliance ]
+    branches: [ master, refactor-reloaded3-compliance, support-android-and-bsd ]
     tags:
       - '*'
   pull_request:
-    branches: [ master, refactor-reloaded3-compliance ]
+    branches: [ master, refactor-reloaded3-compliance, support-android-and-bsd ]
   workflow_dispatch:
 
 jobs:

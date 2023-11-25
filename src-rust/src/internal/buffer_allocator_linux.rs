@@ -1,9 +1,12 @@
-use crate::internal::buffer_allocator::get_possible_buffer_addresses;
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
-use crate::utilities::linux_map_parser::{get_free_regions_from_process_id, MemoryMapEntry};
+use crate::utilities::linux_map_parser::get_free_regions_from_process_id;
+use crate::{
+    internal::buffer_allocator::get_possible_buffer_addresses,
+    utilities::map_parser_utilities::MemoryMapEntry,
+};
 use libc::{
     mmap, munmap, MAP_ANONYMOUS, MAP_FIXED_NOREPLACE, MAP_PRIVATE, PROT_EXEC, PROT_READ, PROT_WRITE,
 };

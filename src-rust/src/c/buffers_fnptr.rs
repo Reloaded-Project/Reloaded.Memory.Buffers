@@ -186,4 +186,36 @@ pub struct BuffersFunctions {
     /// There is no error thrown if size is insufficient.
     pub locatoritem_append_bytes:
         unsafe extern "C" fn(item: *mut LocatorItem, data: *const u8, data_len: usize) -> usize,
+
+    /// Clears the instruction cache for the specified range.
+    ///
+    /// # Arguments
+    ///
+    /// * `start` - The start address of the range to clear.
+    /// * `end` - The end address of the range to clear.
+    pub utilities_clear_instruction_cache: unsafe extern "C" fn(start: *mut u8, end: *mut u8),
+
+    /// Call this method in order to safely be able to overwrite existing code that was
+    /// allocated by the library inside one of its buffers. (e.g. Hooking/detours code.)
+    ///
+    /// This callback handles various edge cases, (such as flushing caches), and flipping page permissions
+    /// on relevant platforms.
+    ///
+    /// # Parameters
+    ///
+    /// * `address` - The address of the code your callback will overwrite.
+    /// * `size` - The size of the code your callback will overwrite.
+    /// * `callback` - Your method to overwrite the code.
+    ///
+    /// # Safety
+    ///
+    /// Only use this with addresses allocated inside a Reloaded.Memory.Buffers buffer.  
+    /// Usage with any other memory is undefined behaviour.
+    ///
+    /// # Remarks
+    ///
+    /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
+    /// should not be skipped on non-x86 architectures.
+    pub overwrite_allocated_code:
+        extern "C" fn(address: *const u8, size: usize, callback: extern "C" fn(*const u8, usize)),
 }

@@ -46,6 +46,8 @@ With the following properties:
 - ***Large Address Aware:*** On Windows, the library can correctly leverage all 4GB in 32-bit processes.  
 - ***Cross Platform***: Supports Windows, OSX and Linux.  
 
+Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited) Android support](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/3).
+
 ## Example Use Cases
 
 !!! tip "These are just examples."
@@ -161,10 +163,11 @@ With the following properties:
 	free_get_buffer_result(result);
 	```
 
+!!! note "Use `append_code` instead of `append_bytes` if you need to add executable code. (Currently unavailable in C# port)"
+
 ### Allocate Memory
 
 !!! info "Allows you to temporarily allocate memory within a specific address range and size constraints."
-
 
 === "C#"
 
@@ -214,6 +217,32 @@ With the following properties:
 	```
 
 !!! note "You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows."
+
+### Overwriting Allocated Instructions
+
+!!! info "On non-x86 architectures, some extra actions may be needed when overwriting executable code allocated with `append_code`."
+
+!!! note "This involves clearing instruction cache, and abiding by Write XOR Execute restrictions."
+
+=== "Rust"
+
+	```rust
+	Self::overwrite_allocated_code(address, size, |addr, size| {
+        // Do stuff with executable code 
+    });
+	```
+
+=== "C/C++"
+
+	```cpp
+	void do_stuff_with_executable_code(char* addr, size_t size) {
+		// Modify executable code in buffer
+	}
+
+	overwrite_allocated_code(address, size, do_stuff_with_executable_code);
+	```
+
+!!! warning "Not currently available in C# version. Submit an issue request or PR if you need this."
 
 ## Community Feedback
 

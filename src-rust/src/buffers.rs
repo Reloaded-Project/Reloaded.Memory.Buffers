@@ -4,7 +4,12 @@ use crate::structs::errors::{BufferAllocationError, BufferSearchError, ItemAlloc
 use crate::structs::internal::LocatorHeader;
 use crate::structs::params::{BufferAllocatorSettings, BufferSearchSettings};
 use crate::structs::{PrivateAllocation, SafeLocatorItem};
+use crate::utilities::disable_write_xor_execute::{
+    disable_write_xor_execute, restore_write_xor_execute,
+};
+use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::round_up;
+use core::u8;
 use std::ptr::NonNull;
 
 pub struct Buffers {}
@@ -112,6 +117,38 @@ impl Buffers {
     ) -> Result<SafeLocatorItem, BufferSearchError> {
         unsafe { Self::get_buffer_recursive(settings, LocatorHeaderFinder::find()) }
     }
+
+    /// Call this method in order to safely be able to overwrite existing code that was
+    /// allocated by the library inside one of its buffers. (e.g. Hooking/detours code.)
+    ///
+    /// This callback handles various edge cases, (such as flushing caches), and flipping page permissions
+    /// on relevant platforms.
+    ///
+    /// # Parameters
+    ///
+    /// * `address` - The address of the code your callback will overwrite.
+    /// * `size` - The size of the code your callback will overwrite.
+    /// * `callback` - Your method to overwrite the code.
+    ///
+    /// # Safety
+    ///
+    /// Only use this with addresses allocated inside a Reloaded.Memory.Buffers buffer.  
+    /// Usage with any other memory is undefined behaviour.
+    ///
+    /// # Remarks
+    ///
+    /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
+    /// should not be skipped on non-x86 architectures.
+    pub fn overwrite_allocated_code(
+        address: *const u8,
+        size: usize,
+        callback: fn(*const u8, usize),
+    ) {
+        disable_write_xor_execute(address, size);
+        callback(address, size);
+        restore_write_xor_execute(address, size);
+        clear_instruction_cache(address as *mut u8, address.wrapping_add(size));
+    }
 }
 
 impl Buffers {
@@ -181,7 +218,6 @@ mod tests {
         assert!(result.is_ok());
 
         let item = result.unwrap();
-        assert!(!item.base_address.as_ptr().is_null());
         assert!(item.size >= settings.size as usize);
     }
 
@@ -195,7 +231,6 @@ mod tests {
         assert!(result.is_ok());
 
         let item = result.unwrap();
-        assert!(!item.base_address.as_ptr().is_null());
         assert!(item.size >= settings.size as usize);
     }
 
@@ -220,7 +255,7 @@ mod tests {
 
     #[cfg(target_arch = "x86_64")]
     #[test]
-    fn memory_is_executable() {
+    fn memory_is_executable_x64() {
         let settings = BufferSearchSettings {
             min_address: (CACHED.max_address / 2),
             max_address: CACHED.max_address,
@@ -238,7 +273,40 @@ mod tests {
 
         unsafe {
             let code_ptr = (*item.item.get()).base_address.value as *mut u8;
-            item.append_bytes(&code);
+            item.append_code(&code);
+
+            // Cast the buffer to a function pointer and execute it.
+            let func: extern "C" fn() -> u64 = std::mem::transmute(code_ptr);
+
+            // If the memory is executable, this will return 0x1234567812345678.
+            let result = func();
+            assert_eq!(result, 0x1234567812345678);
+        }
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[test]
+    fn memory_is_executable_aarch64() {
+        let settings = BufferSearchSettings {
+            min_address: (CACHED.max_address / 2),
+            max_address: CACHED.max_address,
+            size: 4096,
+        };
+
+        let item = Buffers::get_buffer(&settings).unwrap();
+
+        // Prepare a simple piece of x86_64 code: `mov rax, 0x1234567812345678; ret`
+        let code = [
+            0x00, 0xCF, 0x8A, 0xD2, // movz x0, #0x5678, LSL #0
+            0x80, 0x46, 0xA2, 0xF2, // movk x0, #0x1234, LSL #16
+            0x00, 0xCF, 0xCA, 0xF2, // movk x0, #0x5678, LSL #32
+            0x80, 0x46, 0xE2, 0xF2, // movk x0, #0x1234, LSL #48
+            0xC0, 0x03, 0x5F, 0xD6, // ret
+        ];
+
+        unsafe {
+            let code_ptr = (*item.item.get()).base_address.value as *mut u8;
+            item.append_code(&code);
 
             // Cast the buffer to a function pointer and execute it.
             let func: extern "C" fn() -> u64 = std::mem::transmute(code_ptr);

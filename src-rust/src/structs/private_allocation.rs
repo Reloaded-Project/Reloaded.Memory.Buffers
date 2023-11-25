@@ -1,26 +1,21 @@
-#[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::ffi::c_void;
-
 use std::ptr::NonNull;
 
 use crate::utilities::cached::CACHED;
-#[cfg(target_os = "windows")]
-use windows::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE};
-
-#[cfg(target_os = "macos")]
-use mach::kern_return::KERN_SUCCESS;
-
-#[cfg(target_os = "macos")]
-use mach::traps::mach_task_self;
-
-#[cfg(target_os = "macos")]
-use mach::vm::mach_vm_deallocate;
-
-#[cfg(target_os = "macos")]
-use mach::vm_types::{mach_vm_address_t, mach_vm_size_t};
 
 #[cfg(target_os = "windows")]
-use crate::internal::buffer_allocator_windows::ProcessHandle;
+use {
+    crate::internal::buffer_allocator_windows::ProcessHandle,
+    windows::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE},
+};
+
+#[cfg(target_os = "macos")]
+use {
+    mach::kern_return::KERN_SUCCESS,
+    mach::traps::mach_task_self,
+    mach::vm::mach_vm_deallocate,
+    mach::vm_types::{mach_vm_address_t, mach_vm_size_t},
+};
 
 /// Provides information about a recently made allocation.
 ///
@@ -142,7 +137,7 @@ impl PrivateAllocation {
 
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
     #[cfg(target_os = "linux")]
-    pub(crate) fn drop_linux(&mut self) {
+    pub(crate) fn drop_unix(&mut self) {
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
                 let result = libc::munmap(self.base_address.as_ptr() as *mut c_void, self.size);
@@ -154,6 +149,21 @@ impl PrivateAllocation {
             };
         }
     }
+
+    /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    pub(crate) fn drop_mmap_rs(&mut self) {
+        use mmap_rs_with_map_from_existing::MmapOptions;
+        let _map = unsafe {
+            MmapOptions::new(self.size)
+                .unwrap()
+                .with_address(self.base_address.as_ptr() as usize)
+                .map_from_existing()
+                .unwrap()
+        };
+
+        // map will be dropped after being mapped from existing
+    }
 }
 
 impl Drop for PrivateAllocation {
@@ -162,11 +172,15 @@ impl Drop for PrivateAllocation {
         #[cfg(target_os = "windows")]
         return PrivateAllocation::drop_windows(self);
 
-        #[cfg(target_os = "linux")]
-        return PrivateAllocation::drop_linux(self);
+        #[cfg(target_os = "linux")] // linux & co.
+        return PrivateAllocation::drop_unix(self);
 
         #[cfg(target_os = "macos")]
         return PrivateAllocation::drop_macos(self);
+
+        // non-hot-path-os
+        #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+        return PrivateAllocation::drop_mmap_rs(self);
     }
 }
 

@@ -1,7 +1,7 @@
 use errno::errno;
 
 use libc::{
-    c_int, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_EXEC, PROT_READ,
+    c_int, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_READ,
     PROT_WRITE, S_IRWXU,
 };
 use std::ffi::{c_void, CString};
@@ -12,7 +12,11 @@ use libc::c_uint;
 
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 
+#[cfg(not(target_os = "android"))]
 pub const BASE_DIR: &str = "/tmp/.reloaded/memory.buffers";
+
+#[cfg(target_os = "android")] // needs storage permission, no idea if it will even allow it though
+pub const BASE_DIR: &str = "/sdcard/.reloaded/memory.buffers";
 
 pub struct UnixMemoryMappedFile {
     pub file_descriptor: i32,
@@ -38,10 +42,10 @@ impl UnixMemoryMappedFile {
             let dir = Path::new(new_name.as_str()).parent().unwrap();
             std::fs::create_dir_all(dir).unwrap();
 
-            #[cfg(target_os = "linux")]
-            Self::open_linux(file_name, &mut file_descriptor);
+            #[cfg(not(any(target_os = "macos", target_os = "ios")))]
+            Self::open_unix(file_name, &mut file_descriptor);
 
-            #[cfg(target_os = "macos")]
+            #[cfg(any(target_os = "macos", target_os = "ios"))]
             Self::open_macos(file_name, &mut file_descriptor);
 
             if file_descriptor == -1 {
@@ -59,7 +63,7 @@ impl UnixMemoryMappedFile {
             mmap(
                 std::ptr::null_mut::<c_void>(),
                 length,
-                PROT_READ | PROT_WRITE | PROT_EXEC,
+                PROT_READ | PROT_WRITE,
                 MAP_SHARED,
                 file_descriptor,
                 0,
@@ -80,13 +84,14 @@ impl UnixMemoryMappedFile {
         }
     }
 
-    #[cfg(target_os = "macos")]
+    #[cfg(any(target_os = "macos", target_os = "ios"))]
     fn open_macos(file_name: CString, x: &mut c_int) {
         unsafe { *x = open(file_name.as_ptr(), O_RDWR | O_CREAT, S_IRWXU as c_uint) }
     }
 
-    #[cfg(target_os = "linux")]
-    fn open_linux(file_name: CString, x: &mut c_int) {
+    #[cfg(unix)]
+    #[cfg(not(any(target_os = "macos", target_os = "ios")))]
+    fn open_unix(file_name: CString, x: &mut c_int) {
         unsafe { *x = open(file_name.as_ptr(), O_RDWR | O_CREAT, S_IRWXU) }
     }
 }
@@ -116,10 +121,12 @@ impl MemoryMappedFile for UnixMemoryMappedFile {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::utilities::cached::CACHED;
+
+    #[cfg(not(target_os = "android"))]
+    use {super::*, crate::utilities::cached::CACHED};
 
     #[test]
+    #[cfg(not(target_os = "android"))]
     fn test_memory_mapped_file_creation() {
         // Let's create a memory mapped file with a specific size.
         let file_name = format!(
@@ -138,6 +145,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "android"))]
     fn test_memory_mapped_file_data() {
         let file_name = format!(
             "/test_memory_mapped_file_data PID {}",

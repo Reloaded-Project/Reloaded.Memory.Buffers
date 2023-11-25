@@ -19,6 +19,10 @@ pub fn allocate(
 
     #[cfg(target_os = "macos")]
     return crate::internal::buffer_allocator_osx::allocate_osx(settings);
+
+    // Fallback for non-hot-path OSes.
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    crate::internal::buffer_allocator_mmap_rs::allocate_mmap_rs(settings)
 }
 
 pub unsafe fn get_possible_buffer_addresses(
@@ -328,7 +332,7 @@ mod tests {
         #[cfg(target_os = "windows")]
         free_windows(item);
 
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(unix)]
         free_libc(item);
     }
 
@@ -340,7 +344,7 @@ mod tests {
         assert!(success);
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     fn free_libc(item: LocatorItem) {
         unsafe {
             libc::munmap(item.base_address.value as *mut c_void, item.size as usize);

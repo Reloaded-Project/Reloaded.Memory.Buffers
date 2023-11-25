@@ -61,13 +61,32 @@ impl LocatorHeader {
     ///
     /// * `length` - Number of bytes available.
     pub(crate) fn initialize(&mut self, length: usize) {
+        self.set_default_values();
+        let remaining_bytes = (length - LENGTH) as u32;
+
+        // We allocate to allocation_granularity, however, under some platforms (*cough* M1 macOS)
+        // W^X policy is enforced, in which case, we cannot allocate executable memory here,
+        // as the header would also be affected.
+
+        // We will use the remaining space for more headers on these affected platforms, and
+        // on non-W^X platforms, we will use it for buffers.
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        Self::initialize_remaining_space_as_headers(self as *mut LocatorHeader, remaining_bytes);
+
+        #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+        self.initialize_remaining_space_as_buffers(remaining_bytes);
+    }
+
+    fn set_default_values(&mut self) {
         self.this_address = Unaligned::new(self as *mut LocatorHeader);
         self.next_locator_ptr = Unaligned::new(std::ptr::null_mut());
         self.is_locked = AtomicI32::new(0);
         self.flags = 0;
+        self.num_items = 0;
+    }
 
+    fn initialize_remaining_space_as_buffers(&mut self, mut remaining_bytes: u32) {
         let mut num_items = 0u8;
-        let mut remaining_bytes = (length - LENGTH) as u32;
         unsafe {
             let buffer_address = (self.this_address.value as *mut u8).add(LENGTH);
             let mut current_item = self.get_first_item();
@@ -82,6 +101,20 @@ impl LocatorHeader {
         }
 
         self.num_items = num_items;
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    fn initialize_remaining_space_as_headers(header: *mut LocatorHeader, mut remaining_bytes: u32) {
+        unsafe {
+            let mut current_header = header;
+            while remaining_bytes >= LENGTH as u32 {
+                let next_header = (current_header as *mut u8).add(LENGTH) as *mut LocatorHeader;
+                (*next_header).set_default_values();
+                (*current_header).next_locator_ptr = Unaligned::new(next_header);
+                current_header = next_header;
+                remaining_bytes -= LENGTH as u32;
+            }
+        }
     }
 
     /// Returns the version represented by the first 3 bits of `flags`.
