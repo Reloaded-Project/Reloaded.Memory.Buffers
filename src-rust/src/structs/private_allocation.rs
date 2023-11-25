@@ -153,9 +153,16 @@ impl PrivateAllocation {
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
     #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
     pub(crate) fn drop_mmap_rs(&mut self) {
-        todo!(
-            "Not possible to implement until https://github.com/StephanvanSchaik/mmap-rs/pull/40"
-        );
+        use mmap_rs_with_map_from_existing::MmapOptions;
+        let _map = unsafe {
+            MmapOptions::new(self.size)
+                .unwrap()
+                .with_address(self.base_address.as_ptr() as usize)
+                .map_from_existing()
+                .unwrap()
+        };
+
+        // map will be dropped after being mapped from existing
     }
 }
 

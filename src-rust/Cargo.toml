@@ -26,8 +26,8 @@ criterion = "0.5.1"
 [target.'cfg(unix)'.dependencies]
 libc = "0.2.146"
 
-[target.'cfg(unix)'.dev-dependencies]
-pprof = { version = "0.12", features = ["flamegraph", "criterion"] }
+[target.'cfg(all(unix, not(target_os = "android")))'.dev-dependencies]
+pprof = { version = "0.13", features = ["flamegraph", "criterion"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 mach = "0.3.2"
