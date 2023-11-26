@@ -11,7 +11,7 @@ license = "GPL-3.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 memoffset = "0.9.0"
@@ -63,6 +63,6 @@ strip = false  # No stripping!!
 # Optimized Release Build
 [profile.release]
 codegen-units = 1
-lto = true
+lto = "fat"
 strip = true  # Automatically strip symbols from the binary.
 panic = "abort"
