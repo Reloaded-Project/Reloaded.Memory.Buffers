@@ -83,10 +83,9 @@ impl Cached {
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         {
             // Apple lies about page size in libc on M1 says it's 4096 instead of 16384
-            *page_size = 16384;
+            *page_size = MmapOptions::page_size() as i32;
         }
 
-        // Blame Apple
         *allocation_granularity =
             std::cmp::max(MmapOptions::allocation_granularity() as i32, *page_size);
     }
