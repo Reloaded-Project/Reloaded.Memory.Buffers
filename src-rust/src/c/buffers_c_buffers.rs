@@ -1,9 +1,11 @@
-use std::{
-    ffi::{c_char, CString},
-    mem::{self, ManuallyDrop},
-    ptr,
+use super::{
+    buffers_c_locatoritem::{
+        locatoritem_append_bytes, locatoritem_bytes_left, locatoritem_can_use,
+        locatoritem_is_allocated, locatoritem_is_taken, locatoritem_lock, locatoritem_max_address,
+        locatoritem_min_address, locatoritem_try_lock, locatoritem_unlock,
+    },
+    buffers_fnptr::BuffersFunctions,
 };
-
 use crate::{
     buffers::Buffers,
     structs::{
@@ -16,14 +18,11 @@ use crate::{
         icache_clear::clear_instruction_cache,
     },
 };
-
-use super::{
-    buffers_c_locatoritem::{
-        locatoritem_append_bytes, locatoritem_bytes_left, locatoritem_can_use,
-        locatoritem_is_allocated, locatoritem_is_taken, locatoritem_lock, locatoritem_max_address,
-        locatoritem_min_address, locatoritem_try_lock, locatoritem_unlock,
-    },
-    buffers_fnptr::BuffersFunctions,
+use core::ptr::copy_nonoverlapping;
+use std::{
+    ffi::{c_char, CString},
+    mem::{self, ManuallyDrop},
+    ptr,
 };
 
 /// The result of making an allocation.
@@ -282,9 +281,9 @@ pub extern "C" fn utilities_clear_instruction_cache(start: *mut u8, end: *mut u8
 ///
 /// # Parameters
 ///
-/// * `address` - The address of the code your callback will overwrite.
-/// * `size` - The size of the code your callback will overwrite.
-/// * `callback` - Your method to overwrite the code.
+/// * `source` - Source address to copy bytes from.
+/// * `target` - Where these bytes should be copied to. This should be an address inside a buffer.
+/// * `size` - The size of the data to copy.
 ///
 /// # Safety
 ///
@@ -295,15 +294,47 @@ pub extern "C" fn utilities_clear_instruction_cache(start: *mut u8, end: *mut u8
 ///
 /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
 /// should not be skipped on non-x86 architectures.
-pub extern "C" fn overwrite_allocated_code(
-    address: *const u8,
+#[no_mangle]
+pub unsafe extern "C" fn overwrite_allocated_code(source: *const u8, target: *mut u8, size: usize) {
+    disable_write_xor_execute(target, size);
+    copy_nonoverlapping(source, target, size);
+    restore_write_xor_execute(target, size);
+    clear_instruction_cache(target, source.wrapping_add(size));
+}
+
+/// Call this method in order to safely be able to overwrite existing code that was
+/// allocated by the library inside one of its buffers. (e.g. Hooking/detours code.)
+///
+/// This callback handles various edge cases, (such as flushing caches), and flipping page permissions
+/// on relevant platforms.
+///
+/// # Parameters
+///
+/// * `source` - Source address to copy bytes from.
+/// * `target` - Where these bytes should be copied to. This should be an address inside a buffer.
+/// * `size` - The size of the data to copy.
+/// * `callback` - Your method to overwrite the code present there.
+///
+/// # Safety
+///
+/// Only use this with addresses allocated inside a Reloaded.Memory.Buffers buffer.  
+/// Usage with any other memory is undefined behaviour.
+///
+/// # Remarks
+///
+/// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
+/// should not be skipped on non-x86 architectures.
+#[no_mangle]
+pub extern "C" fn overwrite_allocated_code_ex(
+    source: *const u8,
+    target: *mut u8,
     size: usize,
-    callback: extern "C" fn(*const u8, usize),
+    callback: extern "C" fn(*const u8, *mut u8, usize),
 ) {
-    disable_write_xor_execute(address, size);
-    callback(address, size);
-    restore_write_xor_execute(address, size);
-    clear_instruction_cache(address as *mut u8, address.wrapping_add(size));
+    disable_write_xor_execute(target, size);
+    callback(source, target, size);
+    restore_write_xor_execute(target, size);
+    clear_instruction_cache(target, source.wrapping_add(size));
 }
 
 /// Returns all exported functions inside a struct.
@@ -332,6 +363,7 @@ pub extern "C" fn get_functions() -> BuffersFunctions {
         locatoritem_append_bytes,
         utilities_clear_instruction_cache,
         overwrite_allocated_code,
+        overwrite_allocated_code_ex,
     }
 }
 

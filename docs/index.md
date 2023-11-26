@@ -227,7 +227,8 @@ Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited)
 === "Rust"
 
 	```rust
-	Self::overwrite_allocated_code(address, size, |addr, size| {
+	Self::overwrite_allocated_code(source, target, size);
+	Self::overwrite_allocated_code_ex(source, target, size, |src, tgt, sz| {
         // Do stuff with executable code 
     });
 	```
@@ -235,12 +236,15 @@ Note: Rust/C port also works with FreeBSD (untested), and has partial [(limited)
 === "C/C++"
 
 	```cpp
-	void do_stuff_with_executable_code(char* addr, size_t size) {
+	void do_stuff_with_executable_code(char* source, char* target, size_t size) {
 		// Modify executable code in buffer
 	}
 
-	overwrite_allocated_code(address, size, do_stuff_with_executable_code);
+	overwrite_allocated_code(source, target, size);
+	overwrite_allocated_code_ex(source, target, size, do_stuff_with_executable_code);
 	```
+
+Alternative overload also allows you to pass a 'context' variable.
 
 !!! warning "Not currently available in C# version. Submit an issue request or PR if you need this."
 

@@ -203,9 +203,9 @@ pub struct BuffersFunctions {
     ///
     /// # Parameters
     ///
-    /// * `address` - The address of the code your callback will overwrite.
-    /// * `size` - The size of the code your callback will overwrite.
-    /// * `callback` - Your method to overwrite the code.
+    /// * `source` - Source address to copy bytes from.
+    /// * `target` - Where these bytes should be copied to. This should be an address inside a buffer.
+    /// * `size` - The size of the data to copy.
     ///
     /// # Safety
     ///
@@ -217,5 +217,34 @@ pub struct BuffersFunctions {
     /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
     /// should not be skipped on non-x86 architectures.
     pub overwrite_allocated_code:
-        extern "C" fn(address: *const u8, size: usize, callback: extern "C" fn(*const u8, usize)),
+        unsafe extern "C" fn(source: *const u8, target: *mut u8, size: usize),
+
+    /// Call this method in order to safely be able to overwrite existing code that was
+    /// allocated by the library inside one of its buffers. (e.g. Hooking/detours code.)
+    ///
+    /// This callback handles various edge cases, (such as flushing caches), and flipping page permissions
+    /// on relevant platforms.
+    ///
+    /// # Parameters
+    ///
+    /// * `source` - Source address to copy bytes from.
+    /// * `target` - Where these bytes should be copied to. This should be an address inside a buffer.
+    /// * `size` - The size of the data to copy.
+    /// * `callback` - Your method to overwrite the code present there.
+    ///
+    /// # Safety
+    ///
+    /// Only use this with addresses allocated inside a Reloaded.Memory.Buffers buffer.  
+    /// Usage with any other memory is undefined behaviour.
+    ///
+    /// # Remarks
+    ///
+    /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
+    /// should not be skipped on non-x86 architectures.
+    pub overwrite_allocated_code_ex: extern "C" fn(
+        source: *const u8,
+        target: *mut u8,
+        size: usize,
+        callback: extern "C" fn(*const u8, *mut u8, usize),
+    ),
 }
