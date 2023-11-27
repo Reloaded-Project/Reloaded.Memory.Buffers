@@ -1,4 +1,7 @@
+extern crate alloc;
+
 use super::cached::CACHED;
+use alloc::vec::Vec;
 
 // Generic structure to use for custom parsers.
 #[derive(Debug)]

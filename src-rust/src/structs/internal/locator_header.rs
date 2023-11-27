@@ -1,3 +1,4 @@
+extern crate alloc;
 use crate::internal::buffer_allocator::allocate;
 use crate::structs::errors::ItemAllocationError;
 use crate::structs::internal::LocatorItem;
@@ -5,11 +6,12 @@ use crate::structs::params::BufferAllocatorSettings;
 use crate::structs::SafeLocatorItem;
 use crate::utilities::cached::CACHED;
 use crate::utilities::wrappers::Unaligned;
-use std::alloc::{alloc, Layout};
-use std::cell::Cell;
-use std::cmp::min;
-use std::mem::size_of;
-use std::sync::atomic::{AtomicI32, Ordering};
+use core::alloc::Layout;
+use core::cell::Cell;
+use core::cmp::min;
+use core::mem::size_of;
+use core::ptr::null_mut;
+use core::sync::atomic::{AtomicI32, Ordering};
 
 /// Static length of this locator.
 pub(crate) const LENGTH: usize = 4096;
@@ -79,7 +81,7 @@ impl LocatorHeader {
 
     fn set_default_values(&mut self) {
         self.this_address = Unaligned::new(self as *mut LocatorHeader);
-        self.next_locator_ptr = Unaligned::new(std::ptr::null_mut());
+        self.next_locator_ptr = Unaligned::new(null_mut());
         self.is_locked = AtomicI32::new(0);
         self.flags = 0;
         self.num_items = 0;
@@ -153,7 +155,15 @@ impl LocatorHeader {
     /// Acquires the lock, blocking until it can do so.
     pub fn lock(&mut self) {
         while !self.try_lock() {
-            std::thread::yield_now();
+            #[cfg(unix)]
+            unsafe {
+                libc::sched_yield();
+            }
+
+            #[cfg(windows)]
+            unsafe {
+                windows::Win32::System::Threading::SwitchToThread();
+            }
         }
     }
 
@@ -322,9 +332,9 @@ impl LocatorHeader {
         }
 
         // Allocate the next locator.
-        let alloc_size = CACHED.get_allocation_granularity();
+        let alloc_size = CACHED.allocation_granularity;
         unsafe {
-            let addr = alloc(
+            let addr = alloc::alloc::alloc(
                 Layout::from_size_align(alloc_size as usize, CACHED.page_size as usize).unwrap(),
             );
             if addr.is_null() {

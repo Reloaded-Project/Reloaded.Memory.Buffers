@@ -49,7 +49,7 @@ unsafe fn try_allocate_buffer(
         entry.start_address,
         entry.end_address,
         settings.size as usize,
-        CACHED.get_allocation_granularity() as usize,
+        CACHED.allocation_granularity as usize,
         buffer,
     ) {
         let allocated = mmap(

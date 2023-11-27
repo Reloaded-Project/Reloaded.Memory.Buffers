@@ -1,7 +1,9 @@
 use lazy_static::lazy_static;
-use std::process;
 #[cfg(target_os = "windows")]
-use windows::Win32::System::SystemInformation::{GetSystemInfo, SYSTEM_INFO};
+use windows::Win32::System::{
+    SystemInformation::{GetSystemInfo, SYSTEM_INFO},
+    Threading::GetCurrentProcessId,
+};
 
 lazy_static! {
     pub static ref CACHED: Cached = Cached::new();
@@ -10,8 +12,8 @@ lazy_static! {
 pub struct Cached {
     pub max_address: usize,
     pub allocation_granularity: i32,
-    pub this_process_id: u32,
     pub page_size: u32,
+    pub this_process_id: u32,
 }
 
 #[allow(dead_code)]
@@ -38,9 +40,19 @@ impl Cached {
         Cached {
             max_address,
             allocation_granularity,
-            this_process_id: process::id(),
+            this_process_id: Self::get_process_id(),
             page_size: 4096,
         }
+    }
+
+    #[cfg(unix)]
+    fn get_process_id() -> u32 {
+        unsafe { libc::getpid() as u32 }
+    }
+
+    #[cfg(target_os = "windows")]
+    fn get_process_id() -> u32 {
+        unsafe { GetCurrentProcessId() }
     }
 
     #[cfg(target_os = "windows")]
@@ -68,6 +80,8 @@ impl Cached {
     ) {
         // Note: This is a fallback mechanism dependent on mmap-rs.
 
+        use core::cmp::max;
+
         use mmap_rs_with_map_from_existing::MmapOptions;
         if cfg!(target_pointer_width = "32") {
             *max_address = 0xFFFF_FFFF;
@@ -86,15 +100,6 @@ impl Cached {
             *page_size = MmapOptions::page_size() as i32;
         }
 
-        *allocation_granularity =
-            std::cmp::max(MmapOptions::allocation_granularity() as i32, *page_size);
-    }
-
-    pub fn get_allocation_granularity(&self) -> i32 {
-        self.allocation_granularity
-    }
-
-    pub fn get_this_process_id(&self) -> u32 {
-        self.this_process_id
+        *allocation_granularity = max(MmapOptions::allocation_granularity() as i32, *page_size);
     }
 }

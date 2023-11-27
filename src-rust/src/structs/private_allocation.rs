@@ -1,7 +1,5 @@
-use std::ffi::c_void;
-use std::ptr::NonNull;
-
 use crate::utilities::cached::CACHED;
+use core::ptr::{self, NonNull};
 
 #[cfg(target_os = "windows")]
 use {
@@ -85,7 +83,7 @@ impl PrivateAllocation {
     pub(crate) fn null() -> Self {
         unsafe {
             Self {
-                base_address: NonNull::new_unchecked(std::ptr::null_mut()),
+                base_address: NonNull::new_unchecked(ptr::null_mut()),
                 size: Default::default(),
                 _this_process_id: Default::default(),
             }
@@ -95,6 +93,8 @@ impl PrivateAllocation {
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
     #[cfg(target_os = "windows")]
     fn drop_windows(&mut self) {
+        use core::ffi::c_void;
+
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
                 let result = VirtualFree(self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
@@ -138,6 +138,8 @@ impl PrivateAllocation {
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
     #[cfg(target_os = "linux")]
     pub(crate) fn drop_unix(&mut self) {
+        use libc::c_void;
+
         unsafe {
             if self._this_process_id == CACHED.this_process_id {
                 let result = libc::munmap(self.base_address.as_ptr() as *mut c_void, self.size);

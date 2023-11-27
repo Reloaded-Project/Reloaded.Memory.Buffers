@@ -1,5 +1,7 @@
+extern crate alloc;
+
 use crate::internal::memory_mapped_file::MemoryMappedFile;
-use std::ffi::CString;
+use alloc::ffi::CString;
 use windows::core::PCSTR;
 use windows::imp::CloseHandle;
 use windows::Win32::Foundation::{HANDLE, INVALID_HANDLE_VALUE};
@@ -94,7 +96,7 @@ mod tests {
             "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
             CACHED.this_process_id
         );
-        let file_length = CACHED.get_allocation_granularity() as usize;
+        let file_length = CACHED.allocation_granularity as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
 
         assert_eq!(mmf.already_existed, false);
@@ -112,7 +114,7 @@ mod tests {
             CACHED.this_process_id
         );
 
-        let file_length = CACHED.get_allocation_granularity() as usize;
+        let file_length = CACHED.allocation_granularity as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
 
         // Let's test we can read and write to the data.

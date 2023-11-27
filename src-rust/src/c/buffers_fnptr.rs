@@ -1,11 +1,10 @@
-use std::ffi::c_char;
-
 use super::buffers_c_buffers::{AllocationResult, GetBufferResult};
 use crate::structs::{
     internal::LocatorItem,
     params::{BufferAllocatorSettings, BufferSearchSettings},
     PrivateAllocation,
 };
+use core::ffi::c_char;
 
 #[repr(C)]
 pub struct BuffersFunctions {

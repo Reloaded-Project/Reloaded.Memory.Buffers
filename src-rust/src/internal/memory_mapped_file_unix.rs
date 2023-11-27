@@ -1,12 +1,18 @@
-use errno::errno;
+extern crate alloc;
 
+use alloc::ffi::CString;
+use alloc::string::String;
+use alloc::string::ToString;
+use core::mem::MaybeUninit;
+use core::ptr::null_mut;
+use errno::errno;
+use libc::mkdir;
+use libc::stat;
+use libc::S_IFDIR;
 use libc::{
-    c_int, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_READ,
+    c_int, c_void, close, ftruncate, mmap, munmap, open, MAP_SHARED, O_CREAT, O_RDWR, PROT_READ,
     PROT_WRITE, S_IRWXU,
 };
-use std::ffi::{c_void, CString};
-use std::fs::create_dir;
-use std::path::Path;
 
 #[cfg(target_os = "macos")]
 use libc::c_uint;
@@ -40,8 +46,9 @@ impl UnixMemoryMappedFile {
 
         // If it doesn't exist, create a new shared memory.
         if !already_existed {
-            let dir = Path::new(new_name.as_str()).parent().unwrap();
-            Self::create_dir_all(dir);
+            unsafe {
+                Self::create_dir_all(BASE_DIR);
+            }
 
             #[cfg(not(any(target_os = "macos", target_os = "ios")))]
             Self::open_unix(file_name, &mut file_descriptor);
@@ -62,7 +69,7 @@ impl UnixMemoryMappedFile {
 
         let data = unsafe {
             mmap(
-                std::ptr::null_mut::<c_void>(),
+                null_mut::<c_void>(),
                 length,
                 PROT_READ | PROT_WRITE,
                 MAP_SHARED,
@@ -96,14 +103,24 @@ impl UnixMemoryMappedFile {
         unsafe { *x = open(file_name.as_ptr(), O_RDWR | O_CREAT, S_IRWXU) }
     }
 
-    fn create_dir_all(path: &Path) {
-        let mut current_path = std::path::PathBuf::new();
+    unsafe fn create_dir_all(path: &str) {
+        let mut current_path = String::new();
+        for component in path.split('/') {
+            if !component.is_empty() {
+                current_path.push_str(component);
+                current_path.push('/');
 
-        for component in path.components() {
-            current_path = current_path.join(component.as_os_str());
+                // Convert current_path to C string
+                let c_path = CString::new(current_path.as_bytes()).unwrap();
 
-            if !current_path.exists() {
-                let _ = create_dir(&current_path);
+                // Check if directory exists
+                let mut stat_buf = MaybeUninit::uninit().assume_init();
+                if stat(c_path.as_ptr(), &mut stat_buf) != 0 || stat_buf.st_mode & S_IFDIR == 0 {
+                    // Directory does not exist or not a directory, try to create it
+                    if mkdir(c_path.as_ptr(), S_IRWXU) != 0 {
+                        break;
+                    }
+                }
             }
         }
     }
@@ -115,7 +132,9 @@ impl Drop for UnixMemoryMappedFile {
         let _ = unsafe { munmap(self.data as *mut c_void, self.length) };
         unsafe { close(self.file_descriptor) };
         if !self.already_existed {
-            let _ = std::fs::remove_file(Path::new(&self.file_path));
+            unsafe {
+                libc::unlink(self.file_path.as_ptr() as *const i8);
+            }
         }
     }
 }
@@ -146,7 +165,7 @@ mod tests {
             "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
             CACHED.this_process_id
         );
-        let file_length = CACHED.get_allocation_granularity() as usize;
+        let file_length = CACHED.allocation_granularity as usize;
         let mmf = UnixMemoryMappedFile::new(&file_name, file_length);
 
         assert!(!mmf.already_existed);
@@ -165,7 +184,7 @@ mod tests {
             CACHED.this_process_id
         );
 
-        let file_length = CACHED.get_allocation_granularity() as usize;
+        let file_length = CACHED.allocation_granularity as usize;
         println!("file_length: {:?}", file_length);
         let mmf = UnixMemoryMappedFile::new(&file_name, file_length);
 
