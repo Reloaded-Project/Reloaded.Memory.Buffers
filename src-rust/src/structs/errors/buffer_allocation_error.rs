@@ -7,6 +7,7 @@ pub struct BufferAllocationError {
 }
 
 impl std::fmt::Display for BufferAllocationError {
+    #[cfg_attr(feature = "size_opt", optimize(size))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,

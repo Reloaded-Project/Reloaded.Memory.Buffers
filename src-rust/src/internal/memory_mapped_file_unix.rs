@@ -5,6 +5,7 @@ use libc::{
     PROT_WRITE, S_IRWXU,
 };
 use std::ffi::{c_void, CString};
+use std::fs::create_dir;
 use std::path::Path;
 
 #[cfg(target_os = "macos")]
@@ -40,7 +41,7 @@ impl UnixMemoryMappedFile {
         // If it doesn't exist, create a new shared memory.
         if !already_existed {
             let dir = Path::new(new_name.as_str()).parent().unwrap();
-            std::fs::create_dir_all(dir).unwrap();
+            Self::create_dir_all(dir);
 
             #[cfg(not(any(target_os = "macos", target_os = "ios")))]
             Self::open_unix(file_name, &mut file_descriptor);
@@ -93,6 +94,18 @@ impl UnixMemoryMappedFile {
     #[cfg(not(any(target_os = "macos", target_os = "ios")))]
     fn open_unix(file_name: CString, x: &mut c_int) {
         unsafe { *x = open(file_name.as_ptr(), O_RDWR | O_CREAT, S_IRWXU) }
+    }
+
+    fn create_dir_all(path: &Path) {
+        let mut current_path = std::path::PathBuf::new();
+
+        for component in path.components() {
+            current_path = current_path.join(component.as_os_str());
+
+            if !current_path.exists() {
+                let _ = create_dir(&current_path);
+            }
+        }
     }
 }
 

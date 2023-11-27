@@ -9,6 +9,7 @@ pub struct BufferSearchError {
 }
 
 impl Display for BufferSearchError {
+    #[cfg_attr(feature = "size_opt", optimize(size))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,

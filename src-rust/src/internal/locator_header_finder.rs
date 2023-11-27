@@ -47,6 +47,7 @@ impl LocatorHeaderFinder {
         return init_locatorheader_standard(); // OSes with unsupported Memory Mapped Files
     }
 
+    #[cfg_attr(feature = "size_opt", optimize(size))]
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
         // no_std
         let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");

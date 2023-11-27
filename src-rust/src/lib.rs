@@ -52,6 +52,8 @@ For an idea as to how things are set up, [see Reloaded Project Configurations.](
 Happy Hacking 💜
 */
 
+#![cfg_attr(feature = "nightly", feature(optimize_attribute))]
+
 pub mod structs {
 
     pub mod params {
