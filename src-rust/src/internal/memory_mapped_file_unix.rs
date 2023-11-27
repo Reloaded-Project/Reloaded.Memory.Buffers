@@ -105,31 +105,35 @@ impl UnixMemoryMappedFile {
     }
 
     unsafe fn create_dir_all(path: &str) {
-        let mut current_path = String::new();
+        let mut current_path = String::with_capacity(path.len());
+        current_path.push('/');
         for component in path.split('/') {
             if !component.is_empty() {
                 current_path.push_str(component);
-                current_path.push('/');
 
                 // Convert current_path to C string
                 let c_path = CString::new(current_path.as_bytes()).unwrap();
 
-                // Check if directory exists
+                // Properly handle MaybeUninit
                 let mut stat_buf = MaybeUninit::uninit();
-                if stat(c_path.as_ptr(), stat_buf.as_mut_ptr()) != 0 {
-                    // Directory does not exist, try to create it
+                let stat_result = stat(c_path.as_ptr(), stat_buf.as_mut_ptr());
+
+                if stat_result != 0 {
+                    // stat failed, directory does not exist, try to create it
                     if mkdir(c_path.as_ptr(), S_IRWXU) != 0 {
                         // Handle error or break as needed
                         break;
                     }
                 } else {
-                    // Safely assume initialization after successful stat call
+                    // stat succeeded, ensure that the path is a directory
                     let stat_buf = stat_buf.assume_init();
                     if stat_buf.st_mode & S_IFDIR == 0 {
-                        // Path exists but is not a directory.
+                        // Path exists but is not a directory
                         break;
                     }
                 }
+
+                current_path.push('/');
             }
         }
     }
