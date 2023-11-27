@@ -5,7 +5,10 @@ use alloc::string::String;
 use alloc::string::ToString;
 use core::mem::MaybeUninit;
 use core::ptr::null_mut;
+
+#[cfg(not(feature = "no_format"))]
 use errno::errno;
+
 use libc::c_char;
 use libc::mkdir;
 use libc::stat;
@@ -58,12 +61,13 @@ impl UnixMemoryMappedFile {
             Self::open_macos(file_name, &mut file_descriptor);
 
             if file_descriptor == -1 {
-                assert_ne!(
-                    file_descriptor,
-                    -1,
-                    "Failed to open shared memory file, errno: {}",
-                    errno().0
-                );
+                #[cfg(feature = "no_format")]
+                panic!("Failed to open shared memory file.");
+
+                #[cfg(not(feature = "no_format"))]
+                {
+                    panic!("Failed to open shared memory file, errno: {}", errno().0)
+                }
             }
             unsafe { ftruncate(file_descriptor, length as _) };
         }
@@ -80,8 +84,14 @@ impl UnixMemoryMappedFile {
         };
 
         if data == libc::MAP_FAILED {
-            let err_no = errno().0;
-            panic!("Failed to mmap shared memory file, error no: {}", err_no);
+            #[cfg(feature = "no_format")]
+            panic!("Failed to mmap shared memory file.");
+
+            #[cfg(not(feature = "no_format"))]
+            {
+                let err_no = errno().0;
+                panic!("Failed to mmap shared memory file, error no: {}", err_no);
+            }
         }
 
         UnixMemoryMappedFile {

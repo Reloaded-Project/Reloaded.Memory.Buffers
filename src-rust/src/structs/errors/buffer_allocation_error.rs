@@ -9,11 +9,20 @@ pub struct BufferAllocationError {
 impl core::fmt::Display for BufferAllocationError {
     #[cfg_attr(feature = "size_opt", optimize(size))]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(
-            f,
-            "Buffer allocation error: {}. Settings: {:?}",
-            self.text, self.settings
-        )
+        #[cfg(feature = "no_format")]
+        {
+            f.write_str("Buffer Allocation Error: ")?;
+            f.write_str(self.text)
+        }
+
+        #[cfg(not(feature = "no_format"))]
+        {
+            write!(
+                f,
+                "Buffer Allocation Error: {}. Settings: {:?}",
+                self.text, self.settings
+            )
+        }
     }
 }
 

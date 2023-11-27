@@ -11,11 +11,20 @@ pub struct BufferSearchError {
 impl Display for BufferSearchError {
     #[cfg_attr(feature = "size_opt", optimize(size))]
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(
-            f,
-            "Buffer search error: {}. Settings: {:?}",
-            self.text, self.settings
-        )
+        #[cfg(feature = "no_format")]
+        {
+            f.write_str("Buffer Search Error: ")?;
+            f.write_str(self.text)
+        }
+
+        #[cfg(not(feature = "no_format"))]
+        {
+            write!(
+                f,
+                "Buffer Search Error: {}. Settings: {:?}",
+                self.text, self.settings
+            )
+        }
     }
 }
 
