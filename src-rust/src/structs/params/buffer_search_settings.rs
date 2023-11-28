@@ -1,5 +1,4 @@
-use crate::utilities::cached::CACHED;
-use crate::utilities::mathematics;
+use crate::utilities::{cached::get_sys_info, mathematics};
 
 /// Settings to pass to buffer search mechanisms.
 #[derive(Debug, Clone, Copy)]
@@ -20,7 +19,7 @@ impl BufferSearchSettings {
     pub fn new() -> Self {
         Self {
             min_address: 0,
-            max_address: CACHED.max_address,
+            max_address: get_sys_info().max_address,
             size: 4096,
         }
     }
@@ -59,7 +58,7 @@ mod tests {
     fn test_default_settings() {
         let settings = BufferSearchSettings::new();
         assert_eq!(settings.min_address, 0);
-        assert_eq!(settings.max_address, CACHED.max_address);
+        assert_eq!(settings.max_address, get_sys_info().max_address);
         assert_eq!(settings.size, 4096);
     }
 

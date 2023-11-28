@@ -42,92 +42,58 @@ jobs:
           rust_project_path: src-rust
           rust_branch: nightly
 
-  build-c-libs:
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            features: "c_exports"
-          - os: ubuntu-latest
-            target: i686-unknown-linux-gnu
-            features: "c_exports"
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            features: "c_exports"
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            features: "c_exports"
-          - os: windows-latest
-            target: i686-pc-windows-msvc
-            features: "c_exports"
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
-            features: "c_exports"
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            features: "c_exports"
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            features: "c_exports"
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            features: "c_exports,size_opt"
-          - os: ubuntu-latest
-            target: i686-unknown-linux-gnu
-            features: "c_exports,size_opt"
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            features: "c_exports,size_opt"
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            features: "c_exports,size_opt"
-          - os: windows-latest
-            target: i686-pc-windows-msvc
-            features: "c_exports,size_opt"
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
-            features: "c_exports,size_opt"
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            features: "c_exports,size_opt"
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            features: "c_exports,size_opt"
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            features: "c_exports,size_opt,no_format"
-          - os: ubuntu-latest
-            target: i686-unknown-linux-gnu
-            features: "c_exports,size_opt,no_format"
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            features: "c_exports,size_opt,no_format"
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            features: "c_exports,size_opt,no_format"
-          - os: windows-latest
-            target: i686-pc-windows-msvc
-            features: "c_exports,size_opt,no_format"
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
-            features: "c_exports,size_opt,no_format"
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            features: "c_exports,size_opt,no_format"
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            features: "c_exports,size_opt,no_format"
-
+  build-c-libs-linux:
     runs-on: ${{ matrix.os }}
-
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        target: [x86_64-unknown-linux-gnu, i686-unknown-linux-gnu, aarch64-unknown-linux-gnu]
+        features: ["c_exports", "c_exports,size_opt", "c_exports,size_opt,no_format"]
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
       - id: build-libs
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1 # upgrade if needed
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1
+        with:
+          rust_project_path: src-rust
+          target: ${{ matrix.target }}
+          features: ${{ matrix.features }}
+
+  build-c-libs-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+        target: [x86_64-apple-darwin, aarch64-apple-darwin]
+        features: ["c_exports", "c_exports,size_opt", "c_exports,size_opt,no_format"]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - id: build-libs
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1
+        with:
+          rust_project_path: src-rust
+          target: ${{ matrix.target }}
+          features: ${{ matrix.features }}
+
+  build-c-libs-windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        target: [x86_64-pc-windows-msvc, i686-pc-windows-msvc, aarch64-pc-windows-msvc]
+        features: ["c_exports,external_processes", "c_exports,size_opt,external_processes", "c_exports,size_opt,no_format,external_processes"]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - id: build-libs
+        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1
         with:
           rust_project_path: src-rust
           target: ${{ matrix.target }}
@@ -155,7 +121,7 @@ jobs:
           header_file: bindings_c.h
 
   publish-artifacts:
-    needs: ["build-c-headers", "build-c-libs", "test-wine", "test-native"]
+    needs: ["build-c-headers", "build-c-libs-windows", "build-c-libs-linux", "build-c-libs-macos", "test-wine", "test-native"]
     # Publish only on tags
     if: startsWith(github.ref, 'refs/tags/') 
     runs-on: ubuntu-latest

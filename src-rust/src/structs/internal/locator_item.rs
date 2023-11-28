@@ -74,6 +74,11 @@ impl LocatorItem {
     /// Acquires the lock, blocking until it can do so.
     pub fn lock(&mut self) {
         while !self.try_lock() {
+            #[cfg(all(feature = "std", not(unix), not(windows)))]
+            {
+                std::thread::yield_now();
+            }
+
             #[cfg(unix)]
             unsafe {
                 libc::sched_yield();
@@ -81,7 +86,7 @@ impl LocatorItem {
 
             #[cfg(windows)]
             unsafe {
-                windows::Win32::System::Threading::SwitchToThread();
+                windows_sys::Win32::System::Threading::SwitchToThread();
             }
         }
     }

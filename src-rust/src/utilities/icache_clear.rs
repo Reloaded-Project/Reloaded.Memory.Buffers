@@ -23,14 +23,14 @@ pub fn clear_instruction_cache(start: *const u8, end: *const u8) {
 #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
 #[cfg(target_os = "windows")] // MSVC fix
 pub fn clear_instruction_cache(start: *const u8, end: *const u8) {
-    use windows::Win32::System::{
+    use windows_sys::Win32::System::{
         Diagnostics::Debug::FlushInstructionCache, Threading::GetCurrentProcess,
     };
 
     unsafe {
         FlushInstructionCache(
             GetCurrentProcess(),
-            Some(start as *const core::ffi::c_void),
+            start as *const core::ffi::c_void,
             end as usize - start as usize,
         );
     }

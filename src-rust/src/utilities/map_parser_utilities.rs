@@ -1,6 +1,6 @@
 extern crate alloc;
 
-use super::cached::CACHED;
+use super::cached::get_sys_info;
 use alloc::vec::Vec;
 
 // Generic structure to use for custom parsers.
@@ -58,10 +58,10 @@ pub fn get_free_regions<T: MemoryMapEntryTrait>(regions: &[T]) -> Vec<MemoryMapE
     }
 
     // After the last region, up to the end of memory
-    if last_end_address < CACHED.max_address {
+    if last_end_address < get_sys_info().max_address {
         free_regions.push(MemoryMapEntry {
             start_address: last_end_address,
-            end_address: CACHED.max_address,
+            end_address: get_sys_info().max_address,
         });
     }
 

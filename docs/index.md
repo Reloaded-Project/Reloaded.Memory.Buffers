@@ -250,6 +250,8 @@ Alternative overload also allows you to pass a 'context' variable.
 
 ### Crate Features (Rust)
 
+- `std`: [Enabled by Default] Enables use of standard library.   
+- `external_processes`: Support external processes (windows only).  
 - `no_format`: Disables formatting code in errors, saving ~8kB of space.  
 - `size_opt`: Makes cold paths optimized for size instead of optimized for speed. [Requires 'nightly' Rust]  
 - `c_exports` Provides C exports for the library.    

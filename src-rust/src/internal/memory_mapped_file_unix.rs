@@ -178,7 +178,7 @@ impl MemoryMappedFile for UnixMemoryMappedFile {
 mod tests {
 
     #[cfg(not(target_os = "android"))]
-    use {super::*, crate::utilities::cached::CACHED};
+    use {super::*, crate::utilities::cached::get_sys_info};
 
     #[test]
     #[cfg(not(target_os = "android"))]
@@ -186,9 +186,9 @@ mod tests {
         // Let's create a memory mapped file with a specific size.
         let file_name = format!(
             "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
-            CACHED.this_process_id
+            get_sys_info().this_process_id
         );
-        let file_length = CACHED.allocation_granularity as usize;
+        let file_length = get_sys_info().allocation_granularity as usize;
         let mmf = UnixMemoryMappedFile::new(&file_name, file_length);
 
         assert!(!mmf.already_existed);
@@ -204,10 +204,10 @@ mod tests {
     fn test_memory_mapped_file_data() {
         let file_name = format!(
             "/test_memory_mapped_file_data PID {}",
-            CACHED.this_process_id
+            get_sys_info().this_process_id
         );
 
-        let file_length = CACHED.allocation_granularity as usize;
+        let file_length = get_sys_info().allocation_granularity as usize;
         println!("file_length: {:?}", file_length);
         let mmf = UnixMemoryMappedFile::new(&file_name, file_length);
 

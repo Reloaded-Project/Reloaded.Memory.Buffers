@@ -232,7 +232,7 @@ mod tests {
     use crate::{
         internal::locator_header_finder::LocatorHeaderFinder,
         structs::params::{BufferAllocatorSettings, BufferSearchSettings},
-        utilities::cached::CACHED,
+        utilities::cached::get_sys_info,
     };
     use std;
 
@@ -253,8 +253,8 @@ mod tests {
     #[test]
     fn allocate_private_memory_up_to_max_address() {
         let mut settings = BufferAllocatorSettings::new();
-        settings.min_address = CACHED.max_address / 2;
-        settings.max_address = CACHED.max_address;
+        settings.min_address = get_sys_info().max_address / 2;
+        settings.max_address = get_sys_info().max_address;
 
         let result = Buffers::allocate_private_memory(&mut settings);
         assert!(result.is_ok());
@@ -267,8 +267,8 @@ mod tests {
     #[test]
     fn get_buffer_baseline() {
         let settings = BufferSearchSettings {
-            min_address: (CACHED.max_address / 2),
-            max_address: CACHED.max_address,
+            min_address: (get_sys_info().max_address / 2),
+            max_address: get_sys_info().max_address,
             size: 4096,
         };
 
@@ -286,8 +286,8 @@ mod tests {
     #[test]
     fn memory_is_executable_x64() {
         let settings = BufferSearchSettings {
-            min_address: (CACHED.max_address / 2),
-            max_address: CACHED.max_address,
+            min_address: (get_sys_info().max_address / 2),
+            max_address: get_sys_info().max_address,
             size: 4096,
         };
 
@@ -317,8 +317,8 @@ mod tests {
     #[test]
     fn memory_is_executable_aarch64() {
         let settings = BufferSearchSettings {
-            min_address: (CACHED.max_address / 2),
-            max_address: CACHED.max_address,
+            min_address: (get_sys_info().max_address / 2),
+            max_address: get_sys_info().max_address,
             size: 4096,
         };
 
@@ -352,8 +352,8 @@ mod tests {
     #[case(256)]
     fn get_buffer_aligned_test(#[case] alignment: u32) {
         let settings = BufferSearchSettings {
-            min_address: (CACHED.max_address / 2),
-            max_address: CACHED.max_address,
+            min_address: (get_sys_info().max_address / 2),
+            max_address: get_sys_info().max_address,
             size: 4096,
         };
 
@@ -382,7 +382,7 @@ mod tests {
     #[test]
     fn get_buffer_with_proximity() {
         const SIZE: usize = 4096;
-        let base_address = CACHED.max_address - (std::i32::MAX as usize);
+        let base_address = get_sys_info().max_address - (std::i32::MAX as usize);
 
         unsafe {
             LocatorHeaderFinder::reset();

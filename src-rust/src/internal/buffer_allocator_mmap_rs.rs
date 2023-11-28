@@ -1,7 +1,7 @@
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
-use crate::utilities::cached::CACHED;
+use crate::utilities::cached::get_sys_info;
 use crate::utilities::map_parser_utilities::get_free_regions;
 use crate::{
     internal::buffer_allocator::get_possible_buffer_addresses,
@@ -68,7 +68,7 @@ unsafe fn try_allocate_buffer(
         entry.start_address,
         entry.end_address,
         settings.size as usize,
-        CACHED.get_allocation_granularity() as usize,
+        get_sys_info().get_allocation_granularity() as usize,
         buffer,
     ) {
         let mmapoptions = MmapOptions::new(settings.size as usize)

@@ -3,11 +3,10 @@ use core::ptr::null_mut;
 
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 use crate::structs::internal::LocatorHeader;
-use crate::utilities::cached::CACHED;
+use crate::utilities::cached::get_sys_info;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
-use lazy_static::lazy_static;
 use spin::Mutex;
 
 #[cfg(unix)]
@@ -23,9 +22,7 @@ pub struct LocatorHeaderFinder {}
 
 static mut LOCATOR_HEADER_ADDRESS: *mut LocatorHeader = null_mut();
 static mut MMF: Option<Box<dyn MemoryMappedFile>> = None;
-lazy_static! {
-    static ref GLOBAL_LOCK: Mutex<()> = Mutex::new(());
-}
+static GLOBAL_LOCK: Mutex<()> = Mutex::new(());
 
 /// The reason the variable was last found.
 #[cfg(test)]
@@ -55,18 +52,18 @@ impl LocatorHeaderFinder {
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
         // no_std
         let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");
-        name.push_str(&CACHED.this_process_id.to_string());
+        name.push_str(&get_sys_info().this_process_id.to_string());
 
         #[cfg(target_os = "windows")]
         return Box::new(WindowsMemoryMappedFile::new(
             &name,
-            CACHED.allocation_granularity as usize,
+            get_sys_info().allocation_granularity as usize,
         ));
 
         #[cfg(unix)]
         return Box::new(UnixMemoryMappedFile::new(
             &name,
-            CACHED.allocation_granularity as usize,
+            get_sys_info().allocation_granularity as usize,
         ));
     }
 
@@ -202,7 +199,7 @@ mod tests {
     use crate::internal::locator_header_finder::LAST_FIND_REASON;
     use crate::structs::internal::locator_header::LENGTH_OF_PREALLOCATED_CHUNKS;
     use crate::structs::internal::LocatorHeader;
-    use crate::utilities::cached::CACHED;
+    use crate::utilities::cached::get_sys_info;
 
     #[test]
     #[cfg(not(target_os = "android"))]
@@ -261,7 +258,7 @@ mod tests {
             assert!(!address.is_null());
 
             let header = &*address;
-            let expected_num_items = ((CACHED.allocation_granularity
+            let expected_num_items = ((get_sys_info().allocation_granularity
                 - std::mem::size_of::<LocatorHeader>() as i32)
                 as f64
                 / LENGTH_OF_PREALLOCATED_CHUNKS as f64)

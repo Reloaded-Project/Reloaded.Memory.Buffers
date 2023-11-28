@@ -1,7 +1,5 @@
+use crate::utilities::{cached::get_sys_info, mathematics};
 use core::cmp::max;
-
-use crate::utilities::cached::CACHED;
-use crate::utilities::mathematics;
 
 /// Settings to pass to the buffer allocator.
 #[derive(Debug, Clone, Copy)]
@@ -44,9 +42,9 @@ impl BufferAllocatorSettings {
     pub fn new() -> Self {
         Self {
             min_address: 0,
-            max_address: CACHED.max_address,
+            max_address: get_sys_info().max_address,
             size: 4096,
-            target_process_id: CACHED.this_process_id,
+            target_process_id: get_sys_info().this_process_id,
             retry_count: 8,
             brute_force: true,
         }
@@ -75,14 +73,15 @@ impl BufferAllocatorSettings {
     /// Sanitizes the input values.
     pub fn sanitize(&mut self) {
         // On Windows, VirtualAlloc treats 0 as 'any address', we might aswell avoid this out the gate.
-        if cfg!(windows) && (self.min_address < CACHED.allocation_granularity as usize) {
-            self.min_address = CACHED.allocation_granularity as usize;
+        if cfg!(windows) && (self.min_address < get_sys_info().allocation_granularity as usize) {
+            self.min_address = get_sys_info().allocation_granularity as usize;
         }
 
         self.size = max(self.size, 1);
-        self.size =
-            mathematics::round_up(self.size as usize, CACHED.allocation_granularity as usize)
-                as u32;
+        self.size = mathematics::round_up(
+            self.size as usize,
+            get_sys_info().allocation_granularity as usize,
+        ) as u32;
     }
 }
 
@@ -96,14 +95,15 @@ impl Default for BufferAllocatorSettings {
 mod tests {
 
     use super::*;
+    use crate::utilities::cached::get_sys_info;
 
     #[test]
     fn test_default_settings() {
         let settings = BufferAllocatorSettings::new();
         assert_eq!(settings.min_address, 0);
-        assert_eq!(settings.max_address, CACHED.max_address);
+        assert_eq!(settings.max_address, get_sys_info().max_address);
         assert_eq!(settings.size, 4096);
-        assert_eq!(settings.target_process_id, CACHED.this_process_id);
+        assert_eq!(settings.target_process_id, get_sys_info().this_process_id);
         assert_eq!(settings.retry_count, 8);
         assert!(settings.brute_force);
     }
@@ -124,7 +124,7 @@ mod tests {
             mathematics::subtract_with_underflow_cap(target, proximity)
         );
         assert_eq!(settings.size, size as u32);
-        assert_eq!(settings.target_process_id, CACHED.this_process_id);
+        assert_eq!(settings.target_process_id, get_sys_info().this_process_id);
         assert_eq!(settings.retry_count, 8);
         assert!(settings.brute_force);
     }
@@ -138,15 +138,20 @@ mod tests {
         settings.sanitize();
 
         if cfg!(windows) {
-            assert_eq!(settings.min_address, CACHED.allocation_granularity as usize);
+            assert_eq!(
+                settings.min_address,
+                get_sys_info().allocation_granularity as usize
+            );
         } else {
             assert_eq!(settings.min_address, 0);
         }
 
         assert_eq!(
             settings.size,
-            mathematics::round_up(max(1, 1) as usize, CACHED.allocation_granularity as usize)
-                as u32
+            mathematics::round_up(
+                max(1, 1) as usize,
+                get_sys_info().allocation_granularity as usize
+            ) as u32
         );
     }
 }
