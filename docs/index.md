@@ -248,6 +248,12 @@ Alternative overload also allows you to pass a 'context' variable.
 
 !!! warning "Not currently available in C# version. Submit an issue request or PR if you need this."
 
+### Crate Features (Rust)
+
+- `no_format`: Disables formatting code in errors, saving ~8kB of space.  
+- `size_opt`: Makes cold paths optimized for size instead of optimized for speed. [Requires 'nightly' Rust]  
+- `c_exports` Provides C exports for the library.    
+
 ## Community Feedback
 
 If you have questions/bug reports/etc. feel free to [Open an Issue](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/new).
