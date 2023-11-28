@@ -221,7 +221,6 @@ impl Buffers {
                 }
             }
         }
-        // If we can't allocate a new one
     }
 }
 

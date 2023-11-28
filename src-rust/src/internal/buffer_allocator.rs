@@ -6,6 +6,7 @@ use crate::utilities::mathematics::{
     add_with_overflow_cap, round_down, round_up, subtract_with_underflow_cap,
 };
 
+#[cfg_attr(feature = "size_opt", optimize(size))]
 pub fn allocate(
     settings: &mut BufferAllocatorSettings,
 ) -> Result<LocatorItem, BufferAllocationError> {
