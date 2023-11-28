@@ -162,7 +162,7 @@ impl LocatorHeader {
 
             #[cfg(windows)]
             unsafe {
-                windows::Win32::System::Threading::SwitchToThread();
+                windows_sys::Win32::System::Threading::SwitchToThread();
             }
         }
     }

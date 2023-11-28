@@ -7,18 +7,16 @@ use crate::utilities::cached::CACHED;
 use crate::utilities::mathematics::min;
 use crate::utilities::wrappers::Unaligned;
 use core::ffi::c_void;
-use core::mem::size_of;
+use core::mem::{size_of, zeroed};
 use core::sync::atomic::AtomicI32;
-use windows::Win32::Foundation::{CloseHandle, BOOL, HANDLE};
-use windows::Win32::System::Memory::{
-    VirtualAlloc, VirtualAllocEx, VirtualFree, VirtualFreeEx, VirtualQuery, VirtualQueryEx,
-    MEMORY_BASIC_INFORMATION, MEM_COMMIT, MEM_FREE, MEM_RELEASE, MEM_RESERVE,
-    PAGE_EXECUTE_READWRITE,
+use windows_sys::Win32::Foundation::{CloseHandle, BOOL, HANDLE};
+use windows_sys::Win32::System::Memory::{
+    VirtualAlloc, VirtualFree, VirtualQuery, MEMORY_BASIC_INFORMATION, MEM_COMMIT, MEM_FREE,
+    MEM_RELEASE, MEM_RESERVE, PAGE_EXECUTE_READWRITE,
 };
-use windows::Win32::System::SystemInformation::{GetSystemInfo, SYSTEM_INFO};
-use windows::Win32::System::Threading;
-use windows::Win32::System::Threading::{OpenProcess, PROCESS_ALL_ACCESS};
-use Threading::IsWow64Process;
+use windows_sys::Win32::System::SystemInformation::{GetSystemInfo, SYSTEM_INFO};
+use windows_sys::Win32::System::Threading::IsWow64Process;
+use windows_sys::Win32::System::Threading::{OpenProcess, PROCESS_ALL_ACCESS};
 
 // Abstractions for kernel32 functions //
 pub trait Kernel32 {
@@ -39,19 +37,13 @@ impl Kernel32 for LocalKernel32 {
         lp_address: *const c_void,
         lp_buffer: &mut MEMORY_BASIC_INFORMATION,
     ) -> usize {
-        unsafe {
-            VirtualQuery(
-                Some(lp_address),
-                lp_buffer,
-                size_of::<MEMORY_BASIC_INFORMATION>(),
-            )
-        }
+        unsafe { VirtualQuery(lp_address, lp_buffer, size_of::<MEMORY_BASIC_INFORMATION>()) }
     }
 
     fn virtual_alloc(&self, lp_address: *const c_void, dw_size: usize) -> *mut c_void {
         unsafe {
             VirtualAlloc(
-                Some(lp_address),
+                lp_address,
                 dw_size,
                 MEM_RESERVE | MEM_COMMIT,
                 PAGE_EXECUTE_READWRITE,
@@ -60,14 +52,16 @@ impl Kernel32 for LocalKernel32 {
     }
 
     fn virtual_free(&self, lp_address: *mut c_void, dw_size: usize) -> bool {
-        unsafe { VirtualFree(lp_address, dw_size, MEM_RELEASE).as_bool() }
+        unsafe { VirtualFree(lp_address, dw_size, MEM_RELEASE) != 0 }
     }
 }
 
+#[cfg(feature = "external_process")]
 pub struct RemoteKernel32 {
     handle: HANDLE,
 }
 
+#[cfg(feature = "external_process")]
 impl Kernel32 for RemoteKernel32 {
     fn virtual_query(
         &self,
@@ -77,7 +71,7 @@ impl Kernel32 for RemoteKernel32 {
         unsafe {
             VirtualQueryEx(
                 self.handle,
-                Some(lp_address),
+                lp_address,
                 lp_buffer,
                 size_of::<MEMORY_BASIC_INFORMATION>(),
             )
@@ -88,7 +82,7 @@ impl Kernel32 for RemoteKernel32 {
         unsafe {
             VirtualAllocEx(
                 self.handle,
-                Some(lp_address),
+                lp_address,
                 dw_size,
                 MEM_RESERVE | MEM_COMMIT,
                 PAGE_EXECUTE_READWRITE,
@@ -97,7 +91,7 @@ impl Kernel32 for RemoteKernel32 {
     }
 
     fn virtual_free(&self, lp_address: *mut c_void, dw_size: usize) -> bool {
-        unsafe { VirtualFreeEx(self.handle, lp_address, dw_size, MEM_RELEASE).as_bool() }
+        unsafe { VirtualFreeEx(self.handle, lp_address, dw_size, MEM_RELEASE) != 0 }
     }
 }
 
@@ -108,25 +102,24 @@ pub(crate) struct ProcessHandle {
 
 impl ProcessHandle {
     // open_process opens a new process with the given id and returns a ProcessHandle.
-    pub unsafe fn open_process(id: u32) -> Result<Self, windows::core::Error> {
-        let handle = OpenProcess(PROCESS_ALL_ACCESS, false, id);
-
-        match handle {
-            Ok(x) => Ok(Self { handle: x }),
-            Err(x) => Err(x),
+    pub unsafe fn open_process(id: u32) -> Self {
+        ProcessHandle {
+            handle: OpenProcess(PROCESS_ALL_ACCESS, 0, id),
         }
     }
 
-    // get_handle returns the internal HANDLE.
-    pub fn get_handle(&self) -> HANDLE {
-        self.handle
+    pub fn is_valid(&self) -> bool {
+        self.handle != 0
     }
 }
 
 impl Drop for ProcessHandle {
     fn drop(&mut self) {
         unsafe {
-            CloseHandle(self.handle);
+            // Close non-null handle
+            if self.handle != 0 {
+                CloseHandle(self.handle);
+            }
         }
     }
 }
@@ -144,15 +137,15 @@ fn get_max_windows_address(process_id: u32, handle: HANDLE) -> usize {
     unsafe {
         // Is this Windows on Windows 64? (x86 app running on x64 Windows)
         let mut is_wow64: BOOL = Default::default();
-        let has_is_wow64 = IsWow64Process(handle, &mut is_wow64).as_bool();
+        let has_is_wow64 = IsWow64Process(handle, &mut is_wow64) != 0;
 
-        let mut system_info: SYSTEM_INFO = Default::default();
+        let mut system_info: SYSTEM_INFO = zeroed();
         GetSystemInfo(&mut system_info);
 
         let mut max_address = 0x7FFFFFFF; // 32bit max
 
         // If target is not using WoW64 emulation layer, trust GetSystemInfo for max address.
-        if !is_wow64.as_bool() && has_is_wow64 {
+        if is_wow64 == 0 && has_is_wow64 {
             max_address = system_info.lpMaximumApplicationAddress as usize;
         }
 
@@ -167,20 +160,27 @@ pub fn allocate_windows(
     unsafe {
         let process_handle = ProcessHandle::open_process(settings.target_process_id);
 
-        if process_handle.is_err() {
+        if !process_handle.is_valid() {
             return Err(BufferAllocationError::new(
                 *settings,
                 "Failed to open process",
             ));
         }
 
-        let handle = process_handle.unwrap_unchecked().handle;
+        let handle = process_handle.handle;
         let max_address = get_max_windows_address(settings.target_process_id, handle);
-        return if CACHED.this_process_id == settings.target_process_id {
-            allocate_fast(&LocalKernel32 {}, max_address, &settings)
-        } else {
-            allocate_fast(&RemoteKernel32 { handle }, max_address, &settings)
-        };
+
+        #[cfg(feature = "external_process")]
+        {
+            return if CACHED.this_process_id == settings.target_process_id {
+                allocate_fast(&LocalKernel32 {}, max_address, &settings)
+            } else {
+                allocate_fast(&RemoteKernel32 { handle }, max_address, &settings)
+            };
+        }
+
+        #[cfg(not(feature = "external_process"))]
+        allocate_fast(&LocalKernel32 {}, max_address, settings)
     }
 }
 
@@ -189,12 +189,12 @@ fn allocate_fast<T: Kernel32>(
     mut max_address: usize,
     settings: &BufferAllocatorSettings,
 ) -> Result<LocatorItem, BufferAllocationError> {
-    max_address = min(max_address, settings.max_address as usize);
+    max_address = min(max_address, settings.max_address);
 
     for _ in 0..settings.retry_count {
         // Until we get all of the pages.
-        let mut current_address = settings.min_address as usize;
-        let mut memory_information = MEMORY_BASIC_INFORMATION::default();
+        let mut current_address = settings.min_address;
+        let mut memory_information: MEMORY_BASIC_INFORMATION = unsafe { zeroed() };
         while current_address <= max_address {
             // Get our info from VirtualQueryEx.
             let has_page =
@@ -208,7 +208,7 @@ fn allocate_fast<T: Kernel32>(
             match try_allocate_buffer(k32, &mut memory_information, settings) {
                 Some(item) => return Ok(item),
                 None => {
-                    current_address += memory_information.RegionSize as usize;
+                    current_address += memory_information.RegionSize;
                 }
             };
         }
@@ -217,8 +217,8 @@ fn allocate_fast<T: Kernel32>(
     // See remarks on 'BruteForce' in BufferAllocatorSettings, as for why this code exists.
     // I'm not particularly fond of it, but what can you do?
     if settings.brute_force {
-        let mut current_address = settings.min_address as usize;
-        let mut memory_information = MEMORY_BASIC_INFORMATION::default();
+        let mut current_address = settings.min_address;
+        let mut memory_information = unsafe { zeroed() };
         while current_address <= max_address {
             let has_item =
                 k32.virtual_query(current_address as *const c_void, &mut memory_information);
@@ -243,7 +243,7 @@ fn allocate_fast<T: Kernel32>(
 
 fn try_allocate_buffer<T: Kernel32>(
     k32: &T,
-    mut page_info: &mut MEMORY_BASIC_INFORMATION,
+    page_info: &mut MEMORY_BASIC_INFORMATION,
     settings: &BufferAllocatorSettings,
 ) -> Option<LocatorItem> {
     // Fast return if page is not free.
@@ -251,12 +251,12 @@ fn try_allocate_buffer<T: Kernel32>(
         return None;
     }
 
-    let mut results = [0 as usize; 4];
+    let mut results = [0; 4];
     for addr in get_buffer_pointers_in_page_range(
-        &mut page_info,
+        page_info,
         settings.size as usize,
-        settings.min_address as usize,
-        settings.max_address as usize,
+        settings.min_address,
+        settings.max_address,
         &mut results,
     ) {
         let allocated = k32.virtual_alloc(*addr as *const c_void, settings.size as usize);
@@ -290,7 +290,7 @@ fn get_buffer_pointers_in_page_range<'a>(
     results: &'a mut [usize; 4],
 ) -> &'a [usize] {
     let page_start = page_info.BaseAddress as usize;
-    let page_end = page_info.BaseAddress as usize + page_info.RegionSize as usize;
+    let page_end = page_info.BaseAddress as usize + page_info.RegionSize;
     let allocation_granularity = CACHED.allocation_granularity;
 
     unsafe {

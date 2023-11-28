@@ -1,13 +1,14 @@
 extern crate alloc;
 
+use core::ffi::c_void;
+
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 use alloc::ffi::CString;
-use windows::core::PCSTR;
-use windows::imp::CloseHandle;
-use windows::Win32::Foundation::{HANDLE, INVALID_HANDLE_VALUE};
-use windows::Win32::System::Memory::{
+use windows_sys::Win32::Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE};
+use windows_sys::Win32::Security::SECURITY_ATTRIBUTES;
+use windows_sys::Win32::System::Memory::{
     CreateFileMappingA, MapViewOfFile, OpenFileMappingA, UnmapViewOfFile, FILE_MAP_ALL_ACCESS,
-    MEMORYMAPPEDVIEW_HANDLE, PAGE_EXECUTE_READWRITE,
+    MEMORY_MAPPED_VIEW_ADDRESS, PAGE_EXECUTE_READWRITE,
 };
 
 pub struct WindowsMemoryMappedFile {
@@ -23,41 +24,31 @@ impl WindowsMemoryMappedFile {
         let mut already_existed = true;
 
         unsafe {
-            let mut map_handle = OpenFileMappingA(
-                FILE_MAP_ALL_ACCESS.0,
-                false,
-                PCSTR(file_name.as_ptr() as *const u8),
-            );
+            let mut map_handle =
+                OpenFileMappingA(FILE_MAP_ALL_ACCESS, 0, file_name.as_ptr() as *const u8);
 
             // No file existed, as open failed. Try create a new one.
-            if map_handle.is_err() {
+            if map_handle == 0 {
                 map_handle = CreateFileMappingA(
                     INVALID_HANDLE_VALUE,
-                    None,
+                    0 as *const SECURITY_ATTRIBUTES,
                     PAGE_EXECUTE_READWRITE,
                     0,
                     length as u32,
-                    PCSTR(file_name.as_ptr() as *const u8),
+                    file_name.as_ptr() as *const u8,
                 );
 
                 already_existed = false;
             }
 
-            let data = MapViewOfFile(
-                HANDLE(map_handle.as_mut().unwrap().0),
-                FILE_MAP_ALL_ACCESS,
-                0,
-                0,
-                length,
-            )
-            .unwrap()
-            .0 as *mut u8;
+            let data =
+                MapViewOfFile(map_handle, FILE_MAP_ALL_ACCESS, 0, 0, length).Value as *mut u8;
 
             WindowsMemoryMappedFile {
                 already_existed,
                 data,
                 length,
-                map_handle: map_handle.unwrap(),
+                map_handle,
             }
         }
     }
@@ -66,8 +57,10 @@ impl WindowsMemoryMappedFile {
 impl Drop for WindowsMemoryMappedFile {
     fn drop(&mut self) {
         unsafe {
-            UnmapViewOfFile(MEMORYMAPPEDVIEW_HANDLE(self.data as isize));
-            CloseHandle(self.map_handle.0);
+            UnmapViewOfFile(MEMORY_MAPPED_VIEW_ADDRESS {
+                Value: self.data as *mut c_void,
+            });
+            CloseHandle(self.map_handle);
         }
     }
 }

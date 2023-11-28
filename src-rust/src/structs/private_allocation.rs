@@ -4,7 +4,7 @@ use core::ptr::{self, NonNull};
 #[cfg(target_os = "windows")]
 use {
     crate::internal::buffer_allocator_windows::ProcessHandle,
-    windows::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE},
+    windows_sys::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE},
 };
 
 #[cfg(target_os = "macos")]
@@ -31,7 +31,7 @@ pub struct PrivateAllocation {
     /// Exact size of allocated data.
     pub size: usize,
 
-    /// Function that frees the memory.
+    /// Id of the process where allocation is made.
     _this_process_id: u32,
 }
 
@@ -96,23 +96,35 @@ impl PrivateAllocation {
         use core::ffi::c_void;
 
         unsafe {
-            if self._this_process_id == CACHED.this_process_id {
+            #[cfg(feature = "external_process")]
+            {
+                if self._this_process_id == CACHED.this_process_id {
+                    let result =
+                        VirtualFree(self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
+                    if result == 0 {
+                        // "Failed to free memory on Windows"
+                    }
+                } else {
+                    let process_handle = ProcessHandle::open_process(self._this_process_id);
+                    let result = VirtualFreeEx(
+                        process_handle.get_handle(),
+                        self.base_address.as_ptr() as *mut c_void,
+                        0,
+                        MEM_RELEASE,
+                    );
+                    if result == 0 {
+                        // "Failed to free memory on Windows in External Process"
+                    }
+                };
+            }
+
+            #[cfg(not(feature = "external_process"))]
+            {
                 let result = VirtualFree(self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
-                if result.0 == 0 {
+                if result == 0 {
                     // "Failed to free memory on Windows"
                 }
-            } else {
-                let process_handle = ProcessHandle::open_process(self._this_process_id);
-                let result = VirtualFreeEx(
-                    process_handle.unwrap().get_handle(),
-                    self.base_address.as_ptr() as *mut c_void,
-                    0,
-                    MEM_RELEASE,
-                );
-                if result.0 == 0 {
-                    // "Failed to free memory on Windows in External Process"
-                }
-            };
+            }
         }
     }
 

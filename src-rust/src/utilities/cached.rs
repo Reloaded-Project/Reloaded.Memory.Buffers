@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 #[cfg(target_os = "windows")]
-use windows::Win32::System::{
+use windows_sys::Win32::System::{
     SystemInformation::{GetSystemInfo, SYSTEM_INFO},
     Threading::GetCurrentProcessId,
 };
@@ -61,8 +61,10 @@ impl Cached {
         max_address: &mut usize,
         page_size: &mut i32,
     ) {
+        use core::mem::zeroed;
+
         unsafe {
-            let mut info: SYSTEM_INFO = Default::default();
+            let mut info: SYSTEM_INFO = zeroed();
             GetSystemInfo(&mut info);
 
             *max_address = info.lpMaximumApplicationAddress as usize;
