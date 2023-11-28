@@ -1,12 +1,21 @@
-use lazy_static::lazy_static;
 #[cfg(target_os = "windows")]
 use windows_sys::Win32::System::{
     SystemInformation::{GetSystemInfo, SYSTEM_INFO},
     Threading::GetCurrentProcessId,
 };
 
-lazy_static! {
-    pub static ref CACHED: Cached = Cached::new();
+static mut CACHED: Option<Cached> = None;
+
+pub fn get_sys_info() -> &'static Cached {
+    // No thread safety needed here (we're running code with no side effects), so we omit lazy_static to save on library space.
+    unsafe {
+        if CACHED.is_some() {
+            return unsafe { CACHED.as_ref().unwrap_unchecked() };
+        }
+
+        CACHED = Some(Cached::new());
+        return unsafe { CACHED.as_ref().unwrap_unchecked() };
+    }
 }
 
 pub struct Cached {

@@ -2,7 +2,7 @@ use crate::internal::buffer_allocator::get_possible_buffer_addresses;
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
-use crate::utilities::cached::CACHED;
+use crate::utilities::cached::get_sys_info;
 use crate::utilities::wrappers::Unaligned;
 use core::cmp::min;
 use core::mem;
@@ -17,7 +17,7 @@ use mach::vm_types::mach_vm_address_t;
 pub fn allocate_osx(
     settings: &BufferAllocatorSettings,
 ) -> Result<LocatorItem, BufferAllocationError> {
-    let max_address = min(CACHED.max_address, settings.max_address);
+    let max_address = min(get_sys_info().max_address, settings.max_address);
     let min_address = settings.min_address;
 
     unsafe {
@@ -179,7 +179,7 @@ fn get_buffer_pointers_in_page_range(
 ) -> &[usize] {
     let page_start = page_address;
     let page_end = page_address + page_size;
-    let allocation_granularity = CACHED.allocation_granularity;
+    let allocation_granularity = get_sys_info().allocation_granularity;
     unsafe {
         get_possible_buffer_addresses(
             minimum_ptr,

@@ -1,7 +1,7 @@
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
-use crate::utilities::cached::CACHED;
+use crate::utilities::cached::get_sys_info;
 use crate::utilities::linux_map_parser::get_free_regions_from_process_id;
 use crate::{
     internal::buffer_allocator::get_possible_buffer_addresses,
@@ -49,7 +49,7 @@ unsafe fn try_allocate_buffer(
         entry.start_address,
         entry.end_address,
         settings.size as usize,
-        CACHED.allocation_granularity as usize,
+        get_sys_info().allocation_granularity as usize,
         buffer,
     ) {
         let allocated = mmap(

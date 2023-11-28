@@ -998,7 +998,6 @@ dependencies = [
  "criterion",
  "dirs",
  "errno",
- "lazy_static",
  "libc",
  "mach",
  "memoffset 0.9.0",

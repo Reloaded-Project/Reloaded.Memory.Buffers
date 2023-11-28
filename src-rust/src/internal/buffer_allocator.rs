@@ -117,7 +117,7 @@ mod tests {
     use super::*;
     #[cfg(target_os = "windows")]
     use crate::internal::buffer_allocator_windows::{Kernel32, LocalKernel32};
-    use crate::utilities::cached::CACHED;
+    use crate::utilities::cached::get_sys_info;
     use std::ffi::c_void;
 
     const ALLOCATION_GRANULARITY: usize = 65536; // Assuming 64KB Allocation Granularity
@@ -298,7 +298,7 @@ mod tests {
             min_address: 0,
             max_address: i32::MAX as usize,
             size: 4096,
-            target_process_id: CACHED.this_process_id,
+            target_process_id: get_sys_info().this_process_id,
             retry_count: 8,
             brute_force: false,
         };
@@ -313,10 +313,10 @@ mod tests {
     #[test]
     fn can_allocate_up_to_max_address() {
         let mut settings = BufferAllocatorSettings {
-            min_address: CACHED.max_address / 2,
-            max_address: CACHED.max_address,
+            min_address: get_sys_info().max_address / 2,
+            max_address: get_sys_info().max_address,
             size: 4096,
-            target_process_id: CACHED.this_process_id,
+            target_process_id: get_sys_info().this_process_id,
             retry_count: 8,
             brute_force: false,
         };

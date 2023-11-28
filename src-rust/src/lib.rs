@@ -53,7 +53,7 @@ Happy Hacking 💜
 */
 
 #![cfg_attr(feature = "nightly", feature(optimize_attribute))]
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod structs {
 

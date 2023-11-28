@@ -80,16 +80,16 @@ impl MemoryMappedFile for WindowsMemoryMappedFile {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utilities::cached::CACHED;
+    use crate::utilities::cached::get_sys_info;
 
     #[test]
     fn test_windows_memory_mapped_file_creation() {
         // Let's create a memory mapped file with a specific size.
         let file_name = format!(
             "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
-            CACHED.this_process_id
+            get_sys_info().this_process_id
         );
-        let file_length = CACHED.allocation_granularity as usize;
+        let file_length = get_sys_info().allocation_granularity as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
 
         assert_eq!(mmf.already_existed, false);
@@ -104,10 +104,10 @@ mod tests {
     fn test_windows_memory_mapped_file_data() {
         let file_name = format!(
             "/Reloaded.Memory.Buffers.MemoryBuffer.Test, PID {}",
-            CACHED.this_process_id
+            get_sys_info().this_process_id
         );
 
-        let file_length = CACHED.allocation_granularity as usize;
+        let file_length = get_sys_info().allocation_granularity as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
 
         // Let's test we can read and write to the data.

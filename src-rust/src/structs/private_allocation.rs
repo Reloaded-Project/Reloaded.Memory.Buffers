@@ -1,11 +1,10 @@
-use crate::utilities::cached::CACHED;
 use core::ptr::{self, NonNull};
 
+#[allow(unused_imports)]
+use crate::utilities::cached::get_sys_info;
+
 #[cfg(target_os = "windows")]
-use {
-    crate::internal::buffer_allocator_windows::ProcessHandle,
-    windows_sys::Win32::System::Memory::{VirtualFree, VirtualFreeEx, MEM_RELEASE},
-};
+use windows_sys::Win32::System::Memory::{VirtualFree, MEM_RELEASE};
 
 #[cfg(target_os = "macos")]
 use {
@@ -98,7 +97,7 @@ impl PrivateAllocation {
         unsafe {
             #[cfg(feature = "external_process")]
             {
-                if self._this_process_id == CACHED.this_process_id {
+                if self._this_process_id == get_sys_info().this_process_id {
                     let result =
                         VirtualFree(self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
                     if result == 0 {
@@ -132,7 +131,7 @@ impl PrivateAllocation {
     #[cfg(target_os = "macos")]
     pub(crate) fn drop_macos(&mut self) {
         unsafe {
-            if self._this_process_id == CACHED.this_process_id {
+            if self._this_process_id == get_sys_info().this_process_id {
                 let result = mach_vm_deallocate(
                     mach_task_self(),
                     self.base_address.as_ptr() as mach_vm_address_t,
@@ -153,7 +152,7 @@ impl PrivateAllocation {
         use libc::c_void;
 
         unsafe {
-            if self._this_process_id == CACHED.this_process_id {
+            if self._this_process_id == get_sys_info().this_process_id {
                 let result = libc::munmap(self.base_address.as_ptr() as *mut c_void, self.size);
                 if result != 0 {
                     // Failed to free memory on Linux
@@ -200,21 +199,24 @@ impl Drop for PrivateAllocation {
 
 #[cfg(test)]
 mod tests {
-    use crate::{internal::buffer_allocator, structs::params::BufferAllocatorSettings};
+    use crate::{
+        internal::buffer_allocator, structs::params::BufferAllocatorSettings,
+        utilities::cached::get_sys_info,
+    };
 
     use super::*;
 
     #[test]
     fn test_private_allocation() {
         let mut settings = BufferAllocatorSettings::new();
-        settings.min_address = CACHED.max_address / 2;
-        settings.max_address = CACHED.max_address;
+        settings.min_address = get_sys_info().max_address / 2;
+        settings.max_address = get_sys_info().max_address;
 
         let alloc = buffer_allocator::allocate(&mut settings).unwrap();
         let result = PrivateAllocation::new(
             NonNull::<u8>::new(alloc.base_address.value as *mut u8).unwrap(),
             alloc.size as usize,
-            CACHED.this_process_id,
+            get_sys_info().this_process_id,
         );
 
         assert_ne!(result.base_address().as_ptr() as usize, 0);

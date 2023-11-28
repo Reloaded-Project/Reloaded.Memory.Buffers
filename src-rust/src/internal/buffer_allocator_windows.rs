@@ -3,7 +3,7 @@ use crate::internal::buffer_allocator::get_possible_buffer_addresses;
 use crate::structs::errors::BufferAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
-use crate::utilities::cached::CACHED;
+use crate::utilities::cached::get_sys_info;
 use crate::utilities::mathematics::min;
 use crate::utilities::wrappers::Unaligned;
 use core::ffi::c_void;
@@ -127,11 +127,11 @@ impl Drop for ProcessHandle {
 // Helpers //
 
 fn get_max_windows_address(process_id: u32, handle: HANDLE) -> usize {
-    if CACHED.this_process_id == process_id {
+    if get_sys_info().this_process_id == process_id {
         // Note: In WOW64 mode, the following rules apply:
         // - If current process is large address aware, this will return 0xFFFEFFFF.
         // - If it is not LAA, this should return 0x7FFEFFFF.
-        return CACHED.max_address;
+        return get_sys_info().max_address;
     }
 
     unsafe {
@@ -172,7 +172,7 @@ pub fn allocate_windows(
 
         #[cfg(feature = "external_process")]
         {
-            return if CACHED.this_process_id == settings.target_process_id {
+            return if get_sys_info().this_process_id == settings.target_process_id {
                 allocate_fast(&LocalKernel32 {}, max_address, &settings)
             } else {
                 allocate_fast(&RemoteKernel32 { handle }, max_address, &settings)
@@ -229,7 +229,7 @@ fn allocate_fast<T: Kernel32>(
             match try_allocate_buffer(k32, &mut memory_information, settings) {
                 Some(item) => return Ok(item),
                 None => {
-                    current_address += CACHED.allocation_granularity as usize;
+                    current_address += get_sys_info().allocation_granularity as usize;
                 }
             };
         }
@@ -291,7 +291,7 @@ fn get_buffer_pointers_in_page_range<'a>(
 ) -> &'a [usize] {
     let page_start = page_info.BaseAddress as usize;
     let page_end = page_info.BaseAddress as usize + page_info.RegionSize;
-    let allocation_granularity = CACHED.allocation_granularity;
+    let allocation_granularity = get_sys_info().allocation_granularity;
 
     unsafe {
         get_possible_buffer_addresses(

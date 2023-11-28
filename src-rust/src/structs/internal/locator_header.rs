@@ -4,7 +4,7 @@ use crate::structs::errors::ItemAllocationError;
 use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::structs::SafeLocatorItem;
-use crate::utilities::cached::CACHED;
+use crate::utilities::cached::get_sys_info;
 use crate::utilities::wrappers::Unaligned;
 use core::alloc::Layout;
 use core::cell::Cell;
@@ -48,6 +48,7 @@ impl LocatorHeader {
     #[allow(clippy::new_without_default)]
     #[cfg(test)]
     pub fn new() -> Self {
+        extern crate std;
         LocatorHeader {
             this_address: Unaligned::new(std::ptr::null_mut()),
             next_locator_ptr: Unaligned::new(std::ptr::null_mut::<LocatorHeader>()),
@@ -155,6 +156,11 @@ impl LocatorHeader {
     /// Acquires the lock, blocking until it can do so.
     pub fn lock(&mut self) {
         while !self.try_lock() {
+            #[cfg(all(feature = "std", not(unix), not(windows)))]
+            {
+                std::thread::yield_now();
+            }
+
             #[cfg(unix)]
             unsafe {
                 libc::sched_yield();
@@ -332,10 +338,11 @@ impl LocatorHeader {
         }
 
         // Allocate the next locator.
-        let alloc_size = CACHED.allocation_granularity;
+        let alloc_size = get_sys_info().allocation_granularity;
         unsafe {
             let addr = alloc::alloc::alloc(
-                Layout::from_size_align(alloc_size as usize, CACHED.page_size as usize).unwrap(),
+                Layout::from_size_align(alloc_size as usize, get_sys_info().page_size as usize)
+                    .unwrap(),
             );
             if addr.is_null() {
                 self.unlock();
@@ -355,9 +362,10 @@ impl LocatorHeader {
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use crate::structs::internal::locator_header::{Unaligned, LENGTH, MAX_ITEM_COUNT};
     use crate::structs::internal::LocatorHeader;
-    use crate::utilities::cached::CACHED;
+    use crate::utilities::cached::get_sys_info;
     use memoffset::offset_of;
     use std::alloc::{alloc, Layout};
     use std::mem::{align_of, size_of};
@@ -580,8 +588,8 @@ mod tests {
         header.initialize(LENGTH);
 
         let size = 100;
-        let min_address = CACHED.max_address / 2;
-        let max_address = CACHED.max_address;
+        let min_address = get_sys_info().max_address / 2;
+        let max_address = get_sys_info().max_address;
 
         // Act
         let item_count = header.num_items;
@@ -609,8 +617,8 @@ mod tests {
         header.num_items = MAX_ITEM_COUNT as u8;
 
         let size = 100;
-        let min_address = CACHED.max_address / 2;
-        let max_address = CACHED.max_address;
+        let min_address = get_sys_info().max_address / 2;
+        let max_address = get_sys_info().max_address;
 
         // Act
         let item_count = header.num_items;

@@ -118,6 +118,7 @@ You can specify another process with `TargetProcess = someProcess` in `BufferAll
 
 ## Crate Features (Rust)
 
+- `std`: [Enabled by Default] Enables use of standard library.  
 - `external_processes`: Support external processes (windows only).    
 - `no_format`: Disables formatting code in errors, saving ~8kB of space.  
 - `size_opt`: Makes cold paths optimized for size instead of optimized for speed. [Requires 'nightly' Rust]  
