@@ -116,6 +116,11 @@ item.Size.Should().BeGreaterOrEqualTo(settings.Size);
 
 You can specify another process with `TargetProcess = someProcess` in `BufferAllocatorSettings`, but this is only supported on Windows.
 
+## Crate Features (Rust)
+
+- *no_format*: Disables formatting code in errors, saving ~8kB of space.  
+- *size_opt*: Makes cold paths optimized for size instead of optimized for speed. [Requires 'nightly' Rust]  
+
 ## Community Feedback
 
 If you have questions/bug reports/etc. feel free to [Open an Issue](https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/issues/new).
