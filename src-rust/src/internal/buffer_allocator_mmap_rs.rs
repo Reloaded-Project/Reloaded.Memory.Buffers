@@ -52,7 +52,7 @@ pub fn allocate_mmap_rs(
 
     Err(BufferAllocationError::new(
         *settings,
-        "Failed to allocate buffer on Linux",
+        "Failed to allocate buffer (mmap_rs)",
     ))
 }
 

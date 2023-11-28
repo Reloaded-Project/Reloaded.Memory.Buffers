@@ -1,4 +1,5 @@
 use crate::structs::internal::LocatorItem;
+use core::slice;
 
 /// Returns the amount of bytes left in the buffer.
 #[no_mangle]
@@ -97,5 +98,5 @@ pub unsafe extern "C" fn locatoritem_append_bytes(
     data: *const u8,
     data_len: usize,
 ) -> usize {
-    (*item).append_bytes(std::slice::from_raw_parts(data, data_len))
+    (*item).append_bytes(slice::from_raw_parts(data, data_len))
 }

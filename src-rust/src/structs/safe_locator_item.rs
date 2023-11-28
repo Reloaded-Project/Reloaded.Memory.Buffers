@@ -1,5 +1,5 @@
 use crate::structs::internal::LocatorItem;
-use std::cell::Cell;
+use core::cell::Cell;
 
 /// An individual item in the buffer locator that can be dropped (disposed).
 ///

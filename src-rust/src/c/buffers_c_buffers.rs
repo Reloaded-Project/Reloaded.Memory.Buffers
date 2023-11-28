@@ -1,11 +1,5 @@
-use super::{
-    buffers_c_locatoritem::{
-        locatoritem_append_bytes, locatoritem_bytes_left, locatoritem_can_use,
-        locatoritem_is_allocated, locatoritem_is_taken, locatoritem_lock, locatoritem_max_address,
-        locatoritem_min_address, locatoritem_try_lock, locatoritem_unlock,
-    },
-    buffers_fnptr::BuffersFunctions,
-};
+extern crate alloc;
+
 use crate::{
     buffers::Buffers,
     structs::{
@@ -18,11 +12,12 @@ use crate::{
         icache_clear::clear_instruction_cache,
     },
 };
-use core::ptr::copy_nonoverlapping;
-use std::{
-    ffi::{c_char, CString},
+use alloc::ffi::CString;
+use alloc::string::ToString;
+use core::{
+    ffi::c_char,
     mem::{self, ManuallyDrop},
-    ptr,
+    ptr::{self, copy_nonoverlapping, null, null_mut},
 };
 
 /// The result of making an allocation.
@@ -77,13 +72,13 @@ pub extern "C" fn buffers_allocate_private_memory(
             AllocationResult {
                 is_ok: true,
                 ok: unsafe { ptr::read(&*allocation) },
-                err: std::ptr::null(),
+                err: null(),
             }
         }
         Err(err) => AllocationResult {
             is_ok: false,
             ok: PrivateAllocation::null(),
-            err: CString::new(format!("{}", err)).unwrap().into_raw(),
+            err: CString::new(err.to_string()).unwrap().into_raw(),
         },
     }
 }
@@ -125,15 +120,15 @@ pub extern "C" fn buffers_get_buffer_aligned(
             let result = GetBufferResult {
                 is_ok: true,
                 ok: locator_item.item.get(),
-                err: std::ptr::null(),
+                err: null(),
             };
             mem::forget(locator_item);
             result
         }
         Err(err) => GetBufferResult {
             is_ok: false,
-            ok: std::ptr::null_mut(),
-            err: CString::new(format!("{}", err)).unwrap().into_raw(),
+            ok: null_mut(),
+            err: CString::new(err.to_string()).unwrap().into_raw(),
         },
     }
 }
@@ -164,15 +159,15 @@ pub extern "C" fn buffers_get_buffer(settings: &BufferSearchSettings) -> GetBuff
             let result = GetBufferResult {
                 is_ok: true,
                 ok: buffer.item.get(),
-                err: std::ptr::null(),
+                err: null(),
             };
             mem::forget(buffer);
             result
         }
         Err(err) => GetBufferResult {
             is_ok: false,
-            ok: std::ptr::null_mut(),
-            err: CString::new(format!("{}", err)).unwrap().into_raw(),
+            ok: null_mut(),
+            err: CString::new(err.to_string()).unwrap().into_raw(),
         },
     }
 }
@@ -335,36 +330,6 @@ pub extern "C" fn overwrite_allocated_code_ex(
     callback(source, target, size);
     restore_write_xor_execute(target, size);
     clear_instruction_cache(target, source.wrapping_add(size));
-}
-
-/// Returns all exported functions inside a struct.
-#[no_mangle]
-pub extern "C" fn get_functions() -> BuffersFunctions {
-    BuffersFunctions {
-        buffers_allocate_private_memory,
-        buffers_get_buffer_aligned,
-        buffers_get_buffer,
-        free_string,
-        free_private_allocation,
-        free_locator_item,
-        free_allocation_result,
-        free_get_buffer_result,
-        buffersearchsettings_from_proximity,
-        bufferallocatorsettings_from_proximity,
-        locatoritem_bytes_left,
-        locatoritem_min_address,
-        locatoritem_max_address,
-        locatoritem_is_allocated,
-        locatoritem_is_taken,
-        locatoritem_try_lock,
-        locatoritem_lock,
-        locatoritem_unlock,
-        locatoritem_can_use,
-        locatoritem_append_bytes,
-        utilities_clear_instruction_cache,
-        overwrite_allocated_code,
-        overwrite_allocated_code_ex,
-    }
 }
 
 #[cfg(test)]

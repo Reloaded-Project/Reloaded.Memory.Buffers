@@ -1,7 +1,14 @@
-use std::fs::read_to_string;
-use std::io;
-
+extern crate alloc;
 use super::map_parser_utilities::{get_free_regions, MemoryMapEntry};
+use alloc::ffi::CString;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+use libc::c_void;
+use libc::close;
+use libc::open;
+use libc::read;
+use libc::O_RDONLY;
 
 /// Parses the contents of the /proc/{id}/maps file and returns a vector of memory mapping entries.
 ///
@@ -15,7 +22,7 @@ use super::map_parser_utilities::{get_free_regions, MemoryMapEntry};
 ///
 /// * a vector of memory mapping entries if the function succeeds,
 /// * an error if the function fails.
-fn parse_memory_map_from_process_id(process_id: i32) -> io::Result<Vec<MemoryMapEntry>> {
+fn parse_memory_map_from_process_id(process_id: i32) -> Vec<MemoryMapEntry> {
     // Construct the path to the maps file for the given process ID.
     // no std!!
     let mut maps_path = String::from("/proc/");
@@ -23,11 +30,11 @@ fn parse_memory_map_from_process_id(process_id: i32) -> io::Result<Vec<MemoryMap
     maps_path.push_str("/maps");
 
     // Read all the lines from the file into a single string.
-    let all_lines = read_to_string(maps_path)?;
+    let all_lines = unsafe { read_to_string(&maps_path) };
 
     // Split the string into lines.
     let lines: Vec<&str> = all_lines.split('\n').collect();
-    Ok(parse_memory_map_from_lines(lines))
+    parse_memory_map_from_lines(lines)
 }
 
 /// Parses the contents of the /proc/{id}/maps file and returns a vector of memory mapping entries.
@@ -46,7 +53,7 @@ fn parse_memory_map_from_lines(lines: Vec<&str>) -> Vec<MemoryMapEntry> {
     let mut entries = Vec::new();
 
     for line in lines {
-        if let Ok(entry) = parse_memory_map_entry(line) {
+        if let Some(entry) = parse_memory_map_entry(line) {
             entries.push(entry)
         }
     }
@@ -66,19 +73,29 @@ fn parse_memory_map_from_lines(lines: Vec<&str>) -> Vec<MemoryMapEntry> {
 ///
 /// * a memory map entry if the function succeeds,
 /// * an error if the function fails.
-fn parse_memory_map_entry(line: &str) -> Result<MemoryMapEntry, Box<dyn std::error::Error>> {
+fn parse_memory_map_entry(line: &str) -> Option<MemoryMapEntry> {
     let parts: Vec<&str> = line.split_ascii_whitespace().collect();
 
     if let Some(address_range) = parts.first() {
         let addresses: Vec<&str> = address_range.split('-').collect();
         if addresses.len() == 2 {
-            let start_address = usize::from_str_radix(addresses[0], 16)?;
-            let end_address = usize::from_str_radix(addresses[1], 16)?;
-            return Ok(MemoryMapEntry::new(start_address, end_address));
+            let start_address = usize::from_str_radix(addresses[0], 16);
+            let end_address = usize::from_str_radix(addresses[1], 16);
+
+            if start_address.is_err() || end_address.is_err() {
+                return None;
+            }
+
+            unsafe {
+                return Some(MemoryMapEntry::new(
+                    start_address.unwrap_unchecked(),
+                    end_address.unwrap_unchecked(),
+                ));
+            }
         }
     }
 
-    Err("Invalid Memory Map Entry".into())
+    None
 }
 
 /// Returns all free regions based on the found regions.
@@ -87,8 +104,43 @@ fn parse_memory_map_entry(line: &str) -> Result<MemoryMapEntry, Box<dyn std::err
 ///
 /// * `process_id` - ID of the process to get regions for.
 pub fn get_free_regions_from_process_id(process_id: i32) -> Vec<MemoryMapEntry> {
-    let regions = parse_memory_map_from_process_id(process_id).unwrap();
+    let regions = parse_memory_map_from_process_id(process_id);
     get_free_regions(&regions)
+}
+
+unsafe fn read_to_string(path: &str) -> String {
+    const BUFFER_SIZE: usize = 131_072; // 128 KB
+    let c_path = CString::new(path).unwrap();
+    let fd = open(c_path.as_ptr(), O_RDONLY);
+    if fd < 0 {
+        panic!("Can't read map file! Your Linux system is weird.");
+    }
+
+    let mut content = String::with_capacity(BUFFER_SIZE);
+
+    loop {
+        let current_len = content.len();
+        let remaining_capacity = content.capacity() - current_len;
+        content.reserve(BUFFER_SIZE);
+
+        let buffer_ptr = content.as_mut_vec().as_mut_ptr().add(current_len) as *mut c_void;
+        let bytes_read = read(fd, buffer_ptr, remaining_capacity);
+        if bytes_read < 0 {
+            // Error occurred
+            close(fd);
+            panic!("Map read error");
+        } else if bytes_read == 0 {
+            // End of file
+            break;
+        } else {
+            content
+                .as_mut_vec()
+                .set_len(current_len + bytes_read as usize);
+        }
+    }
+
+    close(fd);
+    content
 }
 
 #[cfg(test)]
@@ -114,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Invalid Memory Map Entry")]
+    #[should_panic]
     fn parse_memory_map_entry_invalid_line() {
         let line = "Invalid line";
         let _ = parse_memory_map_entry(line).unwrap();

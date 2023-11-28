@@ -5,8 +5,8 @@ use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::add_with_overflow_cap;
 use crate::utilities::wrappers::Unaligned;
 use core::mem::size_of;
-use std::sync::atomic::{AtomicI32, Ordering};
-use std::thread;
+use core::ptr::copy_nonoverlapping;
+use core::sync::atomic::{AtomicI32, Ordering};
 
 /// Individual item in the locator.
 #[repr(C)]
@@ -74,7 +74,15 @@ impl LocatorItem {
     /// Acquires the lock, blocking until it can do so.
     pub fn lock(&mut self) {
         while !self.try_lock() {
-            thread::yield_now();
+            #[cfg(unix)]
+            unsafe {
+                libc::sched_yield();
+            }
+
+            #[cfg(windows)]
+            unsafe {
+                windows::Win32::System::Threading::SwitchToThread();
+            }
         }
     }
 
@@ -137,7 +145,7 @@ impl LocatorItem {
         let address = self.base_address.value + self.position as usize;
         let data_len = data.len();
 
-        std::ptr::copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
+        copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
         self.position += data_len as u32;
 
         restore_write_xor_execute(self.base_address.value as *const u8, data.len());
@@ -170,7 +178,7 @@ impl LocatorItem {
         let address = self.base_address.value + self.position as usize;
         let data_len = data.len();
 
-        std::ptr::copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
+        copy_nonoverlapping(data.as_ptr(), address as *mut u8, data_len);
         self.position += data_len as u32;
 
         restore_write_xor_execute(self.base_address.value as *const u8, data.len());

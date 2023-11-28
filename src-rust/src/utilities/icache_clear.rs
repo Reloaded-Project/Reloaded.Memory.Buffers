@@ -30,7 +30,7 @@ pub fn clear_instruction_cache(start: *const u8, end: *const u8) {
     unsafe {
         FlushInstructionCache(
             GetCurrentProcess(),
-            Some(start as *const std::ffi::c_void),
+            Some(start as *const core::ffi::c_void),
             end as usize - start as usize,
         );
     }

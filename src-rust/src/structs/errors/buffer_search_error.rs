@@ -1,4 +1,4 @@
-use core::fmt::Display;
+use core::fmt::{Display, Formatter};
 
 use crate::structs::params::BufferSearchSettings;
 
@@ -9,16 +9,24 @@ pub struct BufferSearchError {
 }
 
 impl Display for BufferSearchError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Buffer search error: {}. Settings: {:?}",
-            self.text, self.settings
-        )
+    #[cfg_attr(feature = "size_opt", optimize(size))]
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        #[cfg(feature = "no_format")]
+        {
+            f.write_str("Buffer Search Error: ")?;
+            f.write_str(self.text)
+        }
+
+        #[cfg(not(feature = "no_format"))]
+        {
+            write!(
+                f,
+                "Buffer Search Error: {}. Settings: {:?}",
+                self.text, self.settings
+            )
+        }
     }
 }
-
-impl std::error::Error for BufferSearchError {}
 
 impl BufferSearchError {
     pub fn new(settings: BufferSearchSettings, text: &'static str) -> Self {

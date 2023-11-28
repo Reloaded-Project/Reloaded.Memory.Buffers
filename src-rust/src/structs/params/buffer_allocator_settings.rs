@@ -1,6 +1,7 @@
+use core::cmp::max;
+
 use crate::utilities::cached::CACHED;
 use crate::utilities::mathematics;
-use std::cmp;
 
 /// Settings to pass to the buffer allocator.
 #[derive(Debug, Clone, Copy)]
@@ -74,15 +75,14 @@ impl BufferAllocatorSettings {
     /// Sanitizes the input values.
     pub fn sanitize(&mut self) {
         // On Windows, VirtualAlloc treats 0 as 'any address', we might aswell avoid this out the gate.
-        if cfg!(windows) && (self.min_address < CACHED.get_allocation_granularity() as usize) {
-            self.min_address = CACHED.get_allocation_granularity() as usize;
+        if cfg!(windows) && (self.min_address < CACHED.allocation_granularity as usize) {
+            self.min_address = CACHED.allocation_granularity as usize;
         }
 
-        self.size = cmp::max(self.size, 1);
-        self.size = mathematics::round_up(
-            self.size as usize,
-            CACHED.get_allocation_granularity() as usize,
-        ) as u32;
+        self.size = max(self.size, 1);
+        self.size =
+            mathematics::round_up(self.size as usize, CACHED.allocation_granularity as usize)
+                as u32;
     }
 }
 
@@ -138,20 +138,15 @@ mod tests {
         settings.sanitize();
 
         if cfg!(windows) {
-            assert_eq!(
-                settings.min_address,
-                CACHED.get_allocation_granularity() as usize
-            );
+            assert_eq!(settings.min_address, CACHED.allocation_granularity as usize);
         } else {
             assert_eq!(settings.min_address, 0);
         }
 
         assert_eq!(
             settings.size,
-            mathematics::round_up(
-                cmp::max(1, 1) as usize,
-                CACHED.get_allocation_granularity() as usize
-            ) as u32
+            mathematics::round_up(max(1, 1) as usize, CACHED.allocation_granularity as usize)
+                as u32
         );
     }
 }

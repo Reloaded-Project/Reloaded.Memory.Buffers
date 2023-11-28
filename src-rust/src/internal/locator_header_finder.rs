@@ -1,15 +1,19 @@
+extern crate alloc;
+use core::ptr::null_mut;
+
 use crate::internal::memory_mapped_file::MemoryMappedFile;
 use crate::structs::internal::LocatorHeader;
 use crate::utilities::cached::CACHED;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::string::ToString;
 use lazy_static::lazy_static;
-use std::ptr::null_mut;
-use std::sync::Mutex;
+use spin::Mutex;
 
 #[cfg(unix)]
 use {
     super::memory_mapped_file_unix::BASE_DIR,
     crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile, errno::errno, libc::kill,
-    std::fs, std::path::Path,
 };
 
 #[cfg(target_os = "windows")]
@@ -38,7 +42,7 @@ impl LocatorHeaderFinder {
         }
 
         // Lock initial acquisiton. This is so we don't create two buffers at once.
-        let _unused = GLOBAL_LOCK.lock().unwrap();
+        let _unused = GLOBAL_LOCK.lock();
 
         #[cfg(target_os = "android")]
         return init_locatorheader_memorymappedfiles_unsupported();
@@ -47,10 +51,11 @@ impl LocatorHeaderFinder {
         return init_locatorheader_standard(); // OSes with unsupported Memory Mapped Files
     }
 
+    #[cfg_attr(feature = "size_opt", optimize(size))]
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
         // no_std
         let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");
-        name.push_str(&CACHED.get_this_process_id().to_string());
+        name.push_str(&CACHED.this_process_id.to_string());
 
         #[cfg(target_os = "windows")]
         return Box::new(WindowsMemoryMappedFile::new(
@@ -78,28 +83,32 @@ impl LocatorHeaderFinder {
 
     #[cfg(unix)]
     fn cleanup() {
-        LocatorHeaderFinder::cleanup_posix(BASE_DIR, |path| {
-            if let Err(err) = fs::remove_file(path) {
-                eprintln!("Failed to delete file {}: {}", path.display(), err);
-            }
-        });
-    }
+        use alloc::ffi::CString;
+        use core::ffi::CStr;
+        use libc::{opendir, readdir};
 
-    #[cfg(unix)]
-    fn cleanup_posix<T>(mmf_directory: &str, mut delete_file: T)
-    where
-        T: FnMut(&Path),
-    {
         const MEMORY_MAPPED_FILE_PREFIX: &str = "Reloaded.Memory.Buffers.MemoryBuffer, PID ";
 
-        let dir_entries = fs::read_dir(mmf_directory);
-        if dir_entries.is_err() {
+        let c_mmf_directory = CString::new(BASE_DIR).expect("CString::new failed");
+        let dir = unsafe { opendir(c_mmf_directory.as_ptr()) };
+
+        if dir.is_null() {
             return;
         }
 
-        for entry in dir_entries.unwrap().flatten() {
-            let entry_file_name = entry.file_name();
-            let file_name = entry_file_name.to_str().unwrap();
+        loop {
+            let entry_ptr = unsafe { readdir(dir) };
+            if entry_ptr.is_null() {
+                break;
+            }
+
+            let entry = unsafe { &*entry_ptr };
+            let file_name_cstr = unsafe { CStr::from_ptr(entry.d_name.as_ptr()) };
+            let file_name = match file_name_cstr.to_str() {
+                Ok(str) => str,
+                Err(_) => continue,
+            };
+
             if !file_name.starts_with(MEMORY_MAPPED_FILE_PREFIX) {
                 continue;
             }
@@ -107,13 +116,18 @@ impl LocatorHeaderFinder {
             // Extract PID from the file name
             if let Some(pid_str) = file_name.strip_prefix(MEMORY_MAPPED_FILE_PREFIX) {
                 if let Ok(pid) = pid_str.parse::<i32>() {
-                    // Kill the file if needed.
-                    if !LocatorHeaderFinder::is_process_running(pid) {
-                        delete_file(entry.path().as_ref());
+                    // Here you would check if the process is running and delete the file if needed
+                    // As an example, we're calling the delete_file closure with the file name
+                    if !Self::is_process_running(pid) {
+                        unsafe {
+                            libc::unlink(file_name_cstr.as_ptr());
+                        }
                     }
                 }
             }
         }
+
+        unsafe { libc::closedir(dir) };
     }
 
     #[cfg(unix)]

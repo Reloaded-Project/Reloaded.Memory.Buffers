@@ -52,6 +52,9 @@ For an idea as to how things are set up, [see Reloaded Project Configurations.](
 Happy Hacking 💜
 */
 
+#![cfg_attr(feature = "nightly", feature(optimize_attribute))]
+#![cfg_attr(not(test), no_std)]
+
 pub mod structs {
 
     pub mod params {
@@ -135,11 +138,12 @@ pub(crate) mod utilities {
 
 /// Provides a C interface to the library.
 pub mod c {
+    #[cfg(feature = "c_exports")]
     #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub mod buffers_c_buffers;
+    #[cfg(feature = "c_exports")]
     #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub mod buffers_c_locatoritem;
-    pub mod buffers_fnptr;
 }
 
 pub mod buffers;

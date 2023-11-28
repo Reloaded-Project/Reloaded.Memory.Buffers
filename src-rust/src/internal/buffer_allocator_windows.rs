@@ -6,8 +6,9 @@ use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
 use crate::utilities::mathematics::min;
 use crate::utilities::wrappers::Unaligned;
-use std::ffi::c_void;
-use std::sync::atomic::AtomicI32;
+use core::ffi::c_void;
+use core::mem::size_of;
+use core::sync::atomic::AtomicI32;
 use windows::Win32::Foundation::{CloseHandle, BOOL, HANDLE};
 use windows::Win32::System::Memory::{
     VirtualAlloc, VirtualAllocEx, VirtualFree, VirtualFreeEx, VirtualQuery, VirtualQueryEx,
@@ -42,7 +43,7 @@ impl Kernel32 for LocalKernel32 {
             VirtualQuery(
                 Some(lp_address),
                 lp_buffer,
-                std::mem::size_of::<MEMORY_BASIC_INFORMATION>(),
+                size_of::<MEMORY_BASIC_INFORMATION>(),
             )
         }
     }
@@ -78,7 +79,7 @@ impl Kernel32 for RemoteKernel32 {
                 self.handle,
                 Some(lp_address),
                 lp_buffer,
-                std::mem::size_of::<MEMORY_BASIC_INFORMATION>(),
+                size_of::<MEMORY_BASIC_INFORMATION>(),
             )
         }
     }
@@ -175,7 +176,7 @@ pub fn allocate_windows(
 
         let handle = process_handle.unwrap_unchecked().handle;
         let max_address = get_max_windows_address(settings.target_process_id, handle);
-        return if CACHED.get_this_process_id() == settings.target_process_id {
+        return if CACHED.this_process_id == settings.target_process_id {
             allocate_fast(&LocalKernel32 {}, max_address, &settings)
         } else {
             allocate_fast(&RemoteKernel32 { handle }, max_address, &settings)
@@ -228,7 +229,7 @@ fn allocate_fast<T: Kernel32>(
             match try_allocate_buffer(k32, &mut memory_information, settings) {
                 Some(item) => return Ok(item),
                 None => {
-                    current_address += CACHED.get_allocation_granularity() as usize;
+                    current_address += CACHED.allocation_granularity as usize;
                 }
             };
         }
@@ -290,7 +291,7 @@ fn get_buffer_pointers_in_page_range<'a>(
 ) -> &'a [usize] {
     let page_start = page_info.BaseAddress as usize;
     let page_end = page_info.BaseAddress as usize + page_info.RegionSize as usize;
-    let allocation_granularity = CACHED.get_allocation_granularity();
+    let allocation_granularity = CACHED.allocation_granularity;
 
     unsafe {
         get_possible_buffer_addresses(

@@ -11,11 +11,18 @@ license = "GPL-3.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+c_exports = []
+no_format = []
+size_opt = ["nightly"]
+nightly = [] # Optimizations for nightly builds.
+
 [dependencies]
 memoffset = "0.9.0"
 lazy_static = "1.4.0"
 dirs = "5.0.1"
 errno = "0.3.3"
+spin = "0.9.8"
 
 [dev-dependencies]
 rstest = "0.18.1"

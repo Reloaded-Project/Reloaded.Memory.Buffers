@@ -9,9 +9,8 @@ use crate::utilities::disable_write_xor_execute::{
 };
 use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::round_up;
-use core::ptr::copy_nonoverlapping;
+use core::ptr::{copy_nonoverlapping, NonNull};
 use core::u8;
-use std::ptr::NonNull;
 
 pub struct Buffers {}
 
@@ -222,7 +221,6 @@ impl Buffers {
                 }
             }
         }
-        // If we can't allocate a new one
     }
 }
 

@@ -4,14 +4,14 @@ use crate::structs::internal::LocatorItem;
 use crate::structs::params::BufferAllocatorSettings;
 use crate::utilities::cached::CACHED;
 use crate::utilities::wrappers::Unaligned;
+use core::cmp::min;
+use core::mem;
 use libc::{mach_msg_type_number_t, mach_port_t, mach_task_self, mach_vm_size_t};
 use mach::vm::{mach_vm_allocate, mach_vm_deallocate, mach_vm_protect, mach_vm_region};
 use mach::vm_prot::*;
 use mach::vm_region;
 use mach::vm_region::vm_region_basic_info_data_64_t;
 use mach::vm_types::mach_vm_address_t;
-use std::cmp::min;
-use std::mem;
 
 // Implementation //
 pub fn allocate_osx(
