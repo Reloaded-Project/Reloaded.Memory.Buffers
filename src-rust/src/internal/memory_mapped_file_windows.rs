@@ -31,7 +31,7 @@ impl WindowsMemoryMappedFile {
             if map_handle == 0 {
                 map_handle = CreateFileMappingA(
                     INVALID_HANDLE_VALUE,
-                    0 as *const SECURITY_ATTRIBUTES,
+                    core::ptr::null::<SECURITY_ATTRIBUTES>(),
                     PAGE_EXECUTE_READWRITE,
                     0,
                     length as u32,
