@@ -138,11 +138,12 @@ pub(crate) mod utilities {
 
 /// Provides a C interface to the library.
 pub mod c {
+    #[cfg(feature = "c_exports")]
     #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub mod buffers_c_buffers;
+    #[cfg(feature = "c_exports")]
     #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub mod buffers_c_locatoritem;
-    pub mod buffers_fnptr;
 }
 
 pub mod buffers;

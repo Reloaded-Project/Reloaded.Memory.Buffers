@@ -120,6 +120,7 @@ You can specify another process with `TargetProcess = someProcess` in `BufferAll
 
 - *no_format*: Disables formatting code in errors, saving ~8kB of space.  
 - *size_opt*: Makes cold paths optimized for size instead of optimized for speed. [Requires 'nightly' Rust]  
+- *c_exports*: Provides C exports for the library.    
 
 ## Community Feedback
 

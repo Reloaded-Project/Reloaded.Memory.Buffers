@@ -1,12 +1,5 @@
 extern crate alloc;
-use super::{
-    buffers_c_locatoritem::{
-        locatoritem_append_bytes, locatoritem_bytes_left, locatoritem_can_use,
-        locatoritem_is_allocated, locatoritem_is_taken, locatoritem_lock, locatoritem_max_address,
-        locatoritem_min_address, locatoritem_try_lock, locatoritem_unlock,
-    },
-    buffers_fnptr::BuffersFunctions,
-};
+
 use crate::{
     buffers::Buffers,
     structs::{
@@ -337,36 +330,6 @@ pub extern "C" fn overwrite_allocated_code_ex(
     callback(source, target, size);
     restore_write_xor_execute(target, size);
     clear_instruction_cache(target, source.wrapping_add(size));
-}
-
-/// Returns all exported functions inside a struct.
-#[no_mangle]
-pub extern "C" fn get_functions() -> BuffersFunctions {
-    BuffersFunctions {
-        buffers_allocate_private_memory,
-        buffers_get_buffer_aligned,
-        buffers_get_buffer,
-        free_string,
-        free_private_allocation,
-        free_locator_item,
-        free_allocation_result,
-        free_get_buffer_result,
-        buffersearchsettings_from_proximity,
-        bufferallocatorsettings_from_proximity,
-        locatoritem_bytes_left,
-        locatoritem_min_address,
-        locatoritem_max_address,
-        locatoritem_is_allocated,
-        locatoritem_is_taken,
-        locatoritem_try_lock,
-        locatoritem_lock,
-        locatoritem_unlock,
-        locatoritem_can_use,
-        locatoritem_append_bytes,
-        utilities_clear_instruction_cache,
-        overwrite_allocated_code,
-        overwrite_allocated_code_ex,
-    }
 }
 
 #[cfg(test)]

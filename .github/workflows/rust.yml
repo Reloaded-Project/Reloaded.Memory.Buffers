@@ -48,20 +48,76 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            features: "c_exports"
           - os: ubuntu-latest
             target: i686-unknown-linux-gnu
+            features: "c_exports"
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
+            features: "c_exports"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            features: "c_exports"
           - os: windows-latest
             target: i686-pc-windows-msvc
+            features: "c_exports"
           - os: windows-latest
             target: aarch64-pc-windows-msvc
+            features: "c_exports"
           - os: macos-latest
             target: x86_64-apple-darwin
+            features: "c_exports"
           - os: macos-latest
             target: aarch64-apple-darwin
+            features: "c_exports"
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            features: "c_exports,size_opt"
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+            features: "c_exports,size_opt"
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            features: "c_exports,size_opt"
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            features: "c_exports,size_opt"
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            features: "c_exports,size_opt"
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            features: "c_exports,size_opt"
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            features: "c_exports,size_opt"
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            features: "c_exports,size_opt"
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            features: "c_exports,size_opt,no_format"
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+            features: "c_exports,size_opt,no_format"
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            features: "c_exports,size_opt,no_format"
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            features: "c_exports,size_opt,no_format"
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            features: "c_exports,size_opt,no_format"
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            features: "c_exports,size_opt,no_format"
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            features: "c_exports,size_opt,no_format"
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            features: "c_exports,size_opt,no_format"
 
     runs-on: ${{ matrix.os }}
 
@@ -75,6 +131,7 @@ jobs:
         with:
           rust_project_path: src-rust
           target: ${{ matrix.target }}
+          features: ${{ matrix.features }}
 
   build-c-headers:
     runs-on: ubuntu-latest
