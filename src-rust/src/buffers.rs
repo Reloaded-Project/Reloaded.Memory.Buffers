@@ -284,6 +284,35 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_append_unaligned() {
+        let settings = BufferSearchSettings {
+            min_address: (get_sys_info().max_address / 2),
+            max_address: get_sys_info().max_address,
+            size: 4096,
+        };
+
+        let item = Buffers::get_buffer(&settings).unwrap();
+
+        // Prepare a small piece of data to append
+        let data = [0xAA, 0xBB, 0xCC, 0xDD];
+
+        // Calculate an unaligned address within the buffer
+        // Assuming the buffer starts at an aligned address, appending a single byte should make the next address unaligned
+        unsafe {
+            let buffer_ptr = (*item.item.get()).base_address.value as *mut u8;
+            buffer_ptr.write(0xFF); // append a single byte to force misalignment
+
+            // Append data to the unaligned address
+            // This should not error.
+            item.append_bytes(&data);
+
+            // Append code to the unaligned address
+            // This should not error.
+            item.append_code(&data);
+        }
+    }
+
     #[cfg(target_arch = "x86_64")]
     #[test]
     fn memory_is_executable_x64() {
