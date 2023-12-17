@@ -1,6 +1,6 @@
 [package]
 name = "reloaded-memory-buffers"
-version = "4.0.0"
+version = "4.0.1"
 edition = "2021"
 authors = [ "sewer56" ]
 description = "Shared, Concurrent, Permanent Memory Allocator tied to Process Lifetime"
