@@ -139,6 +139,7 @@ impl Buffers {
     ///
     /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
     /// should not be skipped on non-x86 architectures.
+    #[inline]
     pub unsafe fn overwrite_allocated_code(source: *const u8, target: *mut u8, size: usize) {
         disable_write_xor_execute(target, size);
         copy_nonoverlapping(source, target, size);
@@ -168,6 +169,7 @@ impl Buffers {
     ///
     /// This function can be skipped on some combinations (e.g. Windows/Linux/macOS x86/x64). But
     /// should not be skipped on non-x86 architectures.
+    #[inline]
     pub fn overwrite_allocated_code_ex(
         source: *const u8,
         target: *mut u8,

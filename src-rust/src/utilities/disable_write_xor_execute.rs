@@ -27,6 +27,7 @@ use {
 /// The idea is that you use memory which is read_write_execute (MAP_JIT if mmap),
 /// then disable W^X for the current thread. Then we write the code, and re-enable W^X.
 #[allow(unused_variables)]
+#[inline(always)]
 pub(crate) fn disable_write_xor_execute(address: *const u8, size: usize) {
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     unsafe {
@@ -52,6 +53,7 @@ pub(crate) fn disable_write_xor_execute(address: *const u8, size: usize) {
 ///
 /// Success or error.
 #[allow(unused_variables)]
+#[inline(always)]
 pub(crate) fn restore_write_xor_execute(address: *const u8, size: usize) {
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     unsafe {
