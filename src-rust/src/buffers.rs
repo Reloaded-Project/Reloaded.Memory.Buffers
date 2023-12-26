@@ -9,6 +9,7 @@ use crate::utilities::disable_write_xor_execute::{
 };
 use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::round_up;
+use core::cmp::max;
 use core::ptr::{copy_nonoverlapping, NonNull};
 use core::u8;
 
@@ -73,23 +74,15 @@ impl Buffers {
     ) -> Result<SafeLocatorItem, BufferSearchError> {
         // Add expected size.
         let mut new_settings = *settings;
-        new_settings.size += alignment;
+        new_settings.size += alignment.saturating_sub(1);
 
-        let result = Self::get_buffer(&new_settings);
-
-        if result.is_ok() {
-            // No error. (Hot Path)
-            return result;
-        }
-
-        // If we have an error, pass it back.
+        let result = Self::get_buffer(&new_settings)?;
         unsafe {
-            let locator_item_cell = &result.as_ref().unwrap_unchecked().item;
-            let locator_item = locator_item_cell.get();
+            let locator_item = result.item.get();
             let base_address = (*locator_item).base_address.value;
             let aligned_address = round_up(base_address, alignment as usize);
             (*locator_item).base_address.value = aligned_address;
-            result
+            Ok(result)
         }
     }
 
