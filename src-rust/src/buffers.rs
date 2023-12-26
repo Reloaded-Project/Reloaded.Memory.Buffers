@@ -72,16 +72,23 @@ impl Buffers {
         settings: &BufferSearchSettings,
         alignment: u32,
     ) -> Result<SafeLocatorItem, BufferSearchError> {
-        // Add expected size.
+        let max_misalignment = alignment.saturating_sub(1);
+
+        // Adjust the size to include potential extra space for alignment.
         let mut new_settings = *settings;
-        new_settings.size += alignment.saturating_sub(1);
+        new_settings.size += max_misalignment;
 
         let result = Self::get_buffer(&new_settings)?;
         unsafe {
             let locator_item = result.item.get();
-            let base_address = (*locator_item).base_address.value;
-            let aligned_address = round_up(base_address, alignment as usize);
-            (*locator_item).base_address.value = aligned_address;
+            let address = (*locator_item).base_address.value + (*locator_item).position as usize;
+
+            // Use the round_up function to efficiently align the address.
+            let aligned_address = round_up(address, alignment as usize);
+            let delta = aligned_address - address;
+
+            // Adjust the position in the buffer accordingly.
+            (*locator_item).position += delta as u32;
             Ok(result)
         }
     }
