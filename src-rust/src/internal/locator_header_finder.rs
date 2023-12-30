@@ -6,7 +6,6 @@ use crate::structs::internal::LocatorHeader;
 use crate::utilities::cached::get_sys_info;
 use alloc::boxed::Box;
 use alloc::string::String;
-use alloc::string::ToString;
 use spin::Mutex;
 
 #[cfg(unix)]

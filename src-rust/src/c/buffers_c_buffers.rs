@@ -13,7 +13,6 @@ use crate::{
     },
 };
 use alloc::ffi::CString;
-use alloc::string::ToString;
 use core::{
     ffi::c_char,
     mem::{self, ManuallyDrop},

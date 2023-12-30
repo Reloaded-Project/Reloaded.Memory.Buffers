@@ -2,7 +2,6 @@ extern crate alloc;
 use super::map_parser_utilities::{get_free_regions, MemoryMapEntry};
 use alloc::ffi::CString;
 use alloc::string::String;
-use alloc::string::ToString;
 use alloc::vec::Vec;
 use libc::c_void;
 use libc::close;

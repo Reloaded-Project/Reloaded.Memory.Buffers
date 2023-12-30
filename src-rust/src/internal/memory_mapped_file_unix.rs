@@ -121,7 +121,7 @@ impl UnixMemoryMappedFile {
                 current_path.push_str(component);
 
                 // Convert current_path to C string
-                let c_path = CString::new(current_path.as_bytes()).unwrap();
+                let c_path = CString::new(current_path.as_str()).unwrap();
 
                 // Properly handle MaybeUninit
                 let mut stat_buf = MaybeUninit::uninit();
