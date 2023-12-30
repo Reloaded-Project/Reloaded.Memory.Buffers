@@ -19,6 +19,7 @@ use {
 };
 
 #[cfg(target_os = "windows")]
+#[cfg(not(feature = "all_private"))]
 use crate::internal::memory_mapped_file_windows::WindowsMemoryMappedFile;
 
 pub struct LocatorHeaderFinder {}
