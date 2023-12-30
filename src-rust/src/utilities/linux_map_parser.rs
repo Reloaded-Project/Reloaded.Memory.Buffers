@@ -26,7 +26,8 @@ fn parse_memory_map_from_process_id(process_id: i32) -> Vec<MemoryMapEntry> {
     // Construct the path to the maps file for the given process ID.
     // no std!!
     let mut maps_path = String::from("/proc/");
-    maps_path.push_str(&process_id.to_string());
+    let mut buffer = itoa::Buffer::new();
+    maps_path.push_str(buffer.format(process_id));
     maps_path.push_str("/maps");
 
     // Read all the lines from the file into a single string.

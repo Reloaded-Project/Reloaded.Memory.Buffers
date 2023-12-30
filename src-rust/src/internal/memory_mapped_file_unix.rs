@@ -2,7 +2,6 @@ extern crate alloc;
 
 use alloc::ffi::CString;
 use alloc::string::String;
-use alloc::string::ToString;
 use core::mem::MaybeUninit;
 use core::ptr::null_mut;
 
@@ -43,7 +42,7 @@ impl UnixMemoryMappedFile {
         new_name.push_str(BASE_DIR);
         new_name.push_str(name);
 
-        let file_name = CString::new(new_name.to_string()).expect("CString::new failed");
+        let file_name = CString::new(new_name.clone()).expect("CString::new failed");
 
         let mut file_descriptor = unsafe { open(file_name.as_ptr(), O_RDWR) };
         let already_existed = file_descriptor != -1;

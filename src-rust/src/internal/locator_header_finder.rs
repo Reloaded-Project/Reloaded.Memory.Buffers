@@ -53,7 +53,8 @@ impl LocatorHeaderFinder {
         // no_std
         let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");
         let sys_info = get_sys_info();
-        name.push_str(&sys_info.this_process_id.to_string());
+        let mut buffer = itoa::Buffer::new();
+        name.push_str(buffer.format(sys_info.this_process_id));
 
         #[cfg(target_os = "windows")]
         return Box::new(WindowsMemoryMappedFile::new(
