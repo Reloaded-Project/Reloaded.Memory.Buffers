@@ -12,10 +12,11 @@ license = "GPL-3.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 default = ["std"]
-std = []
-external_processes = []
+std = [] # Better thread yield
+external_processes = [] # Support for external processes in Windows
 c_exports = []
-no_format = []
+no_format = [] # Removes string formatting (less detailed errors) for binary size.
+all_private = [] # No memory mapped files, memory is not shared.
 size_opt = ["nightly"]
 nightly = [] # Optimizations for nightly builds.
 
