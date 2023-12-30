@@ -1,6 +1,5 @@
-use core::fmt::{Display, Formatter};
-
 use crate::structs::params::BufferSearchSettings;
+use core::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone)]
 pub struct BufferSearchError {
@@ -13,8 +12,25 @@ impl BufferSearchError {
     pub fn to_string(&self) -> String {
         #[cfg(feature = "no_format")]
         {
-            let mut error_message = String::from("Buffer Search Error: ");
-            error_message.push_str(self.text);
+            const BASE_MSG: &str = "Buffer Search Error: ";
+            let total_length = BASE_MSG.len() + self.text.len();
+            let mut error_message = String::with_capacity(total_length);
+
+            unsafe {
+                let vec = error_message.as_mut_vec();
+
+                // SAFETY: Ensure that the vector has enough capacity
+                vec.set_len(BASE_MSG.len() + self.text.len());
+
+                // SAFETY: Manually copy elements
+                core::ptr::copy_nonoverlapping(BASE_MSG.as_ptr(), vec.as_mut_ptr(), BASE_MSG.len());
+                core::ptr::copy_nonoverlapping(
+                    self.text.as_ptr(),
+                    vec.as_mut_ptr().add(BASE_MSG.len()),
+                    self.text.len(),
+                );
+            }
+
             error_message
         }
 
@@ -33,7 +49,8 @@ impl Display for BufferSearchError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         #[cfg(feature = "no_format")]
         {
-            f.write_str("Buffer Search Error: ")?;
+            const BASE_MSG: &str = "Buffer Search Error: ";
+            f.write_str(BASE_MSG)?;
             f.write_str(self.text)
         }
 
