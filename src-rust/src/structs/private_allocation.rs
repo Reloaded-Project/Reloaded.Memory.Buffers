@@ -79,6 +79,7 @@ impl PrivateAllocation {
     }
 
     /// Returns an empty allocation, intended to be used as a non-result when an error is present.
+    #[cfg(feature = "c_exports")]
     pub(crate) fn null() -> Self {
         unsafe {
             Self {
