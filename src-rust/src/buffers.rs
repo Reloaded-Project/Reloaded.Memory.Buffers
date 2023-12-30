@@ -9,7 +9,6 @@ use crate::utilities::disable_write_xor_execute::{
 };
 use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::round_up;
-use core::cmp::max;
 use core::ptr::{copy_nonoverlapping, NonNull};
 use core::u8;
 

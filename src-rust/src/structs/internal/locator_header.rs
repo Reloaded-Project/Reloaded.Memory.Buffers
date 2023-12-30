@@ -338,11 +338,11 @@ impl LocatorHeader {
         }
 
         // Allocate the next locator.
-        let alloc_size = get_sys_info().allocation_granularity;
+        let sys_info = get_sys_info();
+        let alloc_size = sys_info.allocation_granularity;
         unsafe {
             let addr = alloc::alloc::alloc(
-                Layout::from_size_align(alloc_size as usize, get_sys_info().page_size as usize)
-                    .unwrap(),
+                Layout::from_size_align(alloc_size as usize, sys_info.page_size as usize).unwrap(),
             );
             if addr.is_null() {
                 self.unlock();

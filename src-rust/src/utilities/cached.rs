@@ -13,9 +13,14 @@ pub fn get_sys_info() -> &'static Cached {
             return CACHED.as_ref().unwrap_unchecked();
         }
 
-        CACHED = Some(Cached::new());
+        make_sys_info();
         return CACHED.as_ref().unwrap_unchecked();
     }
+}
+
+#[inline(never)] // bloats the binary
+fn make_sys_info() {
+    unsafe { CACHED = Some(Cached::new()) };
 }
 
 pub struct Cached {

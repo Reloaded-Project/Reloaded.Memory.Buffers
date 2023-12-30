@@ -40,11 +40,12 @@ pub struct BufferAllocatorSettings {
 impl BufferAllocatorSettings {
     /// Initializes the buffer allocator with default settings.
     pub fn new() -> Self {
+        let sys_info = get_sys_info();
         Self {
             min_address: 0,
-            max_address: get_sys_info().max_address,
+            max_address: sys_info.max_address,
             size: 4096,
-            target_process_id: get_sys_info().this_process_id,
+            target_process_id: sys_info.this_process_id,
             retry_count: 8,
             brute_force: true,
         }
@@ -73,15 +74,15 @@ impl BufferAllocatorSettings {
     /// Sanitizes the input values.
     pub fn sanitize(&mut self) {
         // On Windows, VirtualAlloc treats 0 as 'any address', we might aswell avoid this out the gate.
-        if cfg!(windows) && (self.min_address < get_sys_info().allocation_granularity as usize) {
-            self.min_address = get_sys_info().allocation_granularity as usize;
+        let sys_info = get_sys_info();
+        if cfg!(windows) && (self.min_address < sys_info.allocation_granularity as usize) {
+            self.min_address = sys_info.allocation_granularity as usize;
         }
 
         self.size = max(self.size, 1);
-        self.size = mathematics::round_up(
-            self.size as usize,
-            get_sys_info().allocation_granularity as usize,
-        ) as u32;
+        self.size =
+            mathematics::round_up(self.size as usize, sys_info.allocation_granularity as usize)
+                as u32;
     }
 }
 

@@ -52,18 +52,19 @@ impl LocatorHeaderFinder {
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
         // no_std
         let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");
-        name.push_str(&get_sys_info().this_process_id.to_string());
+        let sys_info = get_sys_info();
+        name.push_str(&sys_info.this_process_id.to_string());
 
         #[cfg(target_os = "windows")]
         return Box::new(WindowsMemoryMappedFile::new(
             &name,
-            get_sys_info().allocation_granularity as usize,
+            sys_info.allocation_granularity as usize,
         ));
 
         #[cfg(unix)]
         return Box::new(UnixMemoryMappedFile::new(
             &name,
-            get_sys_info().allocation_granularity as usize,
+            sys_info.allocation_granularity as usize,
         ));
     }
 
