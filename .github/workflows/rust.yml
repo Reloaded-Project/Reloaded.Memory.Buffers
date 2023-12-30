@@ -87,7 +87,7 @@ jobs:
       matrix:
         os: [windows-latest]
         target: [x86_64-pc-windows-msvc, i686-pc-windows-msvc, aarch64-pc-windows-msvc]
-        features: ["c_exports,external_processes", "c_exports,size_opt,external_processes", "c_exports,size_opt,no_format,external_processes"]
+        features: ["c_exports,external_processes", "c_exports,size_opt,external_processes", "c_exports,size_opt,no_format,external_processes", "c_exports,size_opt,no_format"]
     steps:
       - uses: actions/checkout@v3
         with:
