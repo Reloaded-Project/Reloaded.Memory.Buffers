@@ -1,14 +1,18 @@
 extern crate alloc;
 use core::ptr::null_mut;
 
-use crate::internal::memory_mapped_file::MemoryMappedFile;
 use crate::structs::internal::LocatorHeader;
 use crate::utilities::cached::get_sys_info;
-use alloc::boxed::Box;
-use alloc::string::String;
+
 use spin::Mutex;
 
+#[cfg(not(feature = "all_private"))]
+use {
+    crate::internal::memory_mapped_file::MemoryMappedFile, alloc::boxed::Box, alloc::string::String,
+};
+
 #[cfg(unix)]
+#[cfg(not(feature = "all_private"))]
 use {
     super::memory_mapped_file_unix::BASE_DIR,
     crate::internal::memory_mapped_file_unix::UnixMemoryMappedFile, errno::errno, libc::kill,
@@ -20,7 +24,10 @@ use crate::internal::memory_mapped_file_windows::WindowsMemoryMappedFile;
 pub struct LocatorHeaderFinder {}
 
 static mut LOCATOR_HEADER_ADDRESS: *mut LocatorHeader = null_mut();
+
+#[cfg(not(feature = "all_private"))]
 static mut MMF: Option<Box<dyn MemoryMappedFile>> = None;
+
 static GLOBAL_LOCK: Mutex<()> = Mutex::new(());
 
 /// The reason the variable was last found.
@@ -40,14 +47,15 @@ impl LocatorHeaderFinder {
         // Lock initial acquisiton. This is so we don't create two buffers at once.
         let _unused = GLOBAL_LOCK.lock();
 
-        #[cfg(target_os = "android")]
+        #[cfg(any(target_os = "android", feature = "all_private"))]
         return init_locatorheader_memorymappedfiles_unsupported();
 
-        #[cfg(not(target_os = "android"))]
+        #[cfg(not(any(target_os = "android", feature = "all_private")))]
         return init_locatorheader_standard(); // OSes with unsupported Memory Mapped Files
     }
 
     #[cfg_attr(feature = "size_opt", optimize(size))]
+    #[cfg(not(feature = "all_private"))]
     fn open_or_create_memory_mapped_file() -> Box<dyn MemoryMappedFile> {
         // no_std
         let mut name = String::from("/Reloaded.Memory.Buffers.MemoryBuffer, PID ");
@@ -71,7 +79,11 @@ impl LocatorHeaderFinder {
     #[cfg(test)]
     pub(crate) unsafe fn reset() {
         LOCATOR_HEADER_ADDRESS = null_mut();
-        MMF = None;
+
+        #[cfg(not(feature = "all_private"))]
+        {
+            MMF = None;
+        }
     }
 
     #[cfg(test)]
@@ -80,6 +92,7 @@ impl LocatorHeaderFinder {
     }
 
     #[cfg(unix)]
+    #[cfg(not(feature = "all_private"))]
     fn cleanup() {
         use alloc::ffi::CString;
         use core::ffi::CStr;
@@ -129,6 +142,7 @@ impl LocatorHeaderFinder {
     }
 
     #[cfg(unix)]
+    #[cfg(not(feature = "all_private"))]
     fn is_process_running(pid: i32) -> bool {
         unsafe {
             #[cfg(unix)]
@@ -137,6 +151,7 @@ impl LocatorHeaderFinder {
     }
 }
 
+#[cfg(not(feature = "all_private"))]
 unsafe fn init_locatorheader_standard() -> *mut LocatorHeader {
     let mmf = LocatorHeaderFinder::open_or_create_memory_mapped_file();
 
@@ -165,20 +180,25 @@ unsafe fn init_locatorheader_standard() -> *mut LocatorHeader {
     LOCATOR_HEADER_ADDRESS
 }
 
-#[cfg(target_os = "android")]
+#[cfg(any(target_os = "android", feature = "all_private"))]
 unsafe fn init_locatorheader_memorymappedfiles_unsupported() -> *mut LocatorHeader {
-    use core::mem;
-    use mmap_rs_with_map_from_existing::MmapOptions;
+    use crate::{internal::buffer_allocator::allocate, structs::params::BufferAllocatorSettings};
 
-    let mmap = MmapOptions::new(MmapOptions::allocation_granularity())
-        .unwrap()
-        .map_mut()
-        .unwrap();
+    let sys_info = get_sys_info();
+    let mut settings = BufferAllocatorSettings {
+        min_address: 0,
+        max_address: sys_info.max_address,
+        size: sys_info.allocation_granularity as u32,
+        target_process_id: sys_info.this_process_id,
+        retry_count: 8,
+        brute_force: true,
+    };
 
-    LOCATOR_HEADER_ADDRESS = mmap.start() as *mut LocatorHeader;
-    (*LOCATOR_HEADER_ADDRESS).initialize(mmap.size());
-
-    mem::forget(mmap);
+    // This call is slow but saves on code space. Also handles case of
+    // using part of the allocation as buffers well.
+    let allocation = allocate(&mut settings).unwrap();
+    LOCATOR_HEADER_ADDRESS = allocation.base_address.value as *mut LocatorHeader;
+    (*LOCATOR_HEADER_ADDRESS).initialize(allocation.size as usize);
 
     #[cfg(test)]
     LocatorHeaderFinder::set_last_find_reason(FindReason::Created);
@@ -189,6 +209,7 @@ unsafe fn init_locatorheader_memorymappedfiles_unsupported() -> *mut LocatorHead
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub(crate) enum FindReason {
     Cached,
+    #[cfg(not(feature = "all_private"))]
     PreviouslyExisted,
     Created,
 }
@@ -204,6 +225,7 @@ mod tests {
 
     #[test]
     #[cfg(not(target_os = "android"))]
+    #[cfg(not(feature = "all_private"))]
     fn find_should_return_address_when_previously_exists() {
         unsafe {
             LocatorHeaderFinder::reset();

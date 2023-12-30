@@ -111,12 +111,15 @@ pub(crate) mod internal {
     #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
     pub mod buffer_allocator_mmap_rs;
 
+    #[cfg(not(feature = "all_private"))]
     pub mod memory_mapped_file;
 
     #[cfg(unix)]
+    #[cfg(not(feature = "all_private"))]
     pub mod memory_mapped_file_unix;
 
     #[cfg(target_os = "windows")]
+    #[cfg(not(feature = "all_private"))]
     pub mod memory_mapped_file_windows;
 }
 
