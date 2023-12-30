@@ -77,7 +77,7 @@ pub extern "C" fn buffers_allocate_private_memory(
         Err(err) => AllocationResult {
             is_ok: false,
             ok: PrivateAllocation::null(),
-            err: CString::new(err.to_string()).unwrap().into_raw(),
+            err: CString::new(err.to_string().as_str()).unwrap().into_raw(),
         },
     }
 }
@@ -127,7 +127,7 @@ pub extern "C" fn buffers_get_buffer_aligned(
         Err(err) => GetBufferResult {
             is_ok: false,
             ok: null_mut(),
-            err: CString::new(err.to_string()).unwrap().into_raw(),
+            err: CString::new(err.to_string().as_str()).unwrap().into_raw(),
         },
     }
 }
@@ -166,7 +166,7 @@ pub extern "C" fn buffers_get_buffer(settings: &BufferSearchSettings) -> GetBuff
         Err(err) => GetBufferResult {
             is_ok: false,
             ok: null_mut(),
-            err: CString::new(err.to_string()).unwrap().into_raw(),
+            err: CString::new(err.to_string().as_str()).unwrap().into_raw(),
         },
     }
 }
