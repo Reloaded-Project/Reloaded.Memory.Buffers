@@ -1,5 +1,8 @@
 use crate::structs::params::BufferAllocatorSettings;
 
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 #[derive(Debug, Clone)]
 pub struct BufferAllocationError {
     pub settings: BufferAllocatorSettings,

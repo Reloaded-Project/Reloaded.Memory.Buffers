@@ -1,6 +1,9 @@
 use crate::structs::params::BufferSearchSettings;
 use core::fmt::{Display, Formatter};
 
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 #[derive(Debug, Clone)]
 pub struct BufferSearchError {
     pub settings: BufferSearchSettings,

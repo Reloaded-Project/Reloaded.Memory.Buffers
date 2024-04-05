@@ -1,4 +1,4 @@
-use core::ptr::{self, NonNull};
+use core::ptr::*;
 
 #[allow(unused_imports)]
 use crate::utilities::cached::get_sys_info;
@@ -83,7 +83,7 @@ impl PrivateAllocation {
     pub(crate) fn null() -> Self {
         unsafe {
             Self {
-                base_address: NonNull::new_unchecked(ptr::null_mut()),
+                base_address: NonNull::new_unchecked(null_mut()),
                 size: Default::default(),
                 _this_process_id: Default::default(),
             }
@@ -200,12 +200,8 @@ impl Drop for PrivateAllocation {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        internal::buffer_allocator, structs::params::BufferAllocatorSettings,
-        utilities::cached::get_sys_info,
-    };
-
     use super::*;
+    use crate::{internal::buffer_allocator, structs::params::BufferAllocatorSettings};
 
     #[test]
     fn test_private_allocation() {

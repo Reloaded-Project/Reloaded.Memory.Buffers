@@ -55,6 +55,10 @@ Happy Hacking 💜
 #![cfg_attr(feature = "nightly", feature(optimize_attribute))]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(not(feature = "std"))]
+#[macro_use]
+extern crate alloc;
+
 pub mod structs {
 
     pub mod params {
