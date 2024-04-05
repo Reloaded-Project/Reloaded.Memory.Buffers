@@ -10,5 +10,6 @@
         "coverage.xml",
         "jacoco.xml",
         "coverage.cobertura.xml"
-    ]
+    ],
+    "rust-analyzer.cargo.features": "all",
 }

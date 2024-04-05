@@ -12,26 +12,9 @@ impl BufferAllocationError {
         // We save some space here for C binding use.
         #[cfg(feature = "no_format")]
         {
-            const BASE_MSG: &str = "Buffer Search Error: ";
-            let total_length = BASE_MSG.len() + self.text.len();
-            let mut error_message = String::with_capacity(total_length);
-
-            unsafe {
-                let vec = error_message.as_mut_vec();
-
-                // SAFETY: Ensure that the vector has enough capacity
-                vec.set_len(BASE_MSG.len() + self.text.len());
-
-                // SAFETY: Manually copy elements
-                core::ptr::copy_nonoverlapping(BASE_MSG.as_ptr(), vec.as_mut_ptr(), BASE_MSG.len());
-                core::ptr::copy_nonoverlapping(
-                    self.text.as_ptr(),
-                    vec.as_mut_ptr().add(BASE_MSG.len()),
-                    self.text.len(),
-                );
-            }
-
-            error_message
+            use nanokit::string_concat::concat_2;
+            const BASE_MSG: &str = "Buffer Allocation Error: ";
+            concat_2(BASE_MSG, self.text)
         }
 
         #[cfg(not(feature = "no_format"))]
