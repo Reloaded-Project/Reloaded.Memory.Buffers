@@ -80,6 +80,7 @@ jobs:
           rust_project_path: src-rust
           target: ${{ matrix.target }}
           features: ${{ matrix.features }}
+          use_cross: true
 
   build-c-libs-windows:
     runs-on: ${{ matrix.os }}
