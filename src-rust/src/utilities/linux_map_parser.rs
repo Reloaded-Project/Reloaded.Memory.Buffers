@@ -1,13 +1,17 @@
 extern crate alloc;
 use super::map_parser_utilities::{get_free_regions, MemoryMapEntry};
 use alloc::ffi::CString;
-use alloc::string::String;
-use alloc::vec::Vec;
 use libc::c_void;
 use libc::close;
 use libc::open;
 use libc::read;
 use libc::O_RDONLY;
+
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 
 /// Parses the contents of the /proc/{id}/maps file and returns a vector of memory mapping entries.
 ///

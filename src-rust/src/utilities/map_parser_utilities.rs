@@ -1,6 +1,8 @@
 extern crate alloc;
 
 use super::cached::get_sys_info;
+
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 // Generic structure to use for custom parsers.
