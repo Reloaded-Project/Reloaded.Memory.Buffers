@@ -40,6 +40,7 @@ libc = "0.2.146"
 
 [target.'cfg(all(unix, not(target_os = "android")))'.dev-dependencies]
 pprof = { version = "0.13", features = ["flamegraph", "criterion"] }
+ahash = "0.8.9"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 mach = "0.3.2"
