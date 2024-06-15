@@ -1,9 +1,11 @@
 extern crate alloc;
 
 use alloc::ffi::CString;
-use alloc::string::String;
 use core::mem::MaybeUninit;
 use core::ptr::null_mut;
+
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
 
 #[cfg(not(feature = "no_format"))]
 use errno::errno;

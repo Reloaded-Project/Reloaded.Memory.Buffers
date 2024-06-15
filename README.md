@@ -1,6 +1,6 @@
 <div align="center">
 	<h1>The Reloaded Buffers Library</h1>
-	<img src="https://camo.githubusercontent.com/8f75011947bdd0d14630a789dd4edc11edcbcd9f51bc94511c0f45ec71a0d06b/68747470733a2f2f692e696d6775722e636f6d2f426a506e3772552e706e67" width="150" align="center" />
+	<img src="hhttps://raw.githubusercontent.com/Reloaded-Project/Reloaded.MkDocsMaterial.Themes.R2/adc12754862c5107fcd1357c7501e4d9d9f09d07/Images/Reloaded-Icon.png" width="150" align="center" />
 	<br/> <br/>
 	<strong><i>Allocate Memory, & Knuckles</i></strong>
 	<br/> <br/>

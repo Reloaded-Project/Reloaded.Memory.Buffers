@@ -60,6 +60,7 @@ jobs:
           rust_project_path: src-rust
           target: ${{ matrix.target }}
           features: ${{ matrix.features }}
+          use_cross: true
 
   build-c-libs-macos:
     runs-on: ${{ matrix.os }}
