@@ -1,0 +1,1657 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers/specification/allocation-algorithm/">
+      
+      
+        <link rel="prev" href="../buffer-locator/">
+      
+      
+        <link rel="next" href="../../Reloaded/Pages/contributing/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Allocation Algorithm - Reloaded Memory Buffers</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../Reloaded/Stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="reloaded3-slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#allocation-algorithm" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Reloaded Memory Buffers" class="md-header__button md-logo" aria-label="Reloaded Memory Buffers" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Reloaded Memory Buffers
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Allocation Algorithm
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Reloaded-Project/Reloaded.Memory.Buffers
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Reloaded Memory Buffers" class="md-nav__button md-logo" aria-label="Reloaded Memory Buffers" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Reloaded Memory Buffers
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Reloaded-Project/Reloaded.Memory.Buffers" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Reloaded-Project/Reloaded.Memory.Buffers
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Specification
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Specification
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../buffer-locator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Buffer Locator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Allocation Algorithm
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Allocation Algorithm
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#finding-free-memory-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finding Free Memory Pages
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Finding Free Memory Pages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      Linux
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osx" class="md-nav__link">
+    <span class="md-ellipsis">
+      OSX
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allocating-a-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Allocating a Buffer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Allocating a Buffer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Linux
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osx_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      OSX
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checking-if-buffer-fits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Checking if Buffer Fits
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Reloaded/Pages/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#finding-free-memory-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finding Free Memory Pages
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Finding Free Memory Pages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      Linux
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osx" class="md-nav__link">
+    <span class="md-ellipsis">
+      OSX
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allocating-a-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Allocating a Buffer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Allocating a Buffer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Linux
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osx_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      OSX
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checking-if-buffer-fits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Checking if Buffer Fits
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="allocation-algorithm">Allocation Algorithm</h1>
+<div class="admonition info">
+<p class="admonition-title">Allocating within certain proximity on different platforms can be tricky.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">This page provides snippets from the source to give guidance for other language ports, or for those implementing similar solutions.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">For a full implementation, look at this repo's code.</p>
+</div>
+<p>Allocating buffers and locators generally follows the same algorithm; with minor platform specific differences.</p>
+<ul>
+<li><a href="#finding-free-memory-pages">Enumerate Free Memory Pages</a></li>
+<li><a href="#allocating-a-buffer">Allocating A Buffer</a><ul>
+<li><a href="#checking-if-buffer-fits">Check if Page Satisfies Constraints</a>  </li>
+</ul>
+</li>
+</ul>
+<h2 id="finding-free-memory-pages">Finding Free Memory Pages</h2>
+<div class="admonition info">
+<p class="admonition-title">In order to find all free memory regions we do a page walk using VirtualQuery(Ex).</p>
+</div>
+<h3 id="windows">Windows</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">C#</label><label for="__tabbed_1_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="n">LocatorItem</span><span class="w"> </span><span class="n">Allocate</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">k32</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">maxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">BufferAllocatorSettings</span><span class="w"> </span><span class="n">settings</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">IKernel32</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Note: `k32.VirtualQuery` is `VirtualQueryEx` if targeting another process.</span>
+<span class="w">    </span><span class="c1">// Until we get all of the pages.</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">currentAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">currentAddress</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">maxAddress</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Get our info from VirtualQueryEx.</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">memoryInformation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">hasPage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k32</span><span class="p">.</span><span class="n">VirtualQuery</span><span class="p">(</span><span class="n">currentAddress</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">memoryInformation</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hasPage</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Add the page and increment address iterator to go to next page.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TryAllocateBuffer</span><span class="p">(</span><span class="n">k32</span><span class="p">,</span><span class="w"> </span><span class="k">ref</span><span class="w"> </span><span class="n">memoryInformation</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">item</span><span class="p">))</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">currentAddress</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">memoryInformation</span><span class="p">.</span><span class="n">RegionSize</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Some form of error handling.</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nf">MemoryBufferAllocationException</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;windows.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdexcept&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory&gt;</span>
+
+<span class="n">LocatorItem</span><span class="w"> </span><span class="nf">Allocate</span><span class="p">(</span><span class="n">BufferAllocatorSettings</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">maxAddress</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Note: `VirtualQuery` is `VirtualQueryEx` if targeting another process. Abstract this if needed.</span>
+<span class="w">    </span><span class="c1">// Until we get all of the pages.</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">currentAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">currentAddress</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">maxAddress</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Get our info from VirtualQueryEx.</span>
+<span class="w">        </span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="w"> </span><span class="n">memoryInformation</span><span class="p">;</span>
+<span class="w">        </span><span class="n">DWORD</span><span class="w"> </span><span class="n">hasPage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VirtualQuery</span><span class="p">((</span><span class="n">LPVOID</span><span class="p">)</span><span class="n">currentAddress</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">memoryInformation</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">memoryInformation</span><span class="p">));</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hasPage</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Add the page and increment address iterator to go to next page.</span>
+<span class="w">        </span><span class="n">LocatorItem</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TryAllocateBuffer</span><span class="p">(</span><span class="n">memoryInformation</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">item</span><span class="p">))</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">currentAddress</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">memoryInformation</span><span class="p">.</span><span class="n">RegionSize</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Some form of error handling.</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Failed to allocate memory buffer&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="linux">Linux</h3>
+<div class="admonition info">
+<p class="admonition-title">In order to find all free memory regions we need to parse a text file at <code>$"/proc/{processId}/maps"</code>.</p>
+</div>
+<p>The following code parses an individual line of said file:  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">C#</label><label for="__tabbed_2_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">internal</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">MemoryMapEntry</span><span class="w"> </span><span class="nf">ParseMemoryMapEntry</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">line</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Example line: &quot;7f9c89991000-7f9c89993000 r--p 00000000 08:01 3932177                    /path/to/file&quot;</span>
+<span class="w">    </span><span class="n">ReadOnlySpan</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lineSpan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">AsSpan</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">dashIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lineSpan</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dashIndex</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">ThrowHelpers</span><span class="p">.</span><span class="n">ThrowLinuxBadMemoryMapEntry</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">spaceIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lineSpan</span><span class="p">.</span><span class="n">Slice</span><span class="p">(</span><span class="n">dashIndex</span><span class="p">).</span><span class="n">IndexOf</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">spaceIndex</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">ThrowHelpers</span><span class="p">.</span><span class="n">ThrowLinuxBadMemoryMapEntry</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">ReadOnlySpan</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">startAddressSpan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lineSpan</span><span class="p">.</span><span class="n">SliceFast</span><span class="p">(..</span><span class="n">dashIndex</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ReadOnlySpan</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">endAddressSpan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lineSpan</span><span class="p">.</span><span class="n">SliceFast</span><span class="p">(</span><span class="n">dashIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">spaceIndex</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MemoryMapEntry</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">StartAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseHexAddress</span><span class="p">(</span><span class="n">startAddressSpan</span><span class="p">),</span>
+<span class="w">        </span><span class="n">EndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseHexAddress</span><span class="p">(</span><span class="n">endAddressSpan</span><span class="p">)</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdexcept&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstddef&gt;</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">MemoryMapEntry</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">StartAddress</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">EndAddress</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">MemoryMapEntry</span><span class="w"> </span><span class="nf">ParseMemoryMapEntry</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">line</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Example line: &quot;7f9c89991000-7f9c89993000 r--p 00000000 08:01 3932177                    /path/to/file&quot;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">dashIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dashIndex</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Bad Memory Map Entry&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">spaceIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">dashIndex</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">spaceIndex</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Bad Memory Map Entry&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">startAddressStr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">dashIndex</span><span class="p">);</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">endAddressStr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">dashIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">spaceIndex</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">dashIndex</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">MemoryMapEntry</span><span class="w"> </span><span class="n">entry</span><span class="p">;</span>
+<span class="w">    </span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">stoul</span><span class="p">(</span><span class="n">startAddressStr</span><span class="p">,</span><span class="w"> </span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="w">    </span><span class="n">entry</span><span class="p">.</span><span class="n">EndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">stoul</span><span class="p">(</span><span class="n">endAddressStr</span><span class="p">,</span><span class="w"> </span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">entry</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Parsing this file gives you all of the mapped memory regions.<br />
+Any regions not listed in this files are considered free, thus, we should try allocating there.<br />
+We can extract the free regions in the following fashion:  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">C#</label><label for="__tabbed_3_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="c1">/// Returns all free regions based on the found regions.</span>
+<span class="c1">/// &lt;/summary&gt;</span>
+<span class="c1">/// &lt;param name=&quot;regions&quot;&gt;The found regions.&lt;/param&gt;</span>
+<span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">MemoryMapEntry</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetFreeRegions</span><span class="p">(</span><span class="n">Span</span><span class="o">&lt;</span><span class="n">MemoryMapEntry</span><span class="o">&gt;</span><span class="w"> </span><span class="n">regions</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">lastEndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">freeRegions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">MemoryMapEntry</span><span class="o">&gt;</span><span class="p">(</span><span class="n">regions</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// +2 for start and finish</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">regions</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="o">++</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">MemoryMapEntry</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regions</span><span class="p">.</span><span class="n">DangerousGetReferenceAt</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">lastEndAddress</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">freeRegions</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MemoryMapEntry</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="n">StartAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastEndAddress</span><span class="p">,</span>
+<span class="w">                </span><span class="n">EndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span>
+<span class="w">            </span><span class="p">});</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">lastEndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">EndAddress</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// After the last region, up to the end of memory</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lastEndAddress</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">Cached</span><span class="p">.</span><span class="n">GetMaxAddress</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">freeRegions</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MemoryMapEntry</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">StartAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastEndAddress</span><span class="p">,</span>
+<span class="w">            </span><span class="n">EndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cached</span><span class="p">.</span><span class="n">GetMaxAddress</span><span class="p">()</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">freeRegions</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;climits&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdexcept&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdint&gt;</span>
+<span class="cp">#ifdef _WIN32</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Windows.h&gt;</span>
+<span class="cp">#else</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<span class="cp">#endif</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Cached</span>
+<span class="p">{</span>
+<span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ScPagesizeLinux</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ScPagesizeOsx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">29</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">s_maxAddress</span><span class="p">;</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">s_allocationGranularity</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">GetMaxAddress</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">s_maxAddress</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">GetAllocationGranularity</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">s_allocationGranularity</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">Initialize</span><span class="p">()</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="cp">#ifdef _WIN32</span>
+<span class="w">        </span><span class="n">SYSTEM_INFO</span><span class="w"> </span><span class="n">info</span><span class="p">;</span>
+<span class="w">        </span><span class="n">GetSystemInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">info</span><span class="p">);</span>
+<span class="w">        </span><span class="n">s_maxAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">lpMaximumApplicationAddress</span><span class="p">);</span>
+<span class="w">        </span><span class="n">s_allocationGranularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">dwAllocationGranularity</span><span class="p">);</span>
+<span class="cp">#elif __linux__</span>
+<span class="w">        </span><span class="n">s_maxAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UINTPTR_MAX</span><span class="p">;</span>
+<span class="w">        </span><span class="n">s_allocationGranularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">sysconf</span><span class="p">(</span><span class="n">ScPagesizeLinux</span><span class="p">));</span>
+<span class="cp">#elif __APPLE__</span>
+<span class="w">        </span><span class="n">s_maxAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UINTPTR_MAX</span><span class="p">;</span>
+<span class="w">        </span><span class="n">s_allocationGranularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">sysconf</span><span class="p">(</span><span class="n">ScPagesizeOsx</span><span class="p">));</span>
+<span class="cp">#else</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Platform not supported&quot;</span><span class="p">);</span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// Initialize static members</span>
+<span class="kt">uint64_t</span><span class="w"> </span><span class="n">Cached</span><span class="o">::</span><span class="n">s_maxAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">Cached</span><span class="o">::</span><span class="n">s_allocationGranularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MemoryMapEntry</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetFreeRegions</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MemoryMapEntry</span><span class="o">&gt;</span><span class="w"> </span><span class="n">regions</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">lastEndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MemoryMapEntry</span><span class="o">&gt;</span><span class="w"> </span><span class="n">freeRegions</span><span class="p">;</span>
+<span class="w">    </span><span class="n">freeRegions</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">regions</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// +2 for start and finish</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">regions</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">lastEndAddress</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">freeRegions</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="n">lastEndAddress</span><span class="p">,</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">});</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">lastEndAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">EndAddress</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// After the last region, up to the end of memory</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lastEndAddress</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">Cached</span><span class="o">::</span><span class="n">GetMaxAddress</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">freeRegions</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="n">lastEndAddress</span><span class="p">,</span><span class="w"> </span><span class="n">Cached</span><span class="o">::</span><span class="n">GetMaxAddress</span><span class="p">()});</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">freeRegions</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Lastly, try allocating based on the free regions, like this:  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">C#</label><label for="__tabbed_4_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Until we get all of the pages.</span>
+<span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">MemoryMapEntry</span><span class="w"> </span><span class="n">region</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">LinuxMapParser</span><span class="p">.</span><span class="n">GetFreeRegions</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">TargetProcess</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Exit if we are done iterating.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">region</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">)</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Add the page and increment address iterator to go to next page.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TryAllocateBuffer</span><span class="p">(</span><span class="n">region</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">item</span><span class="p">))</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.</span>
+<span class="c1">// Note: Uses C++20</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/mman.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;array&gt;</span>
+
+<span class="c1">// Until we get all of the pages.</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MemoryMapEntry</span><span class="o">&amp;</span><span class="w"> </span><span class="n">region</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">LinuxMapParser</span><span class="o">::</span><span class="n">GetFreeRegions</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">TargetProcess</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Exit if we are done iterating.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">region</span><span class="p">.</span><span class="n">StartAddress</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">)</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Add the page and increment address iterator to go to next page.</span>
+<span class="w">    </span><span class="n">LocatorItem</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TryAllocateBuffer</span><span class="p">(</span><span class="n">region</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">item</span><span class="p">))</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="osx">OSX</h3>
+<div class="admonition info">
+<p class="admonition-title">For OSX, you have to find all used pages via <code>mach_vm_region</code>, then use that information to find the free pages.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">It seems OSX seems to impose a minimum address, in around where the <code>.text</code> segment would eventually get allocated. Usually getting memory in first 2GiB appears impossible.</p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">C#</label><label for="__tabbed_5_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>private static List&lt;(nuint addr, nuint size)&gt; GetFreePages(nuint minAddress, nuint maxAddress, nuint selfTask)
+{
+    var result = new List&lt;(nuint addr, nuint size)&gt;();
+    uint infoCount = VM_REGION_BASIC_INFO_COUNT;
+    var currentAddress = minAddress;
+
+    // Until we get all of the pages.
+    while (currentAddress &lt;= maxAddress)
+    {
+        var actualAddress = currentAddress;
+        nuint availableSize = 0;
+        int kr = mach_vm_region(selfTask, ref actualAddress, ref availableSize, VM_REGION_BASIC_INFO_64, out vm_region_basic_info_64 _, ref infoCount, out _);
+
+        // KERN_INVALID_ADDRESS, i.e. no more regions.
+        if (kr == 1)
+        {
+            var padding = maxAddress - currentAddress;
+            if (padding &gt; 0)
+                result.Add((currentAddress, padding));
+
+            break;
+        }
+
+        // Any other error.
+        if (kr != 0)
+            break;
+
+        var freeBytes = actualAddress - currentAddress;
+        if (freeBytes &gt; 0)
+            result.Add((currentAddress, freeBytes));
+
+        currentAddress = actualAddress + availableSize;
+    }
+
+    return result;
+}
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.
+// I also cannot guarantee this one compiles, I don&#39;t have a macOS compiler readily available.
+#include &lt;vector&gt;
+#include &lt;mach/mach.h&gt;
+
+struct PageRange {
+    mach_vm_address_t addr;
+    mach_vm_size_t size;
+};
+
+std::vector&lt;PageRange&gt; GetFreePages(mach_vm_address_t minAddress, mach_vm_address_t maxAddress, mach_port_t selfTask) {
+    std::vector&lt;PageRange&gt; result;
+    mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_vm_address_t currentAddress = minAddress;
+
+    // Until we get all of the pages.
+    while (currentAddress &lt;= maxAddress) {
+        mach_vm_address_t actualAddress = currentAddress;
+        mach_vm_size_t availableSize = 0;
+        vm_region_basic_info_data_64_t info;
+        mach_msg_type_number_t infoCnt = VM_REGION_BASIC_INFO_COUNT_64;
+        mach_port_t object_name;
+        kern_return_t kr = mach_vm_region(selfTask, &amp;actualAddress, &amp;availableSize, VM_REGION_BASIC_INFO, reinterpret_cast&lt;vm_region_info_t&gt;(&amp;info), &amp;infoCnt, &amp;object_name);
+
+        // KERN_INVALID_ADDRESS, i.e. no more regions.
+        if (kr == KERN_INVALID_ADDRESS) {
+            mach_vm_size_t padding = maxAddress - currentAddress;
+            if (padding &gt; 0)
+                result.push_back({currentAddress, padding});
+
+            break;
+        }
+
+        // Any other error.
+        if (kr != KERN_SUCCESS)
+            break;
+
+        mach_vm_size_t freeBytes = actualAddress - currentAddress;
+        if (freeBytes &gt; 0)
+            result.push_back({currentAddress, freeBytes});
+
+        currentAddress = actualAddress + availableSize;
+    }
+
+    return result;
+}
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Now, try allocating in those free pages:  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">C#</label><label for="__tabbed_6_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Until we get all of the pages.</span>
+<span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">GetFreePages</span><span class="p">(</span><span class="n">currentAddress</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">nuint</span><span class="p">)</span><span class="n">maxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">selfTask</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TryAllocateBuffer</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="n">page</span><span class="p">.</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">selfTask</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">item</span><span class="p">))</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// results is replaced with a vector because stack allocated arrays are not commonly used in C++</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">mach_vm_address_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="k">for</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="n">pageAddress</span><span class="p">,</span><span class="w"> </span><span class="n">pageSize</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">size</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">minAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">maxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">kern_return_t</span><span class="w"> </span><span class="n">kr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mach_vm_allocate</span><span class="p">(</span><span class="n">selfTask</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">KERN_SUCCESS</span><span class="p">)</span>
+<span class="w">        </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">size</span><span class="p">};</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">It appears you can't use <code>mmap</code> for allocating on OSX in these scenarios, so make sure to use <code>mach_vm_allocate</code>.</p>
+</div>
+<h2 id="allocating-a-buffer">Allocating a Buffer</h2>
+<h3 id="windows_1">Windows</h3>
+<div class="admonition info">
+<p class="admonition-title">For all found pages, satisfying constraints, we then do VirtualAlloc(Ex) to reserve and commit them.</p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">C#</label><label for="__tabbed_7_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">TryAllocateBuffer</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">k32</span><span class="p">,</span><span class="w"> </span><span class="k">ref</span><span class="w"> </span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">,</span><span class="w"> </span><span class="n">BufferAllocatorSettings</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">LocatorItem</span><span class="w"> </span><span class="n">result</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">IKernel32</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Fast return if page is not free.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageInfo</span><span class="p">.</span><span class="n">State</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MEM_STATE</span><span class="p">.</span><span class="n">FREE</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">stackalloc</span><span class="w"> </span><span class="n">nuint</span><span class="p">[</span><span class="m">4</span><span class="p">];</span>
+<span class="w">    </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="k">ref</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">nuint</span><span class="w"> </span><span class="n">allocated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k32</span><span class="p">.</span><span class="n">VirtualAlloc</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">nuint</span><span class="p">)</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">allocated</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Sanity test in case of &#39;0&#39; value input and random address allocated.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">allocated</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">addr</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">k32</span><span class="p">.</span><span class="n">VirtualFree</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">);</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">/// &lt;summary&gt;</span>
+<span class="c1">/// Checks if memory can be allocated inside &lt;paramref name=&quot;pageInfo&quot;/&gt; provided the size, minimum and maximum pointer.</span>
+<span class="c1">/// &lt;/summary&gt;</span>
+<span class="c1">/// &lt;param name=&quot;pageInfo&quot;&gt;Contains the information about a singular memory page.&lt;/param&gt;</span>
+<span class="c1">/// &lt;param name=&quot;bufferSize&quot;&gt;The size that an allocation would occupy. Pre-aligned to page-size.&lt;/param&gt;</span>
+<span class="c1">/// &lt;param name=&quot;minimumPtr&quot;&gt;The maximum pointer an allocation can occupy.&lt;/param&gt;</span>
+<span class="c1">/// &lt;param name=&quot;maximumPtr&quot;&gt;The minimum pointer an allocation can occupy.&lt;/param&gt;</span>
+<span class="c1">/// &lt;param name=&quot;results&quot;&gt;Span containing the results; must have at least 4 items.&lt;/param&gt;</span>
+<span class="c1">/// &lt;returns&gt;Zero if the operation fails; otherwise positive value.&lt;/returns&gt;</span>
+<span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="k">ref</span><span class="w"> </span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">bufferSize</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">minimumPtr</span><span class="p">,</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageStart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">.</span><span class="n">BaseAddress</span><span class="p">;</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">.</span><span class="n">BaseAddress</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">.</span><span class="n">RegionSize</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cached</span><span class="p">.</span><span class="n">GetAllocationGranularity</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nf">GetPossibleBufferAddresses</span><span class="p">(</span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">pageStart</span><span class="p">,</span><span class="w"> </span><span class="n">pageEnd</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">nuint</span><span class="p">)</span><span class="w"> </span><span class="n">bufferSize</span><span class="p">,</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.</span>
+<span class="c1">// Note: Uses C++20</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;span&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="o">&amp;</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">bufferSize</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">results</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">pageStart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">.</span><span class="n">BaseAddress</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">pageEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">.</span><span class="n">BaseAddress</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">.</span><span class="n">RegionSize</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetAllocationGranularity</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">GetPossibleBufferAddresses</span><span class="p">(</span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">pageStart</span><span class="p">,</span><span class="w"> </span><span class="n">pageEnd</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">bufferSize</span><span class="p">),</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">bool</span><span class="w"> </span><span class="n">TryAllocateBuffer</span><span class="p">(</span><span class="n">Kernel32</span><span class="o">&amp;</span><span class="w"> </span><span class="n">k32</span><span class="p">,</span><span class="w"> </span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="o">&amp;</span><span class="w"> </span><span class="n">pageInfo</span><span class="p">,</span><span class="w"> </span><span class="n">BufferAllocatorSettings</span><span class="o">&amp;</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">LocatorItem</span><span class="o">&amp;</span><span class="w"> </span><span class="n">result</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageInfo</span><span class="p">.</span><span class="n">State</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MEM_STATE</span><span class="o">::</span><span class="n">FREE</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="o">&gt;</span><span class="w"> </span><span class="n">resultArray</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">resultArray</span><span class="p">);</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="n">pageInfo</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Can redirect to VirtualAllocEx if target is another process.</span>
+<span class="w">        </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">allocated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k32</span><span class="p">.</span><span class="n">VirtualAlloc</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">));</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">allocated</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Sanity test in case of &#39;0&#39; value input and random address allocated.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">allocated</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">addr</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">k32</span><span class="p">.</span><span class="n">VirtualFree</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="linux_1">Linux</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">C#</label><label for="__tabbed_8_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">TryAllocateBuffer</span><span class="p">(</span><span class="n">MemoryMapEntry</span><span class="w"> </span><span class="n">entry</span><span class="p">,</span><span class="w"> </span><span class="n">BufferAllocatorSettings</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">LocatorItem</span><span class="w"> </span><span class="n">result</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">stackalloc</span><span class="w"> </span><span class="n">nuint</span><span class="p">[</span><span class="m">4</span><span class="p">];</span>
+<span class="w">    </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">GetPossibleBufferAddresses</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="p">,</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">EndAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="n">Cached</span><span class="p">.</span><span class="n">GetAllocationGranularity</span><span class="p">(),</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE = 0x100022</span>
+<span class="w">        </span><span class="n">nint</span><span class="w"> </span><span class="n">allocated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Posix</span><span class="p">.</span><span class="n">mmap</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">nuint</span><span class="p">)</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">MemoryProtection</span><span class="p">.</span><span class="n">ReadWriteExecute</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="n">x100022</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">allocated</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="m">1</span><span class="p">)</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Error handling for older kernels before 2018 that don&#39;t respect MAP_FIXED_NOREPLACE.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">nuint</span><span class="p">)</span><span class="n">allocated</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">addr</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Posix</span><span class="p">.</span><span class="n">munmap</span><span class="p">((</span><span class="n">nuint</span><span class="p">)</span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">((</span><span class="n">nuint</span><span class="p">)</span><span class="n">allocated</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.</span>
+<span class="c1">// Note: Uses C++20</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/mman.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;array&gt;</span>
+
+<span class="kt">bool</span><span class="w"> </span><span class="nf">TryAllocateBuffer</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MemoryMapEntry</span><span class="o">&amp;</span><span class="w"> </span><span class="n">entry</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">BufferAllocatorSettings</span><span class="o">&amp;</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">LocatorItem</span><span class="o">&amp;</span><span class="w"> </span><span class="n">result</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="o">&gt;</span><span class="w"> </span><span class="n">resultArray</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">resultArray</span><span class="p">);</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">GetPossibleBufferAddresses</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">StartAddress</span><span class="p">,</span><span class="w"> </span><span class="n">entry</span><span class="p">.</span><span class="n">EndAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="n">GetAllocationGranularity</span><span class="p">(),</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">intptr_t</span><span class="w"> </span><span class="n">allocated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mmap</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">addr</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="n">PROT_READ</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PROT_WRITE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PROT_EXEC</span><span class="p">,</span><span class="w"> </span><span class="n">MAP_PRIVATE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">MAP_ANONYMOUS</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">MAP_FIXED_NOREPLACE</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">allocated</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">intptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">MAP_FAILED</span><span class="p">))</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Error handling for older kernels before 2018 that don&#39;t respect MAP_FIXED_NOREPLACE.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">addr</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">munmap</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">allocated</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">allocated</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="osx_1">OSX</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">C#</label><label for="__tabbed_9_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">TryAllocateBuffer</span><span class="p">(</span><span class="n">nuint</span><span class="w"> </span><span class="n">pageAddress</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageSize</span><span class="p">,</span>
+<span class="w">    </span><span class="n">BufferAllocatorSettings</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">selfTask</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">LocatorItem</span><span class="w"> </span><span class="n">result</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">stackalloc</span><span class="w"> </span><span class="n">nuint</span><span class="p">[</span><span class="m">4</span><span class="p">];</span>
+<span class="w">    </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="n">pageAddress</span><span class="p">,</span><span class="w"> </span><span class="n">pageSize</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MinAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">kr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mach_vm_allocate</span><span class="p">(</span><span class="n">selfTask</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">nuint</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">addr</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LocatorItem</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">Size</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kt">bool</span><span class="w"> </span><span class="nf">TryAllocateBuffer</span><span class="p">(</span><span class="n">mach_vm_address_t</span><span class="w"> </span><span class="n">pageAddress</span><span class="p">,</span><span class="w"> </span><span class="n">mach_vm_size_t</span><span class="w"> </span><span class="n">pageSize</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="n">BufferAllocatorSettings</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w"> </span><span class="n">mach_port_t</span><span class="w"> </span><span class="n">selfTask</span><span class="p">,</span><span class="w"> </span><span class="n">LocatorItem</span><span class="o">&amp;</span><span class="w"> </span><span class="n">result</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// results is replaced with a vector because stack allocated arrays are not commonly used in C++</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">mach_vm_address_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">GetBufferPointersInPageRange</span><span class="p">(</span><span class="n">pageAddress</span><span class="p">,</span><span class="w"> </span><span class="n">pageSize</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">size</span><span class="p">),</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">minAddress</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">maxAddress</span><span class="p">,</span><span class="w"> </span><span class="n">results</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">kern_return_t</span><span class="w"> </span><span class="n">kr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mach_vm_allocate</span><span class="p">(</span><span class="n">selfTask</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">KERN_SUCCESS</span><span class="p">)</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">size</span><span class="p">};</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="checking-if-buffer-fits">Checking if Buffer Fits</h2>
+<div class="admonition info">
+<p class="admonition-title">For any memory page returned from the OS, we need to check if it satisfies our constraints.</p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:2"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">C#</label><label for="__tabbed_10_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">internal</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetPossibleBufferAddresses</span><span class="p">(</span><span class="n">nuint</span><span class="w"> </span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageStart</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageEnd</span><span class="p">,</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">bufSize</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">,</span><span class="w"> </span><span class="n">Span</span><span class="o">&lt;</span><span class="n">nuint</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Get range for page and min-max region.</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">minMaxRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AddressRange</span><span class="p">(</span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">pageRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AddressRange</span><span class="p">(</span><span class="n">pageStart</span><span class="p">,</span><span class="w"> </span><span class="n">pageEnd</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Check if there is any overlap at all.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Overlaps</span><span class="p">(</span><span class="n">minMaxRange</span><span class="p">))</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Three possible cases here:</span>
+<span class="w">    </span><span class="c1">//   1. Page fits entirely inside min-max range and is smaller.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bufSize</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">pageRange</span><span class="p">.</span><span class="n">Size</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">default</span><span class="p">;</span><span class="w"> </span><span class="c1">// does not fit.</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">numItems</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Note: We have to test aligned to both page boundaries and min-max range boundaries;</span>
+<span class="w">    </span><span class="c1">//       because, they may not perfectly overlap, e.g. min-max may be way greater than</span>
+<span class="w">    </span><span class="c1">//       page size, so testing from start/end of that will not even overlap with available pages.</span>
+<span class="w">    </span><span class="c1">//       Or the opposite can happen... min-max range may be smaller than page size.</span>
+
+<span class="w">    </span><span class="c1">//   2. Min-max range is inside page, test aligned to page boundaries.</span>
+
+<span class="w">    </span><span class="c1">// Round up from page min.</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageMinAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundUp</span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">,</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">pageMinRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AddressRange</span><span class="p">(</span><span class="n">pageMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">AddWithOverflowCap</span><span class="p">(</span><span class="n">pageMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMinRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMinRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">.</span><span class="n">DangerousGetReferenceAt</span><span class="p">(</span><span class="n">numItems</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageMinRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Round down from page max.</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">pageMaxAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundDown</span><span class="p">(</span><span class="n">SubtractWithUnderflowCap</span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">EndPointer</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">),</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">pageMaxRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AddressRange</span><span class="p">(</span><span class="n">pageMaxAligned</span><span class="p">,</span><span class="w"> </span><span class="n">pageMaxAligned</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">bufSize</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMaxRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMaxRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">.</span><span class="n">DangerousGetReferenceAt</span><span class="p">(</span><span class="n">numItems</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageMaxRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//   3. Min-max range is inside page, test aligned to Min-max range.</span>
+
+<span class="w">    </span><span class="c1">// Round up from ptr min.</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">ptrMinAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundUp</span><span class="p">(</span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">ptrMinRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AddressRange</span><span class="p">(</span><span class="n">ptrMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">AddWithOverflowCap</span><span class="p">(</span><span class="n">ptrMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMinRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMinRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">.</span><span class="n">DangerousGetReferenceAt</span><span class="p">(</span><span class="n">numItems</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrMinRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Round down from ptr max.</span>
+<span class="w">    </span><span class="n">nuint</span><span class="w"> </span><span class="n">ptrMaxAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundDown</span><span class="p">(</span><span class="n">SubtractWithUnderflowCap</span><span class="p">(</span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">),</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">ptrMaxRange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AddressRange</span><span class="p">(</span><span class="n">ptrMaxAligned</span><span class="p">,</span><span class="w"> </span><span class="n">ptrMaxAligned</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">bufSize</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMaxRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMaxRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">.</span><span class="n">DangerousGetReferenceAt</span><span class="p">(</span><span class="n">numItems</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrMaxRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">results</span><span class="p">.</span><span class="n">SliceFast</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">numItems</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">/// &lt;summary&gt;</span>
+<span class="c1">///     Defines a physical address range with a minimum and maximum address.</span>
+<span class="c1">/// &lt;/summary&gt;</span>
+<span class="k">internal</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">AddressRange</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">;</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">;</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">EndPointer</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="nf">AddressRange</span><span class="p">(</span><span class="n">nuint</span><span class="w"> </span><span class="n">startPointer</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">endPointer</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">StartPointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">startPointer</span><span class="p">;</span>
+<span class="w">        </span><span class="n">EndPointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endPointer</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">/// &lt;summary&gt;</span>
+<span class="w">    </span><span class="c1">///     Returns true if the other address range is completely inside</span>
+<span class="w">    </span><span class="c1">///     the current address range.</span>
+<span class="w">    </span><span class="c1">/// &lt;/summary&gt;</span>
+<span class="w">    </span><span class="c1">/// &lt;param name=&quot;otherRange&quot;&gt;True if this address range is contained entirely inside the other.&lt;/param&gt;</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">Contains</span><span class="p">(</span><span class="k">in</span><span class="w"> </span><span class="n">AddressRange</span><span class="w"> </span><span class="n">otherRange</span><span class="p">)</span>
+<span class="w">        </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">StartPointer</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">EndPointer</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">/// &lt;summary&gt;</span>
+<span class="w">    </span><span class="c1">///     Returns true if the other address range intersects this address range, i.e.</span>
+<span class="w">    </span><span class="c1">///     start or end of this range falls inside other range.</span>
+<span class="w">    </span><span class="c1">/// &lt;/summary&gt;</span>
+<span class="w">    </span><span class="c1">/// &lt;param name=&quot;otherRange&quot;&gt;Returns true if there are any overlaps in the address ranges.&lt;/param&gt;</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">Overlaps</span><span class="p">(</span><span class="k">in</span><span class="w"> </span><span class="n">AddressRange</span><span class="w"> </span><span class="n">otherRange</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PointInRange</span><span class="p">(</span><span class="n">otherRange</span><span class="p">,</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PointInRange</span><span class="p">(</span><span class="n">otherRange</span><span class="p">,</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PointInRange</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PointInRange</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">EndPointer</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">/// &lt;summary&gt;</span>
+<span class="w">    </span><span class="c1">///     Returns true if a number &quot;point&quot;, is between min and max of address range.</span>
+<span class="w">    </span><span class="c1">/// &lt;/summary&gt;</span>
+<span class="w">    </span><span class="c1">/// &lt;param name=&quot;range&quot;&gt;Range inside which to test the point.&lt;/param&gt;</span>
+<span class="w">    </span><span class="c1">/// &lt;param name=&quot;point&quot;&gt;The point to test.&lt;/param&gt;</span>
+<span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">PointInRange</span><span class="p">(</span><span class="k">in</span><span class="w"> </span><span class="n">AddressRange</span><span class="w"> </span><span class="n">range</span><span class="p">,</span><span class="w"> </span><span class="n">nuint</span><span class="w"> </span><span class="n">point</span><span class="p">)</span>
+<span class="w">        </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">point</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">range</span><span class="p">.</span><span class="n">StartPointer</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">point</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">range</span><span class="p">.</span><span class="n">EndPointer</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Disclaimer: This code was ported by AI, then cleaned up by human. Not tested.</span>
+<span class="c1">// Note: Uses C++20</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstddef&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdint&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;span&gt;</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">AddressRange</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Returns the size of the address range.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="nf">Size</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">EndPointer</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Constructor for AddressRange.</span>
+<span class="cm">     * @param startPointer - Start of the address range.</span>
+<span class="cm">     * @param endPointer - End of the address range.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="p">(</span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">startPointer</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">endPointer</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">(</span><span class="n">startPointer</span><span class="p">),</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">(</span><span class="n">endPointer</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Checks if this address range contains the other address range.</span>
+<span class="cm">     * @param otherRange - The other address range to check.</span>
+<span class="cm">     * @return true if this address range contains the other, false otherwise.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">Contains</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AddressRange</span><span class="o">&amp;</span><span class="w"> </span><span class="n">otherRange</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">StartPointer</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">EndPointer</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Checks if this address range overlaps with the other address range.</span>
+<span class="cm">     * @param otherRange - The other address range to check.</span>
+<span class="cm">     * @return true if the address ranges overlap, false otherwise.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">Overlaps</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AddressRange</span><span class="o">&amp;</span><span class="w"> </span><span class="n">otherRange</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">PointInRange</span><span class="p">(</span><span class="n">otherRange</span><span class="p">,</span><span class="w"> </span><span class="n">StartPointer</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">PointInRange</span><span class="p">(</span><span class="n">otherRange</span><span class="p">,</span><span class="w"> </span><span class="n">EndPointer</span><span class="p">)</span>
+<span class="w">            </span><span class="o">||</span><span class="w"> </span><span class="n">PointInRange</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">PointInRange</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">otherRange</span><span class="p">.</span><span class="n">EndPointer</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Checks if a point is within an address range.</span>
+<span class="cm">     * @param range - The address range to check.</span>
+<span class="cm">     * @param point - The point to check.</span>
+<span class="cm">     * @return true if the point is in the range, false otherwise.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">PointInRange</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">AddressRange</span><span class="o">&amp;</span><span class="w"> </span><span class="n">range</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">point</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">point</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">range</span><span class="p">.</span><span class="n">StartPointer</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">point</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">range</span><span class="p">.</span><span class="n">EndPointer</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Rounds up a number to the nearest multiple.</span>
+<span class="cm"> * @param number - The number to round up.</span>
+<span class="cm"> * @param multiple - The multiple to round up to.</span>
+<span class="cm"> * @return The rounded up number.</span>
+<span class="cm">*/</span>
+<span class="kt">uintptr_t</span><span class="w"> </span><span class="nf">RoundUp</span><span class="p">(</span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">number</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">multiple</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">((</span><span class="n">number</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">multiple</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">multiple</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">multiple</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm">* Rounds down a number to the nearest multiple.</span>
+<span class="cm">* @param number - The number to round down.</span>
+<span class="cm">* @param multiple - The multiple to round down to.</span>
+<span class="cm">* @return The rounded down number.</span>
+<span class="cm">*/</span>
+<span class="kt">uintptr_t</span><span class="w"> </span><span class="nf">RoundDown</span><span class="p">(</span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">number</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">multiple</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">number</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">multiple</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">multiple</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm">* Adds two numbers and caps the result to UINTPTR_MAX to prevent overflow.</span>
+<span class="cm">* @param a - The first number.</span>
+<span class="cm">* @param b - The second number.</span>
+<span class="cm">* @return The sum of the two numbers, capped at UINTPTR_MAX if there would be an overflow.</span>
+<span class="cm">*/</span>
+<span class="kt">uintptr_t</span><span class="w"> </span><span class="nf">AddWithOverflowCap</span><span class="p">(</span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">UINTPTR_MAX</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">UINTPTR_MAX</span><span class="p">;</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm">* Subtracts two numbers and makes the result 0 if it is going to underflow.</span>
+<span class="cm">* @param a - The first number.</span>
+<span class="cm">* @param b - The second number.</span>
+<span class="cm">* @return The subtraction of the two numbers, with value 0 if there would be an underflow.</span>
+<span class="cm">*/</span>
+<span class="kt">uintptr_t</span><span class="w"> </span><span class="nf">SubtractWithUnderflowCap</span><span class="p">(</span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">b</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm">* Retrieves all locations could be allocated in given a page and address range.</span>
+<span class="cm">* @param minimumPtr - The minimum possible address for the buffer.</span>
+<span class="cm">* @param maximumPtr - The maximum possible address for the buffer.</span>
+<span class="cm">* @param pageStart - The start of the page.</span>
+<span class="cm">* @param pageEnd - The end of the page.</span>
+<span class="cm">* @param bufSize - The size of the buffer.</span>
+<span class="cm">* @param allocationGranularity - The allocation granularity.</span>
+<span class="cm">* @param results - Stores possible locations of the buffer, must be at least 4 elements long.</span>
+<span class="cm">* @return All possible locations for the buffer.</span>
+<span class="cm">*/</span>
+<span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetPossibleBufferAddresses</span><span class="p">(</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">pageStart</span><span class="p">,</span><span class="w"> </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">pageEnd</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">bufSize</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">,</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Get range for page and min-max region.</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="w"> </span><span class="nf">minMaxRange</span><span class="p">(</span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">maximumPtr</span><span class="p">);</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="w"> </span><span class="nf">pageRange</span><span class="p">(</span><span class="n">pageStart</span><span class="p">,</span><span class="w"> </span><span class="n">pageEnd</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Check if there is any overlap at all.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Overlaps</span><span class="p">(</span><span class="n">minMaxRange</span><span class="p">))</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Three possible cases here:</span>
+<span class="w">    </span><span class="c1">//   1. Page fits entirely inside min-max range and is smaller.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bufSize</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">pageRange</span><span class="p">.</span><span class="n">Size</span><span class="p">())</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">span</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">numItems</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Note: We have to test aligned to both page boundaries and min-max range boundaries;</span>
+<span class="w">    </span><span class="c1">//       because, they may not perfectly overlap, e.g. min-max may be way greater than</span>
+<span class="w">    </span><span class="c1">//       page size, so testing from start/end of that will not even overlap with available pages.</span>
+<span class="w">    </span><span class="c1">//       Or the opposite can happen... min-max range may be smaller than page size.</span>
+
+<span class="w">    </span><span class="c1">//   2. Min-max range is inside page, test aligned to page boundaries.</span>
+<span class="w">    </span><span class="c1">// Round up from page min.</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">pageMinAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundUp</span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">,</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="w"> </span><span class="nf">pageMinRange</span><span class="p">(</span><span class="n">pageMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">AddWithOverflowCap</span><span class="p">(</span><span class="n">pageMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMinRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMinRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">[</span><span class="n">numItems</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageMinRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Round down from page max.</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">pageMaxAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundDown</span><span class="p">(</span><span class="n">SubtractWithUnderflowCap</span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">EndPointer</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">),</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="w"> </span><span class="nf">pageMaxRange</span><span class="p">(</span><span class="n">pageMaxAligned</span><span class="p">,</span><span class="w"> </span><span class="n">pageMaxAligned</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">bufSize</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMaxRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">pageMaxRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">[</span><span class="n">numItems</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pageMaxRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">//   3. Min-max range is inside page, test aligned to Min-max range.</span>
+
+<span class="w">    </span><span class="c1">// Round up from ptr min.</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">ptrMinAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundUp</span><span class="p">(</span><span class="n">minimumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="w"> </span><span class="nf">ptrMinRange</span><span class="p">(</span><span class="n">ptrMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">AddWithOverflowCap</span><span class="p">(</span><span class="n">ptrMinAligned</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMinRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMinRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">[</span><span class="n">numItems</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrMinRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Round down from ptr max.</span>
+<span class="w">    </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">ptrMaxAligned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RoundDown</span><span class="p">(</span><span class="n">SubtractWithUnderflowCap</span><span class="p">(</span><span class="n">maximumPtr</span><span class="p">,</span><span class="w"> </span><span class="n">bufSize</span><span class="p">),</span><span class="w"> </span><span class="n">allocationGranularity</span><span class="p">);</span>
+<span class="w">    </span><span class="n">AddressRange</span><span class="w"> </span><span class="nf">ptrMaxRange</span><span class="p">(</span><span class="n">ptrMaxAligned</span><span class="p">,</span><span class="w"> </span><span class="n">ptrMaxAligned</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">bufSize</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pageRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMaxRange</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">minMaxRange</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">ptrMaxRange</span><span class="p">))</span>
+<span class="w">        </span><span class="n">results</span><span class="p">[</span><span class="n">numItems</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrMaxRange</span><span class="p">.</span><span class="n">StartPointer</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">results</span><span class="p">.</span><span class="n">subspan</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">numItems</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Reloaded-Project" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/thesewer56?lang=en-GB" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
