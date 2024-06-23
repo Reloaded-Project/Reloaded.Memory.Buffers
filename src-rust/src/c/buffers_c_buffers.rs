@@ -332,19 +332,22 @@ pub extern "C" fn overwrite_allocated_code_ex(
 }
 
 #[cfg(test)]
+#[allow(unused_imports)]
 mod tests {
-    use crate::c::buffers_c_buffers::{
-        buffers_allocate_private_memory, buffers_get_buffer, buffersearchsettings_from_proximity,
-    };
-    use crate::c::buffers_c_buffers::{free_allocation_result, free_get_buffer_result};
-    use crate::c::buffers_c_locatoritem::{
-        locatoritem_append_bytes, locatoritem_bytes_left, locatoritem_min_address,
+    use crate::c::{
+        buffers_c_buffers::{
+            buffers_allocate_private_memory, buffers_get_buffer,
+            buffersearchsettings_from_proximity, free_allocation_result, free_get_buffer_result,
+        },
+        buffers_c_locatoritem::locatoritem_append_bytes,
     };
     use crate::{
+        c::buffers_c_locatoritem::{locatoritem_bytes_left, locatoritem_min_address},
         internal::locator_header_finder::LocatorHeaderFinder,
         structs::params::{BufferAllocatorSettings, BufferSearchSettings},
         utilities::cached::get_sys_info,
     };
+
     use rstest::rstest;
 
     #[cfg(not(target_os = "macos"))]
@@ -436,11 +439,9 @@ mod tests {
         }
 
         let settings = buffersearchsettings_from_proximity(i32::MAX as usize, base_address, SIZE);
-
         let result = buffers_get_buffer(&settings);
 
         assert!(result.is_ok);
-
         assert!(locatoritem_bytes_left(result.ok) >= SIZE as u32);
 
         let offset = (locatoritem_min_address(result.ok) as i64 - base_address as i64).abs();
