@@ -96,7 +96,7 @@ impl PrivateAllocation {
         use core::ffi::c_void;
 
         unsafe {
-            #[cfg(feature = "external_process")]
+            #[cfg(feature = "external_processes")]
             {
                 if self._this_process_id == get_sys_info().this_process_id {
                     let result =
@@ -118,7 +118,7 @@ impl PrivateAllocation {
                 };
             }
 
-            #[cfg(not(feature = "external_process"))]
+            #[cfg(not(feature = "external_processes"))]
             {
                 let result = VirtualFree(self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
                 if result == 0 {

@@ -56,12 +56,12 @@ impl Kernel32 for LocalKernel32 {
     }
 }
 
-#[cfg(feature = "external_process")]
+#[cfg(feature = "external_processes")]
 pub struct RemoteKernel32 {
     handle: HANDLE,
 }
 
-#[cfg(feature = "external_process")]
+#[cfg(feature = "external_processes")]
 impl Kernel32 for RemoteKernel32 {
     fn virtual_query(
         &self,
@@ -170,7 +170,7 @@ pub fn allocate_windows(
         let handle = process_handle.handle;
         let max_address = get_max_windows_address(settings.target_process_id, handle);
 
-        #[cfg(feature = "external_process")]
+        #[cfg(feature = "external_processes")]
         {
             return if get_sys_info().this_process_id == settings.target_process_id {
                 allocate_fast(&LocalKernel32 {}, max_address, &settings)
@@ -179,7 +179,7 @@ pub fn allocate_windows(
             };
         }
 
-        #[cfg(not(feature = "external_process"))]
+        #[cfg(not(feature = "external_processes"))]
         allocate_fast(&LocalKernel32 {}, max_address, settings)
     }
 }
