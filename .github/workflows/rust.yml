@@ -5,8 +5,12 @@ on:
     branches: [ main, master, optimize-for-size ]
     tags:
       - '*'
+    paths:
+      - 'src-rust/**'
   pull_request:
     branches: [ main, master, optimize-for-size ]
+    paths:
+      - 'src-rust/**'
   workflow_dispatch:
 
 env:
