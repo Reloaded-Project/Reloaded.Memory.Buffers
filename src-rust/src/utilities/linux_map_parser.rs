@@ -112,6 +112,7 @@ pub fn get_free_regions_from_process_id(process_id: i32) -> Vec<MemoryMapEntry> 
     get_free_regions(&regions)
 }
 
+#[allow(clippy::comparison_chain)]
 unsafe fn read_to_string(path: &str) -> String {
     const BUFFER_SIZE: usize = 131_072; // 128 KB
     let c_path = CString::new(path).unwrap();

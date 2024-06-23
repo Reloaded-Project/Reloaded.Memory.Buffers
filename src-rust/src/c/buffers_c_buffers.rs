@@ -346,14 +346,13 @@ mod tests {
         utilities::cached::get_sys_info,
     };
     use rstest::rstest;
-    use std;
 
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn allocate_private_memory_in_2gib() {
         let mut settings = BufferAllocatorSettings::new();
         settings.min_address = 0;
-        settings.max_address = std::i32::MAX as usize;
+        settings.max_address = i32::MAX as usize;
 
         let result = buffers_allocate_private_memory(&mut settings);
         assert!(result.is_ok);
@@ -430,14 +429,13 @@ mod tests {
     #[test]
     fn get_buffer_with_proximity() {
         const SIZE: usize = 4096;
-        let base_address = get_sys_info().max_address - (std::i32::MAX as usize);
+        let base_address = get_sys_info().max_address - (i32::MAX as usize);
 
         unsafe {
             LocatorHeaderFinder::reset();
         }
 
-        let settings =
-            buffersearchsettings_from_proximity(std::i32::MAX as usize, base_address, SIZE);
+        let settings = buffersearchsettings_from_proximity(i32::MAX as usize, base_address, SIZE);
 
         let result = buffers_get_buffer(&settings);
 
