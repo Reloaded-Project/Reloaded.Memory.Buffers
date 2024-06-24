@@ -1,162 +1,178 @@
-name: Rust Build, Test & Publish
+name: Test, Upload Coverage and Release Rust
 
 on:
   push:
     branches: [ main, master, optimize-for-size ]
     tags:
       - '*'
+    paths:
+      - 'src-rust/**'
   pull_request:
     branches: [ main, master, optimize-for-size ]
+    paths:
+      - 'src-rust/**'
   workflow_dispatch:
 
+env:
+  build-with-pgo: false
+
 jobs:
-  test-native:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - id: test-rust
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/test-and-coverage@v1 # upgrade if needed
-        with:
-          rust_project_path: src-rust
-          upload_coverage: true
-          rust_branch: nightly
-
-  test-wine:
+  build-and-test-linux:
     runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - id: test-rust
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/test-in-wine@v1 # upgrade if needed
-        with:
-          rust_project_path: src-rust
-          rust_branch: nightly
-
-  build-c-libs-linux:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
         target: [x86_64-unknown-linux-gnu, i686-unknown-linux-gnu, aarch64-unknown-linux-gnu]
         features: ["c_exports", "c_exports,size_opt", "c_exports,size_opt,no_format", "c_exports,size_opt,no_format,all_private"]
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - id: build-libs
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1
-        with:
-          rust_project_path: src-rust
-          target: ${{ matrix.target }}
-          features: ${{ matrix.features }}
-          use_cross: true
 
-  build-c-libs-macos:
-    runs-on: ${{ matrix.os }}
+      - name: Build C Libraries and Run Tests
+        uses: Reloaded-Project/devops-rust-lightweight-binary@v1
+        with:
+          rust-project-path: src-rust
+          crate-name: ${{ github.event.repository.name }}
+          target: ${{ matrix.target }}
+          use-pgo: ${{ env.build-with-pgo }}
+          use-cross: ${{ matrix.target != 'x86_64-unknown-linux-gnu' }}
+          features: ${{ matrix.features }}
+          build-library: true
+          run-tests-and-coverage: true
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-and-test-macos-x86:
+    runs-on: macos-13
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
-        target: [x86_64-apple-darwin, aarch64-apple-darwin]
         features: ["c_exports", "c_exports,size_opt", "c_exports,size_opt,no_format", "c_exports,size_opt,no_format,all_private"]
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - id: build-libs
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1
-        with:
-          rust_project_path: src-rust
-          target: ${{ matrix.target }}
-          features: ${{ matrix.features }}
 
-  build-c-libs-windows:
-    runs-on: ${{ matrix.os }}
+      - name: Build C Libraries and Run Tests
+        uses: Reloaded-Project/devops-rust-lightweight-binary@v1
+        with:
+          rust-project-path: src-rust
+          crate-name: ${{ github.event.repository.name }}
+          target: x86_64-apple-darwin
+          use-pgo: ${{ env.build-with-pgo }}
+          use-cross: false
+          features: ${{ matrix.features }}
+          build-library: true
+          run-tests-and-coverage: true
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-and-test-macos-arm:
+    runs-on: macos-14
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
-        target: [x86_64-pc-windows-msvc, i686-pc-windows-msvc, aarch64-pc-windows-msvc]
-        features: ["c_exports,external_processes", "c_exports,size_opt,external_processes", "c_exports,size_opt,no_format,external_processes", "c_exports,size_opt,no_format", "c_exports,size_opt,no_format,all_private"]
+        features: ["c_exports", "c_exports,size_opt", "c_exports,size_opt,no_format", "c_exports,size_opt,no_format,all_private"]
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - id: build-libs
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/build-c-library@v1
+
+      - name: Build C Libraries and Run Tests
+        uses: Reloaded-Project/devops-rust-lightweight-binary@v1
         with:
-          rust_project_path: src-rust
-          target: ${{ matrix.target }}
+          rust-project-path: src-rust
+          crate-name: ${{ github.event.repository.name }}
+          target: aarch64-apple-darwin
+          use-pgo: ${{ env.build-with-pgo }}
+          use-cross: false
           features: ${{ matrix.features }}
+          build-library: true
+          run-tests-and-coverage: true
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-and-test-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Native Windows builds with testing
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            run_tests: true
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            run_tests: true
+          # aarch64 Windows build without testing
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            run_tests: false # no native runner
+          # Wine builds (on Linux)
+          - os: ubuntu-latest
+            target: x86_64-pc-windows-gnu
+            run_tests: true
+          - os: ubuntu-latest
+            target: i686-pc-windows-gnu
+            run_tests: true
+        features: ["c_exports,external_processes", "c_exports,size_opt,external_processes", "c_exports,size_opt,no_format,external_processes", "c_exports,size_opt,no_format", "c_exports,size_opt,no_format,all_private"]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build C Libraries and Run Tests
+        uses: Reloaded-Project/devops-rust-lightweight-binary@v1
+        with:
+          rust-project-path: src-rust
+          crate-name: ${{ github.event.repository.name }}
+          target: ${{ matrix.target }}
+          use-pgo: ${{ env.build-with-pgo }}
+          use-cross: ${{ matrix.os == 'ubuntu-latest' || matrix.target == 'aarch64-pc-windows-msvc' }}
+          features: ${{ matrix.features }}
+          build-library: true
+          run-tests-and-coverage: ${{ matrix.run_tests }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
   build-c-headers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Generate C++ bindings
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
+        uses: Reloaded-Project/devops-rust-cbindgen@v1
         with:
-          rust_project_path: src-rust
-          config_file: cbindgen_cpp.toml
-          header_file: bindings_cpp.hpp
-  
-      - name: Generate C bindings
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/generate-bindings@v1
-        with:
-          rust_project_path: src-rust
-          config_file: cbindgen_c.toml
-          header_file: bindings_c.h
+          rust-project-path: src-rust
+          config-file: cbindgen_cpp.toml
+          output-header-file: bindings_cpp.hpp
 
-  publish-artifacts:
-    needs: ["build-c-headers", "build-c-libs-windows", "build-c-libs-linux", "build-c-libs-macos", "test-wine", "test-native"]
-    # Publish only on tags
-    if: startsWith(github.ref, 'refs/tags/') 
+      - name: Generate C bindings
+        uses: Reloaded-Project/devops-rust-cbindgen@v1
+        with:
+          rust-project-path: src-rust
+          config-file: cbindgen_c.toml
+          output-header-file: bindings_c.h
+
+  publish-crate:
+    permissions:
+      contents: write
+    needs: [build-and-test-linux, build-and-test-macos-x86, build-and-test-macos-arm, build-and-test-windows, build-c-headers]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: ↙️ Download Artifacts
-        uses: actions/download-artifact@v3
+      - name: Publish Rust Crate and Artifacts  
+        uses: Reloaded-Project/devops-publish-action@v1
         with:
-          path: artifacts
-
-      - name: Compress Artifacts
-        shell: bash
-        run: |
-          dir="artifacts" # Replace with your subdirectory
-          for subdir in "$dir"/*; do
-            if [ -d "$subdir" ]; then
-              base=$(basename "$subdir")
-              zip -r "$dir/$base.zip" "$subdir"
-              rm -r "$subdir"
-            fi
-          done
-          ls -A ./artifacts
-
-      - name: GitHub Release Artifacts
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            artifacts/*
-
-      - name: Publish to crates.io
-        uses: Reloaded-Project/reloaded-project-configurations-rust/.github/actions/publish-crate@v1
-        with:
-          rust_project_path: src-rust
-          token: ${{ secrets.CRATES_IO_TOKEN }}
+          crates-io-token: ${{ secrets.CRATES_IO_TOKEN }}
+          rust-project-paths: |
+            src-rust

@@ -4,8 +4,12 @@ on:
     branches: [ master, refactor-reloaded3-compliance, support-android-and-bsd ]
     tags:
       - '*'
+    paths:
+      - 'src/**'
   pull_request:
     branches: [ master, refactor-reloaded3-compliance, support-android-and-bsd ]
+    paths:
+      - 'src/**'
   workflow_dispatch:
 
 jobs:

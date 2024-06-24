@@ -9,9 +9,6 @@ readme = "../README.md"
 repository = "https://github.com/Reloaded-Project/Reloaded.Memory.Buffers"
 license = "GPL-3.0"
 
-[lib]
-crate-type = ["cdylib"]
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 default = ["std"]
@@ -22,6 +19,7 @@ no_format = [] # Removes string formatting (less detailed errors) for binary siz
 all_private = [] # No memory mapped files, memory is not shared.
 size_opt = ["nightly"]
 nightly = [] # Optimizations for nightly builds.
+direct-mmap = [] # If set, uses built-in code for memory mapping. This is auto activated in build.rs for supported platforms.
 
 [dependencies]
 concat-string = "1.0.1"

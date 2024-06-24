@@ -10,7 +10,6 @@ use crate::utilities::disable_write_xor_execute::{
 use crate::utilities::icache_clear::clear_instruction_cache;
 use crate::utilities::mathematics::round_up;
 use core::ptr::{copy_nonoverlapping, NonNull};
-use core::u8;
 
 pub struct Buffers {}
 
@@ -235,14 +234,13 @@ mod tests {
         structs::params::{BufferAllocatorSettings, BufferSearchSettings},
         utilities::cached::get_sys_info,
     };
-    use std;
 
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn allocate_private_memory_in_2gib() {
         let mut settings = BufferAllocatorSettings::new();
         settings.min_address = 0;
-        settings.max_address = std::i32::MAX as usize;
+        settings.max_address = i32::MAX as usize;
 
         let result = Buffers::allocate_private_memory(&mut settings);
         assert!(result.is_ok());
@@ -412,14 +410,14 @@ mod tests {
     #[test]
     fn get_buffer_with_proximity() {
         const SIZE: usize = 4096;
-        let base_address = get_sys_info().max_address - (std::i32::MAX as usize);
+        let base_address = get_sys_info().max_address - (i32::MAX as usize);
 
         unsafe {
             LocatorHeaderFinder::reset();
         }
 
         let item = Buffers::get_buffer(&BufferSearchSettings::from_proximity(
-            std::i32::MAX as usize,
+            i32::MAX as usize,
             base_address,
             SIZE,
         ));

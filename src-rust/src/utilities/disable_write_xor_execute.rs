@@ -1,7 +1,7 @@
 // An utility to disable write xor execute protection on a memory region.
 // This method contains the code to disable W^X on platforms where it's enforced.
 
-#[cfg(target_os = "macos")]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 use {
     libc::mach_task_self, mach::vm::mach_vm_protect, mach::vm_prot::VM_PROT_EXECUTE,
     mach::vm_prot::VM_PROT_READ, mach::vm_prot::VM_PROT_WRITE, mach::vm_types::mach_vm_size_t,

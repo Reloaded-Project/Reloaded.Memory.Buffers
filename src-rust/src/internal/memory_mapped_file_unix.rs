@@ -10,7 +10,6 @@ use alloc::string::String;
 #[cfg(not(feature = "no_format"))]
 use errno::errno;
 
-use libc::c_char;
 use libc::mkdir;
 use libc::stat;
 use libc::S_IFDIR;
@@ -156,8 +155,11 @@ impl Drop for UnixMemoryMappedFile {
         let _ = unsafe { munmap(self.data as *mut c_void, self.length) };
         unsafe { close(self.file_descriptor) };
         if !self.already_existed {
-            unsafe {
-                libc::unlink(self.file_path.as_ptr() as *const c_char);
+            // Create a null-terminated C string
+            if let Ok(file_path_cstr) = CString::new(self.file_path.as_str()) {
+                unsafe {
+                    libc::unlink(file_path_cstr.as_ptr());
+                }
             }
         }
     }
