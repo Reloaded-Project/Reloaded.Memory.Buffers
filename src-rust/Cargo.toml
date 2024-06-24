@@ -19,6 +19,7 @@ no_format = [] # Removes string formatting (less detailed errors) for binary siz
 all_private = [] # No memory mapped files, memory is not shared.
 size_opt = ["nightly"]
 nightly = [] # Optimizations for nightly builds.
+mmap-rs = [] # Uses mmap-rs for memory mapping. This is auto activated during build.
 
 [dependencies]
 concat-string = "1.0.1"

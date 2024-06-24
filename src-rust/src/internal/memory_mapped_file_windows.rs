@@ -92,12 +92,12 @@ mod tests {
         let file_length = get_sys_info().allocation_granularity as usize;
         let mmf = WindowsMemoryMappedFile::new(&file_name, file_length);
 
-        assert_eq!(mmf.already_existed, false);
+        assert!(!mmf.already_existed);
         assert_eq!(mmf.length, file_length);
 
         // Assert the file can be opened again (i.e., it exists)
         let mmf_existing = WindowsMemoryMappedFile::new(&file_name, file_length);
-        assert_eq!(mmf_existing.already_existed, true);
+        assert!(mmf_existing.already_existed);
     }
 
     #[test]

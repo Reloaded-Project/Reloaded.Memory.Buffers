@@ -22,7 +22,7 @@ pub fn allocate(
     return crate::internal::buffer_allocator_osx::allocate_osx(settings);
 
     // Fallback for non-hot-path OSes.
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    #[cfg(feature = "mmap-rs")]
     crate::internal::buffer_allocator_mmap_rs::allocate_mmap_rs(settings)
 }
 

@@ -234,7 +234,6 @@ mod tests {
         structs::params::{BufferAllocatorSettings, BufferSearchSettings},
         utilities::cached::get_sys_info,
     };
-    use std;
 
     #[cfg(not(target_os = "macos"))]
     #[test]
@@ -418,7 +417,7 @@ mod tests {
         }
 
         let item = Buffers::get_buffer(&BufferSearchSettings::from_proximity(
-            std::i32::MAX as usize,
+            i32::MAX as usize,
             base_address,
             SIZE,
         ));

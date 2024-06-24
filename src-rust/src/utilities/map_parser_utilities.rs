@@ -44,7 +44,6 @@ impl MemoryMapEntryTrait for MemoryMapEntry {
 /// # Arguments
 ///
 /// * `regions` - A slice of MemoryMapEntry that contains the regions.
-
 #[cfg_attr(feature = "size_opt", optimize(size))]
 pub fn get_free_regions<T: MemoryMapEntryTrait>(regions: &[T]) -> Vec<MemoryMapEntry> {
     let mut last_end_address: usize = 0;

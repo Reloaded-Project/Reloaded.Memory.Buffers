@@ -98,6 +98,9 @@ impl PrivateAllocation {
         unsafe {
             #[cfg(feature = "external_processes")]
             {
+                use crate::internal::buffer_allocator_windows::ProcessHandle;
+                use windows_sys::Win32::System::Memory::VirtualFreeEx;
+
                 if self._this_process_id == get_sys_info().this_process_id {
                     let result =
                         VirtualFree(self.base_address.as_ptr() as *mut c_void, 0, MEM_RELEASE);
@@ -107,7 +110,7 @@ impl PrivateAllocation {
                 } else {
                     let process_handle = ProcessHandle::open_process(self._this_process_id);
                     let result = VirtualFreeEx(
-                        process_handle.get_handle(),
+                        process_handle.get_raw_handle(),
                         self.base_address.as_ptr() as *mut c_void,
                         0,
                         MEM_RELEASE,
@@ -165,7 +168,7 @@ impl PrivateAllocation {
     }
 
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    #[cfg(feature = "mmap-rs")]
     pub(crate) fn drop_mmap_rs(&mut self) {
         use mmap_rs_with_map_from_existing::MmapOptions;
         let _map = unsafe {
@@ -193,7 +196,7 @@ impl Drop for PrivateAllocation {
         return PrivateAllocation::drop_macos(self);
 
         // non-hot-path-os
-        #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+        #[cfg(feature = "mmap-rs")]
         return PrivateAllocation::drop_mmap_rs(self);
     }
 }
