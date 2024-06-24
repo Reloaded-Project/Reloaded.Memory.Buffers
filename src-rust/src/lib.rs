@@ -133,7 +133,7 @@ pub(crate) mod utilities {
     pub mod cached;
     pub mod icache_clear;
 
-    #[cfg(any(target_os = "linux", feature = "mmap-rs"))]
+    #[cfg(any(target_os = "linux", not(feature = "direct-mmap")))]
     pub mod map_parser_utilities;
 
     pub mod mathematics;

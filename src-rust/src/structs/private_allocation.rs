@@ -168,7 +168,7 @@ impl PrivateAllocation {
     }
 
     /// Frees the allocated memory when the `PrivateAllocation` instance is dropped.
-    #[cfg(feature = "mmap-rs")]
+    #[cfg(not(feature = "direct-mmap"))]
     pub(crate) fn drop_mmap_rs(&mut self) {
         use mmap_rs_with_map_from_existing::MmapOptions;
         let _map = unsafe {
@@ -196,7 +196,7 @@ impl Drop for PrivateAllocation {
         return PrivateAllocation::drop_macos(self);
 
         // non-hot-path-os
-        #[cfg(feature = "mmap-rs")]
+        #[cfg(not(feature = "direct-mmap"))]
         return PrivateAllocation::drop_mmap_rs(self);
     }
 }
