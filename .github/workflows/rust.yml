@@ -138,6 +138,15 @@ jobs:
           run-tests-and-coverage: ${{ matrix.run_tests }}
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
+      # Note: The GitHub Runner Images will contain an up to date Rust Stable Toolchain
+      #       thus as per recommendation of cargo-semver-checks, we're using stable here.
+      - name: Run cargo-semver-checks
+        if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/')
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo install cargo-semver-checks --locked
+          cargo semver-checks --target ${{ matrix.target }} --features ${{ matrix.features }}
+
   build-c-headers:
     runs-on: ubuntu-latest
     steps:
