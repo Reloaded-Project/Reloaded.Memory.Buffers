@@ -77,7 +77,7 @@ jobs:
       - name: "Install ReportGenerator"
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
       - name: "Download Coverage Artifacts"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           path: artifacts
       - name: "Merge Coverage Files"
