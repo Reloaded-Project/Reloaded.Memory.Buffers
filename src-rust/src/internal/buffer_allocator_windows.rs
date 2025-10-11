@@ -56,12 +56,12 @@ impl Kernel32 for LocalKernel32 {
     }
 }
 
-#[cfg(feature = "external_process")]
+#[cfg(feature = "external_processes")]
 pub struct RemoteKernel32 {
     handle: HANDLE,
 }
 
-#[cfg(feature = "external_process")]
+#[cfg(feature = "external_processes")]
 impl Kernel32 for RemoteKernel32 {
     fn virtual_query(
         &self,
@@ -69,7 +69,7 @@ impl Kernel32 for RemoteKernel32 {
         lp_buffer: &mut MEMORY_BASIC_INFORMATION,
     ) -> usize {
         unsafe {
-            VirtualQueryEx(
+            windows_sys::Win32::System::Memory::VirtualQueryEx(
                 self.handle,
                 lp_address,
                 lp_buffer,
@@ -80,7 +80,7 @@ impl Kernel32 for RemoteKernel32 {
 
     fn virtual_alloc(&self, lp_address: *const c_void, dw_size: usize) -> *mut c_void {
         unsafe {
-            VirtualAllocEx(
+            windows_sys::Win32::System::Memory::VirtualAllocEx(
                 self.handle,
                 lp_address,
                 dw_size,
@@ -91,7 +91,14 @@ impl Kernel32 for RemoteKernel32 {
     }
 
     fn virtual_free(&self, lp_address: *mut c_void, dw_size: usize) -> bool {
-        unsafe { VirtualFreeEx(self.handle, lp_address, dw_size, MEM_RELEASE) != 0 }
+        unsafe {
+            windows_sys::Win32::System::Memory::VirtualFreeEx(
+                self.handle,
+                lp_address,
+                dw_size,
+                MEM_RELEASE,
+            ) != 0
+        }
     }
 }
 
@@ -110,6 +117,11 @@ impl ProcessHandle {
 
     pub fn is_valid(&self) -> bool {
         self.handle != 0
+    }
+
+    #[cfg(feature = "external_processes")]
+    pub fn get_raw_handle(&self) -> HANDLE {
+        self.handle
     }
 }
 
@@ -170,16 +182,16 @@ pub fn allocate_windows(
         let handle = process_handle.handle;
         let max_address = get_max_windows_address(settings.target_process_id, handle);
 
-        #[cfg(feature = "external_process")]
+        #[cfg(feature = "external_processes")]
         {
-            return if get_sys_info().this_process_id == settings.target_process_id {
-                allocate_fast(&LocalKernel32 {}, max_address, &settings)
+            if get_sys_info().this_process_id == settings.target_process_id {
+                allocate_fast(&LocalKernel32 {}, max_address, settings)
             } else {
-                allocate_fast(&RemoteKernel32 { handle }, max_address, &settings)
-            };
+                allocate_fast(&RemoteKernel32 { handle }, max_address, settings)
+            }
         }
 
-        #[cfg(not(feature = "external_process"))]
+        #[cfg(not(feature = "external_processes"))]
         allocate_fast(&LocalKernel32 {}, max_address, settings)
     }
 }

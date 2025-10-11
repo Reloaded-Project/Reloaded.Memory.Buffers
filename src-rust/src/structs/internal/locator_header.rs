@@ -8,6 +8,7 @@ use crate::utilities::cached::get_sys_info;
 use crate::utilities::wrappers::Unaligned;
 use core::alloc::Layout;
 use core::cell::Cell;
+#[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
 use core::cmp::min;
 use core::mem::size_of;
 use core::ptr::null_mut;
@@ -88,6 +89,7 @@ impl LocatorHeader {
         self.num_items = 0;
     }
 
+    #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
     fn initialize_remaining_space_as_buffers(&mut self, mut remaining_bytes: u32) {
         let mut num_items = 0u8;
         unsafe {
